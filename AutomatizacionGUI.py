@@ -4,6 +4,7 @@ import tkinter as tk
 from tkinter import ttk
 from tkinter import filedialog
 import os.path
+import webbrowser
 from AutomatizacionEmpleado import AutomatizacionEmpleado
 
 class Application(ttk.Frame):
@@ -15,30 +16,52 @@ class Application(ttk.Frame):
         super().__init__(main_window)
         main_window.title('GestionExpedienteElectronico')
         main_window.resizable(False, False)
-        main_window.geometry('300x160')
+        main_window.geometry('350x160')
         self.create_oneProcessWidgets()
 
     
     def create_oneProcessWidgets(self):
         """ 
-        - GUI GestionExpedienteElectronico_Version1
+        ### GUI GestionExpedienteElectronico_Version1
          """
-        self.label4 = tk.Label(self)
-        self.label4.pack(side = tk.TOP)
+
+        self.label = tk.Label(self, text=r"HammerDev99", fg="blue", cursor="hand2")
+        self.label.pack(side=tk.BOTTOM, padx=10, pady=10)
+        self.label.bind("<Button-1>", lambda e: self.callback("https://github.com/HammerDev99/GestionExpedienteElectronico_Version1"))
+
         self.label1 = tk.Label(self, text='Crear índice del expediente electrónico')
-        self.label1.pack(side = tk.TOP)
-        self.label2 = tk.Label(self, text='')
-        self.label2.pack(side = tk.BOTTOM)
-        self.entry1 = tk.Entry (self, width = 40)
+        self.label1.pack(pady=15)
+        
+        self.scrollbar = tk.Scrollbar(self, orient=tk.HORIZONTAL)
+        self.scrollbar.pack(fill="x")
+
+        self.entry1 = tk.Entry (self, width = 50, xscrollcommand=self.scrollbar.set)
         self.entry1.config(state=tk.DISABLED)
-        self.entry1.pack(side = tk.TOP)
-        self.pathExpediente = tk.Button(self, text = 'Seleccionar expediente', command = self.obtenerExpediente, height = 1, width = 17)
-        self.pathExpediente.pack(side = tk.TOP)
+        self.entry1.insert("end", str(dir(tk.Scrollbar)))
+        self.entry1.pack(fill="x", before=self.scrollbar)
+        
+        self.scrollbar.config(command=self.entry1.xview)
+
+        self.pathExpediente = tk.Button(self, text = 'Agregar carpeta', command = self.obtenerExpediente, height = 1, width = 17)
+        self.pathExpediente.pack(side=tk.LEFT)
+
+        self.label5 = tk.Label(self, text='')
+        self.label5.pack(side=tk.LEFT)
+
+        self.aceptar = tk.Button(self, text = 'Aceptar', command = self.procesaCarpeta, height = 1, width = 7)
+        self.aceptar.pack(side=tk.RIGHT, padx=3)
+
         self.cancelar = tk.Button(self, text = 'Cancelar', fg = 'red', command = self.master.destroy, height = 1, width = 7)
-        self.cancelar.pack(side = tk.BOTTOM)
-        self.aceptar = tk.Button(self, text = 'Procesar', command = self.procesaCarpeta, height = 1, width = 7)
-        self.aceptar.pack(side = tk.BOTTOM)
+        self.cancelar.pack(side=tk.RIGHT, before=self.aceptar)
+
         self.pack()
+
+    def callback(self, url):
+        """
+        @modules: webbrowser 
+        """
+
+        webbrowser.open_new(url)
 
     def obtenerExpediente(self):
         """ 
@@ -77,7 +100,7 @@ class Application(ttk.Frame):
                 3:'Seleccione una carpeta para procesar',
                 4:'Agregue archivos a la lista',
                 5:'La carpeta electrónica del expediente se encuentra actualizada',
-                6:'Procesamiento detenido'
+                6:'Procedimiento detenido'
              }
         if result != None:
             tk.messagebox.showinfo(message=switcher.get(result), title=os.path.basename(self.expediente))

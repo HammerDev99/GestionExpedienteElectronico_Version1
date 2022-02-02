@@ -23,7 +23,7 @@ class AutomatizacionEmpleado:
         """ 
         @param: input tipo str; Obtiene ruta de la carpeta a procesar
 
-        - Inicializa variables globales con lista de archivos ordenados por nombre
+        ### Inicializa variables globales con lista de archivos ordenados por nombre
          """
         self.ruta = input
         self.files = os.listdir(self.ruta)
@@ -90,11 +90,6 @@ class AutomatizacionEmpleado:
 
         #*********************************************
         #Separar instrucciones en funcion a parte
-        """nombresExtensiones, nombres, extensiones, numeraciones, ban = self.formatNames(ruta, files)
-        if ban: 
-            self.renameFiles(files, nombresExtensiones, ruta)
-        fullFilePaths = self.fullFilePath(nombresExtensiones, ruta)
-        fechamod, tama, cantidadpag, observaciones = self.getMetadata(fullFilePaths)"""
         nombresExtensiones, nombres, extensiones, numeraciones, ban = self.obj1.formatNames(ruta, files)
         if ban: 
             self.renameFiles(files, nombresExtensiones, ruta)
@@ -130,15 +125,18 @@ class AutomatizacionEmpleado:
         return pathArchivos
 
     def process(self):
+        """ 
+        @return: int
+        @modules: xlwings
+        """
+
         auxFiles, extension = self.separatePath(self.files) # datos en variales files
         listAux = [os.path.basename(self.indice)] # datos en carpeta
         indexName, indexExtension = self.separatePath(listAux)
-
         for x in range(len(auxFiles)): # extrae el indice de la lista
             if auxFiles[x] == indexName[0]:
                 auxFiles.pop(x)
                 break
-
         indexPath = self.indice
         try:
             wb = xw.Book(indexPath) 
@@ -148,7 +146,6 @@ class AutomatizacionEmpleado:
         except Exception:
             print("Excepcion presentada al intentar acceder al indice electronico\n")
             traceback.print_exc()
-
         df = self.createDataFrame(self.files, self.ruta)
         self.updateXlsm(df, macro_vba, sheet)
         wb.save()
