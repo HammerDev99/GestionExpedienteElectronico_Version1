@@ -54,5 +54,5 @@ EL SOFTWARE SE PROPORCIONA "TAL CUAL", SIN GARANTÍA DE NINGÚN TIPO, EXPRESA O 
 
 ## Reporte de fallos 🆘
 
-* Para reporte de fallos se ha dispuesto el siguiente [formulario](https://forms.gle/Rrt2CZbDfodNtn96A) donde podrá registrarlos la evidencia de forma detallada
+* Para reporte de fallos se ha dispuesto el siguiente [formulario](https://forms.gle/Rrt2CZbDfodNtn96A) donde podrá registrar la evidencia de forma detallada
 ---
