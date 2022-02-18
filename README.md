@@ -50,7 +50,7 @@ EL SOFTWARE SE PROPORCIONA "TAL CUAL", SIN GARANTÍA DE NINGÚN TIPO, EXPRESA O 
 
 ## Expresiones de Gratitud 🎁
 
-* No puedo decir nada más que gracias a [jorgemariohid](https://github.com/jorgemariohid), tu motivación ha sido de mucha ayuda en la creación de este proyecto 📢
+* [jorgemariohid](https://github.com/jorgemariohid), tu motivación ha sido de mucha ayuda en la creación de este proyecto 📢
 
 ## Reporte de fallos 🆘
 
