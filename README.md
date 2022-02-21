@@ -50,7 +50,9 @@ EL SOFTWARE SE PROPORCIONA "TAL CUAL", SIN GARANTÍA DE NINGÚN TIPO, EXPRESA O 
 
 ## Expresiones de Gratitud 🎁
 
-* [jorgemariohid](https://github.com/jorgemariohid), tu motivación ha sido de mucha ayuda en la creación de este proyecto 📢
+* Gracias a los creadores de Python, Tkinter
+
+* [jorgemariohid](https://github.com/jorgemariohid), tu motivación ha sido el aliciente en la creación de este proyecto 📢
 
 ## Reporte de fallos 🆘
 
