@@ -38,7 +38,7 @@ Para el buen funcionamiento y ejecución de acuerdo con los parámetros establec
 
 ## Construido con 🛠️
 
-* [Python](https://www.python.org/) - El lenguaje de programación usado
+* [Python](https://www.python.org/) versión 3.9.6 - El lenguaje de programación usado
 
 ## Autor ✒️
 
