@@ -3,7 +3,7 @@
 ## Table of Contents
 
 - [Descripción](#descripción)
-- [Features Of The BadRobo](#features-of-the-badrobo)
+- [Caracteristicas de GestionExpedienteElectronico](#features-of-the-badrobo)
 - [Instalación](#Instalación)
 - [How to Update ?](#UPDATING)
 - [License](#license)
