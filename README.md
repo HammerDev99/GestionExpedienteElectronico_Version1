@@ -8,7 +8,7 @@ _Es una aplicación de escritorio que permite realizar de forma automatizada el 
 
 - [Description](#description)
 - [Features Of The BadRobo](#features-of-the-badrobo)
-- [Instalación](#Instalación 🔧)
+- [Instalación](#Instalación)
 - [How to Update ?](#UPDATING)
 - [License](#license)
 - [Contact Us](#contact-us)
@@ -24,7 +24,7 @@ _Que cosas necesitas para instalar el software y como instalarlas_
 Da un ejemplo
 ```
 ---
-# Instalación 🔧
+# Instalación
 
 _Una serie de ejemplos paso a paso que te dice lo que debes ejecutar para tener un entorno de desarrollo ejecutandose_
 
