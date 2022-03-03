@@ -38,7 +38,7 @@ Da un ejemplo
 ---
 # Instalación
 
-_ Una serie de pasos que se deben ejecutar para tener un entorno de ejecución adecuado_
+_Una serie de pasos que se deben ejecutar para tener un entorno de ejecución adecuado_
 
 ```
 Da un ejemplo
@@ -49,7 +49,7 @@ _Finaliza con un ejemplo de cómo obtener datos del sistema o como usarlos para 
 ---
 ## Consideraciones antes de ejecutar
 
-_Para el buen funcionamiento y ejecución de acuerdo con los parámetros establecidos en el Protocolo de gestión del expediente electrónico arriba indicado, deberá tener en cuenta las siguientes consideraciones:
+Para el buen funcionamiento y ejecución de acuerdo con los parámetros establecidos en el Protocolo de gestión del expediente electrónico arriba indicado, deberá tener en cuenta las siguientes consideraciones:
 
 ---
 ## Ejecutando el programa
