@@ -8,12 +8,12 @@
 - [Pre-requisitos](#Pre-requisitos)
 - [Instalación](#Instalación)
 - [Consideraciones antes de ejecutar](#Consideraciones-antes-de-ejecutar)
-- [Ejecutando el programa](#Ejecutando el programa)
-- [Construido con](#Construido con)
+- [Ejecutando el programa](#Ejecutando-el-programa)
+- [Construido con](#Construido-con)
 - [Autor](#Autor)
 - [Licencia](#licencia)
-- [Expresiones de Gratitud](#Expresiones de Gratitud)
-- [Reporte de fallos](#Reporte de fallos) 
+- [Expresiones de Gratitud](#Expresiones-de-Gratitud)
+- [Reporte de fallos](#Reporte-de-fallos) 
 
 ---
 ## Descripción
