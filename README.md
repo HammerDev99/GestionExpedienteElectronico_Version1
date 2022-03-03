@@ -49,7 +49,7 @@ _Finaliza con un ejemplo de cómo obtener datos del sistema o como usarlos para 
 ---
 ## Consideraciones antes de ejecutar
 
-_Para el buen funcionamiento y ejecución de acuerdo con los parámetros establecidos en el Protocolo de gestión del expediente electrónico arriba indicado, deberá tener en cuenta las siguientes consideraciones:_
+_ Para el buen funcionamiento y ejecución de acuerdo con los parámetros establecidos en el Protocolo de gestión del expediente electrónico arriba indicado, deberá tener en cuenta las siguientes consideraciones:_
 
 ---
 ## Ejecutando el programa
@@ -76,7 +76,7 @@ Este proyecto está bajo la Licencia MIT - mira el archivo [LICENCIA](https://gi
 
 * Gracias a los creadores de Python, Tkinter
 
-* [jorgemariohid](https://github.com/jorgemariohid), tu motivación ha sido el clave en la creación de este proyecto 📢
+* [jorgemariohid](https://github.com/jorgemariohid), tu motivación ha sido el clave en la creación de este proyecto
 
 ---
 ## Reporte de fallos
