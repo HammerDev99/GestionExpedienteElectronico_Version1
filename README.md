@@ -32,7 +32,7 @@ Es una aplicación de escritorio que permite realizar de forma automatizada el r
 Que cosas necesitas para instalar el software y como instalarlas
 
 ```
-Da un ejemplo
+Texto de prueba
 ```
 
 ---
@@ -41,7 +41,7 @@ Da un ejemplo
 Una serie de pasos que se deben ejecutar para tener un entorno de ejecución adecuado
 
 ```
-Da un ejemplo
+Texto de prueba
 ```
 
 Finaliza con un ejemplo de cómo obtener datos del sistema o como usarlos para una pequeña demo
