@@ -58,7 +58,7 @@ Para el buen funcionamiento y ejecución de acuerdo con los parámetros establec
 
 * **Daniel Arbelaez** - *Trabajo Inicial* - [HammerDev99](https://github.com/HammerDev99/)
 
-## Licencia 📄
+## Licencia
 
 Este proyecto está bajo la Licencia MIT - mira el archivo [LICENCIA](https://github.com/HammerDev99/GestionExpedienteElectronico_Version1/blob/master/LICENCE) para detalles
 
