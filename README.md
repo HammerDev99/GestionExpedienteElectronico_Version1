@@ -3,7 +3,7 @@
 ## Table of Contents
 
 - [Descripción](#descripción)
-- [Caracteristicas de GestionExpedienteElectronico](#features-of-the-badrobo)
+- [Características de GestionExpedienteElectronico](#Características de GestionExpedienteElectronico)
 - [Instalación](#Instalación)
 - [How to Update ?](#UPDATING)
 - [Licencia](#licencia)
@@ -15,8 +15,11 @@
 
 _Es una aplicación de escritorio que permite realizar de forma automatizada el registro de los metadatos de los expedientes judiciales electrónicos, asimismo permite la creación del índice del expediente electrónico que se encuentra estándarizado y regulado en el Plan Estratégico de Transformación Digital de la Rama Judicial, dentro del cual se contempla el programa de Expediente Electrónico. Los parámetros y estándares técnicos y funcionales del presente proyecto, coincide con lo indicado en el acuerdo PCSJA20-11567 de 2020 "Protocolo para la gestión de documentos electrónicos, digitalización y conformación del expediente electrónico" versión 2, el cual consiste en la producción, gestión y tratamiento estandarizado de los documentos y expedientes híbridos y electrónicos. Al documento estándar se puede acceder mediante el siguiente [link](https://www.ramajudicial.gov.co/documents/3196516/46103054/Protocolo+para+la+gesti%C3%B3n+de+documentos+electronicos.pdf/cb0d98ef-2844-4570-b12a-5907d76bc1a3)._
 
----------------------
+---
+# Características de GestionExpedienteElectronico
 
+_Datos relacionados_
+---
 
 ## Comenzando 🚀
 
