@@ -21,9 +21,9 @@ _Es una aplicación de escritorio que permite realizar de forma automatizada el 
 Datos relacionados
 ---
 
-## Comenzando 🚀
+## Comenzando
 
-### Pre-requisitos 📋
+### Pre-requisitos
 
 _Que cosas necesitas para instalar el software y como instalarlas_
 
@@ -43,7 +43,7 @@ Da un ejemplo
 
 _Finaliza con un ejemplo de cómo obtener datos del sistema o como usarlos para una pequeña demo_
 
-## Ejecutando el programa ⚙️
+## Ejecutando el programa
 
 _Las siguientes instrucciones te permitirán obtener una ejecución sin errores del programa._
 
@@ -53,11 +53,11 @@ Para el buen funcionamiento y ejecución de acuerdo con los parámetros establec
 
 * 
 
-## Construido con 🛠️
+## Construido con
 
 * [Python](https://www.python.org/) versión 3.9.6 - El lenguaje de programación usado
 
-## Autor ✒️
+## Autor 
 
 * **Daniel Arbelaez** - *Trabajo Inicial* - [HammerDev99](https://github.com/HammerDev99/)
 
@@ -69,13 +69,13 @@ EL SOFTWARE SE PROPORCIONA "TAL CUAL", SIN GARANTÍA DE NINGÚN TIPO, EXPRESA O 
 
 ---------------------
 
-## Expresiones de Gratitud 🎁
+## Expresiones de Gratitud
 
 * Gracias a los creadores de Python, Tkinter
 
 * [jorgemariohid](https://github.com/jorgemariohid), tu motivación ha sido el clave en la creación de este proyecto 📢
 
-## Reporte de fallos 🆘
+## Reporte de fallos
 
 * Para reporte de fallos se ha dispuesto el siguiente [formulario](https://forms.gle/Rrt2CZbDfodNtn96A) donde podrá registrar la evidencia de forma detallada
 ---
