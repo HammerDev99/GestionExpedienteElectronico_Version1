@@ -4,11 +4,16 @@
 
 - [Descripción](#descripción)
 - [Características de GestionExpedienteElectronico](#Características-de-GestionExpedienteElectronico)
+- [Comenzando](#Comenzando)
+- [Pre-requisitos](#Pre-requisitos)
 - [Instalación](#Instalación)
-- [How to Update ?](#UPDATING)
+- [Consideraciones antes de ejecutar](#Consideraciones antes de ejecutar)
+- [Ejecutando el programa](#Ejecutando el programa)
+- [Construido con](#Construido con)
+- [Autor](#Autor)
 - [Licencia](#licencia)
-- [Contact Us](#contact-us)
-- [Donate](#Donate)
+- [Expresiones de Gratitud](#Expresiones de Gratitud)
+- [Reporte de fallos](#Reporte de fallos) 
 
 ---
 # Descripción
@@ -18,24 +23,19 @@ _Es una aplicación de escritorio que permite realizar de forma automatizada el 
 ---
 ## Características de GestionExpedienteElectronico
 
-Datos relacionados
----
-
 ## Comenzando
 
-### Pre-requisitos
+## Pre-requisitos
 
 _Que cosas necesitas para instalar el software y como instalarlas_
 
 ```
 Da un ejemplo
 ```
----
+
 # Instalación
 
-_🔧 Una serie de ejemplos paso a paso que te dice lo que debes ejecutar para tener un entorno de desarrollo ejecutandose_
-
-_Dí cómo será ese paso_
+_ Una serie de pasos que se deben ejecutar para tener un entorno de ejecución adecuado_
 
 ```
 Da un ejemplo
@@ -43,15 +43,13 @@ Da un ejemplo
 
 _Finaliza con un ejemplo de cómo obtener datos del sistema o como usarlos para una pequeña demo_
 
-## Ejecutando el programa
-
-_Las siguientes instrucciones te permitirán obtener una ejecución sin errores del programa._
-
-### Consideraciones antes de ejecutar el programa 📋
+## Consideraciones antes de ejecutar
 
 Para el buen funcionamiento y ejecución de acuerdo con los parámetros establecidos en el Protocolo de gestión del expediente electrónico arriba indicado, deberá tener en cuenta las siguientes consideraciones:
 
-* 
+## Ejecutando el programa
+
+_Las siguientes instrucciones te permitirán obtener una ejecución sin errores del programa._
 
 ## Construido con
 
