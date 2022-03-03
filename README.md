@@ -36,7 +36,7 @@ Texto de prueba
 ```
 
 ---
-# Instalación
+## Instalación
 
 Una serie de pasos que se deben ejecutar para tener un entorno de ejecución adecuado
 
@@ -81,4 +81,4 @@ Este proyecto está bajo la Licencia MIT - mira el archivo [LICENCIA](https://gi
 ---
 ## Reporte de fallos
 
-* Para reporte de fallos se ha dispuesto el siguiente [formulario](https://forms.gle/Rrt2CZbDfodNtn96A) donde podrá registrar la evidencia de forma detallada
+Para reporte de fallos se ha dispuesto el siguiente [formulario](https://forms.gle/Rrt2CZbDfodNtn96A) donde podrá registrar la evidencia de forma detallada
