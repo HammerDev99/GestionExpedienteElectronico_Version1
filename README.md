@@ -1,3 +1,5 @@
+### README EN CONSTRUCCIÓN
+
 # GestionExpedienteElectronico_Version1 (Beta)
 
 ## Tabla de contenidos
