@@ -70,7 +70,7 @@ EL SOFTWARE SE PROPORCIONA "TAL CUAL", SIN GARANTÍA DE NINGÚN TIPO, EXPRESA O 
 
 * Gracias a los creadores de Python, Tkinter
 
-* [jorgemariohid](https://github.com/jorgemariohid), tu motivación ha sido el aliciente en la creación de este proyecto 📢
+* [jorgemariohid](https://github.com/jorgemariohid), tu motivación ha sido el clave en la creación de este proyecto 📢
 
 ## Reporte de fallos 🆘
 
