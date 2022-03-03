@@ -29,7 +29,7 @@ _Es una aplicación de escritorio que permite realizar de forma automatizada el 
 ---
 ## Pre-requisitos
 
-_Que cosas necesitas para instalar el software y como instalarlas_
+Que cosas necesitas para instalar el software y como instalarlas
 
 ```
 Da un ejemplo
@@ -38,13 +38,13 @@ Da un ejemplo
 ---
 # Instalación
 
-_Una serie de pasos que se deben ejecutar para tener un entorno de ejecución adecuado_
+Una serie de pasos que se deben ejecutar para tener un entorno de ejecución adecuado
 
 ```
 Da un ejemplo
 ```
 
-_Finaliza con un ejemplo de cómo obtener datos del sistema o como usarlos para una pequeña demo_
+Finaliza con un ejemplo de cómo obtener datos del sistema o como usarlos para una pequeña demo
 
 ---
 ## Consideraciones antes de ejecutar
@@ -54,7 +54,7 @@ Para el buen funcionamiento y ejecución de acuerdo con los parámetros establec
 ---
 ## Ejecutando el programa
 
-_Las siguientes instrucciones te permitirán obtener una ejecución sin errores del programa._
+Las siguientes instrucciones te permitirán obtener una ejecución sin errores del programa.
 
 ---
 ## Construido con
