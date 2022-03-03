@@ -7,7 +7,7 @@
 - [Comenzando](#Comenzando)
 - [Pre-requisitos](#Pre-requisitos)
 - [Instalación](#Instalación)
-- [Consideraciones antes de ejecutar](#Consideraciones antes de ejecutar)
+- [Consideraciones antes de ejecutar](#Consideraciones-antes-de-ejecutar)
 - [Ejecutando el programa](#Ejecutando el programa)
 - [Construido con](#Construido con)
 - [Autor](#Autor)
@@ -49,7 +49,7 @@ _Finaliza con un ejemplo de cómo obtener datos del sistema o como usarlos para 
 ---
 ## Consideraciones antes de ejecutar
 
-Para el buen funcionamiento y ejecución de acuerdo con los parámetros establecidos en el Protocolo de gestión del expediente electrónico arriba indicado, deberá tener en cuenta las siguientes consideraciones:
+_Para el buen funcionamiento y ejecución de acuerdo con los parámetros establecidos en el Protocolo de gestión del expediente electrónico arriba indicado, deberá tener en cuenta las siguientes consideraciones:_
 
 ---
 ## Ejecutando el programa
