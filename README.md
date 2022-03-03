@@ -3,7 +3,7 @@
 ## Table of Contents
 
 - [Descripción](#descripción)
-- [Características de GestionExpedienteElectronico](#Características de GestionExpedienteElectronico)
+- [Caracteristicas de GestionExpedienteElectronico](#Caracteristicas de GestionExpedienteElectronico)
 - [Instalación](#Instalación)
 - [How to Update ?](#UPDATING)
 - [Licencia](#licencia)
