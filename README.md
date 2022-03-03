@@ -1,6 +1,6 @@
 # GestionExpedienteElectronico_Version1 (Beta)
 
-## Table of Contents
+## Tabla de contenidos
 
 - [Descripción](#descripción)
 - [Características de GestionExpedienteElectronico](#Características-de-GestionExpedienteElectronico)
