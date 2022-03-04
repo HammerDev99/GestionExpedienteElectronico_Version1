@@ -31,11 +31,11 @@ Funciones a realizar en la ejecuci'on del programa
 ## Pre-requisitos
 
 ⚙️ Tener instalado Excel Que cosas necesitas para instalar el software y como instalarlas (modulos y funciones)
-⚙️ Entre otros la instalacion de estos modulos [requirements.txt](https://github.com/HammerDev99/GestionExpedienteElectronico_Version1/blob/master/requirements.txt), para eso puedes ejecutar el siguiente comando en el terminal.
+⚙Entre otros la instalacion de estos modulos [requirements.txt](https://github.com/HammerDev99/GestionExpedienteElectronico_Version1/blob/master/requirements.txt), para eso puedes ejecutar el siguiente comando en el terminal.
 ```
 python -m pip install -r .\requirements.txt
 ```
-⚙️ Tener instalado Excel
+⚙Tener instalado Excel
 ---
 ## Instalación
 
