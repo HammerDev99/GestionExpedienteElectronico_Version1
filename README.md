@@ -76,7 +76,7 @@ Este proyecto está bajo la Licencia MIT - mira el archivo [LICENCIA](https://gi
 ---
 ## Expresiones de Gratitud
 
-* Gracias a los creadores de Python, Tkinter
+* Gracias a los creadores de Python y los módulos tk, openpyxl, pandas, xlwings, pyPDF2
 
 * [jorgemariohid](https://github.com/jorgemariohid), tu motivación ha sido el clave en la creación de este proyecto
 
