@@ -25,13 +25,12 @@ Es una aplicación de escritorio que permite realizar de forma automatizada el r
 ---
 ## Características de GestionExpedienteElectronico
 
----
-## Comenzando
+Funciones a realizar en la ejecuci'on del programa
 
 ---
 ## Pre-requisitos
 
-Que cosas necesitas para instalar el software y como instalarlas
+Que cosas necesitas para instalar el software y como instalarlas (modulos y funciones)
 
 ```
 Texto de prueba
@@ -45,13 +44,10 @@ Una serie de pasos que se deben ejecutar para tener un entorno de ejecución ade
 ```
 Texto de prueba
 ```
-
-Finaliza con un ejemplo de cómo obtener datos del sistema o como usarlos para una pequeña demo
-
 ---
 ## Consideraciones antes de ejecutar
 
-Para el buen funcionamiento y ejecución de acuerdo con los parámetros establecidos en el Protocolo de gestión del expediente electrónico arriba indicado, deberá tener en cuenta las siguientes consideraciones:
+Para el buen funcionamiento y ejecución de acuerdo con los parámetros establecidos en el Protocolo de gestión del expediente electrónico arriba indicado, deberá tener en cuenta las siguientes consideraciones: (orden de los archivos en el escritorio)
 
 ---
 ## Ejecutando el programa
