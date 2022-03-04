@@ -31,7 +31,7 @@ Funciones a realizar en la ejecuci'on del programa
 ## Pre-requisitos
 
 Que cosas necesitas para instalar el software y como instalarlas (modulos y funciones)
-
+Entre otros la instalacion de estos modulos [requirements.txt](https://github.com/HammerDev99/GestionExpedienteElectronico_Version1/blob/master/requirements.txt)
 ```
 Texto de prueba
 ```
