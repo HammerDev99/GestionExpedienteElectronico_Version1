@@ -39,7 +39,6 @@ class AutomatizacionData:
                 observaciones.append('Número de archivos contenidos: '+str(number_files)+'. Formatos: '+str(extensiones))
         return fechamod, tama, cantidadpag, observaciones
 
-        
     # VALIDAR ERROR CUANDO LOS NOMBRES SEAN DE SOLO NUMEROS
     def formatNames(self, ruta, files): 
         """ 

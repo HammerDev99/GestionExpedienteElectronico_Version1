@@ -16,7 +16,7 @@ class Application(ttk.Frame):
         super().__init__(main_window)
         main_window.title('GestionExpedienteElectronico')
         main_window.resizable(False, False)
-        main_window.geometry('350x160')
+        main_window.geometry('350x165')
         self.create_oneProcessWidgets()
 
     
@@ -29,11 +29,11 @@ class Application(ttk.Frame):
         self.label.pack(side=tk.BOTTOM, padx=10, pady=10)
         self.label.bind("<Button-1>", lambda e: self.callback("https://github.com/HammerDev99/GestionExpedienteElectronico_Version1"))
 
-        self.label1 = tk.Label(self, text='Crear índice del expediente electrónico')
+        self.label1 = tk.Label(self, text='Seleccione la carpeta del expediente electrónico')
         self.label1.pack(pady=15)
         
         self.scrollbar = tk.Scrollbar(self, orient=tk.HORIZONTAL)
-        self.scrollbar.pack(fill="x")
+        self.scrollbar.pack(fill="x", padx=5)
 
         self.entry1 = tk.Entry (self, width = 50, xscrollcommand=self.scrollbar.set)
         self.entry1.config(state=tk.DISABLED)
