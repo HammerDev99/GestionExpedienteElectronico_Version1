@@ -1,0 +1,10 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+
+# Jupyter Notebook
+prueba_logica_archivos.ipynb
+
+# Environments
+owl_env/
+
+# Unit test / coverage reports
