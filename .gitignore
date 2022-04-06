@@ -1,10 +1,9 @@
 # Byte-compiled / optimized / DLL files
 __pycache__/
+black_box_test.py
 
 # Jupyter Notebook
 prueba_logica_archivos.ipynb
 
 # Environments
 owl_env/
-
-# Unit test / coverage reports
