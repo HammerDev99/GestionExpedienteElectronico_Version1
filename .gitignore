@@ -2,6 +2,9 @@
 __pycache__/
 black_box_test.py
 
+# Folder
+.vscode/
+
 # Jupyter Notebook
 prueba_logica_archivos.ipynb
 
