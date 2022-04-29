@@ -124,6 +124,9 @@ class AutomatizacionEmpleado:
             pathArchivos.append(fulldirct)
         return pathArchivos
 
+    # Probar usando el modulo OpenPyXl para manipular los archivos de excel
+    # https://programacion.net/articulo/como_trabajar_con_archivos_excel_utilizando_python_1419
+    # https://openpyxl.readthedocs.io/en/stable/editing_worksheets.html?highlight=insert%20row
     def process(self):
         """ 
         @return: int
