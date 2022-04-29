@@ -25,7 +25,8 @@
 
 ## Descripción
 
-Es una aplicación de escritorio que permite realizar de forma automatizada el registro de los metadatos de los expedientes judiciales electrónicos, asimismo permite la creación del índice del expediente electrónico que se encuentra estándarizado y regulado en el Plan Estratégico de Transformación Digital de la Rama Judicial, dentro del cual se contempla el programa de Expediente Electrónico. Los parámetros y estándares técnicos y funcionales del presente proyecto, coincide con lo indicado en el acuerdo PCSJA20-11567 de 2020 "Protocolo para la gestión de documentos electrónicos, digitalización y conformación del expediente electrónico" versión 2, el cual consiste en la producción, gestión y tratamiento estandarizado de los documentos y expedientes híbridos y electrónicos. Al documento estándar se puede acceder mediante el siguiente [link](https://www.ramajudicial.gov.co/documents/3196516/46103054/Protocolo+para+la+gesti%C3%B3n+de+documentos+electronicos.pdf/cb0d98ef-2844-4570-b12a-5907d76bc1a3).
+Es una aplicación de escritorio que permite realizar de forma automatizada el *diligenciamiento
+estricto y actualización* del formato de índice electrónico con los metadatos de los documentos que conforman el expediente electrónico, asimismo permite la creación desde cero del índice del expediente electrónico que se encuentra estándarizado y regulado en el Plan Estratégico de Transformación Digital de la Rama Judicial, dentro del cual se contempla el programa de Expediente Electrónico. Los parámetros y estándares técnicos y funcionales del presente proyecto, coincide con lo indicado en el acuerdo PCSJA20-11567 de 2020 "Protocolo para la gestión de documentos electrónicos, digitalización y conformación del expediente electrónico" versión 2, el cual consiste en la producción, gestión y tratamiento estandarizado de los documentos y expedientes híbridos y electrónicos. Al documento estándar se puede acceder mediante el siguiente [link](https://www.ramajudicial.gov.co/documents/3196516/46103054/Protocolo+para+la+gesti%C3%B3n+de+documentos+electronicos.pdf/cb0d98ef-2844-4570-b12a-5907d76bc1a3).
 
 ---
 
@@ -37,8 +38,21 @@ Esta aplicación de escritorio fue desarrollada para gestionar de forma automati
 
 **Expediente Electrónico**: Conjunto de documentos electrónicos correspondientes a un mismo trámite o procedimiento, cualquiera que sea el tipo de información que contengan.
 
-**Metadatos**: Información estructurada o semi estructurada que posibilita la creación, registro, clasificación, acceso, conservación y disposición de los documentos a lo largo del
-tiempo. Los metadatos incluyen una amplia información que se puede utilizar para identificar, autenticar y contextualizar los documentos, los procesos y sus relaciones.
+**Metadatos**: Información estructurada o semi estructurada que posibilita la creación, registro, clasificación, acceso, conservación y disposición de los documentos a lo largo del tiempo. Los metadatos incluyen una amplia información que se puede utilizar para identificar, autenticar y contextualizar los documentos, los procesos y sus relaciones. Los metadatos permiten asegurar la integridad, fiabilidad, disponibilidad y valor probatorio de los documentos.
+
+**Metadatos de los documentos**: Describen la información de cada uno de los documentos que conforman el expediente, para asegurar su secuencialidad, integridad y disponibilidad. Algunos de los metadatos de los documentos que se registran en el libro índice son:
+
+- Nombre Documento
+- Fecha creación del documento
+- Fecha Incorporación Expediente
+- Orden Documento
+- Número de Páginas
+- Página Inicio (automático con fórmula excel)
+- Página Fin (automático con fórmula excel)
+- Formato
+- Tamaño
+- Origen (Electrónico ó Digitalizado)
+- Observaciones
 
 ---
 
@@ -47,7 +61,7 @@ tiempo. Los metadatos incluyen una amplia información que se puede utilizar par
 ### Pre-requisitos
 
 - Para hacer uso del aplicativo, el usuario deberá descargar en su dispositivo la carpeta del expediente electrónico que requiera gestionar.
-
+- Adicional si se tiene sincronizada la nube en el dispositivo, para evitar errores no deseados deberá pausar la sincronización en la nube.
 - Para el buen funcionamiento del aplicativo deberás hacer uso de los siguientes módulos que serán instalados antes de ejecutar el programa:
   - tk==0.1.0
   - openpyxl==3.0.7
@@ -73,11 +87,10 @@ Una serie de pasos que se deben ejecutar para tener un entorno de ejecución ade
 
 Para el buen funcionamiento y ejecución de acuerdo con los parámetros establecidos en el "Protocolo de gestión del expediente electrónico" indicado en la descripción de este proyecto, deberá tener en cuenta las siguientes consideraciones:
 
-1. Si se tiene sincronizada la nube en el dispositivo, para evitar producir errores deberá pausar la sincronización en la nube.
-2. El consecutivo de los archivos debe comprender 4 dígitos (0001Archivo.pdf, 0002Archivo.txt, 0003Archivo.docx)
-3. Los archivos y carpetas al interior de la carpeta del expediente electrónico deberán estar nombrados en orden consecutivo (0001Archivo1).
-4. Las carpetas que contengan menos de 10 archivos deberán estár incluidos en la carpeta raíz del expediente electrónico
-5. Los archivos comprimidos que contengan menos de 10 archivos deberán descomprimirse y ubicarse en la carpeta raíz, de lo contrario se deberá crear una carpeta con el siguiente formato "AnexosMemorialAAAAMMDD" y alojarlos en ella.
+1. El consecutivo de los archivos debe comprender 4 dígitos (0001Archivo.pdf, 0002Archivo.txt, 0003Archivo.docx)
+2. Los archivos y carpetas al interior de la carpeta del expediente electrónico deberán estar nombrados en orden consecutivo (0001Archivo1).
+3. Las carpetas que contengan menos de 10 archivos deberán estár incluidos en la carpeta raíz del expediente electrónico
+4. Los archivos comprimidos que contengan menos de 10 archivos deberán descomprimirse y ubicarse en la carpeta raíz, de lo contrario se deberá crear una carpeta con el siguiente formato "AnexosMemorialAAAAMMDD" y alojarlos en ella.
 
 ---
 
