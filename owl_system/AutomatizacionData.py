@@ -10,6 +10,9 @@ import PyPDF2
 
 class AutomatizacionData:
 
+    def __init__(self):
+        pass
+
     def getMetadata(self, files):
         """ 
         @param: files (List)

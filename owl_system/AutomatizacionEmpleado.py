@@ -17,14 +17,11 @@ class AutomatizacionEmpleado:
     ruta = ''
     indice = ''
     files = []
-    obj1 = AutomatizacionData()
 
     def __init__(self, input: str, indice):
-        """ 
-        @param: input tipo str; Obtiene ruta de la carpeta a procesar
+        # @param: input tipo str; Obtiene ruta de la carpeta a procesar
 
         ### Inicializa variables globales con lista de archivos ordenados por nombre
-         """
         self.ruta = input
         self.files = os.listdir(self.ruta)
         if indice == '':
@@ -70,7 +67,7 @@ class AutomatizacionEmpleado:
         @modules: os, shutil
         """
 
-        ruta = os.path.dirname(os.path.abspath(__file__)) + r"\0000IndiceElectronicoC0.xlsm"
+        ruta = os.path.dirname(os.path.abspath(__file__)) + r"\assets\0000IndiceElectronicoC0.xlsm"
         shutil.copy(ruta, rutaFinal)
         self.indice = os.path.join(rutaFinal, '0000IndiceElectronicoC0.xlsm')
 

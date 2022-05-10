@@ -75,7 +75,7 @@ Esta aplicación de escritorio fue desarrollada para gestionar de forma automati
 
 Una serie de pasos que se deben ejecutar para tener un entorno de ejecución adecuado:
 
-- Para la instalación de los módulos ([requirements.txt](requirements.txt) siendo usuario windows basta con ejecutar el siguiente comando:
+- Para la instalación de los módulos ([requirements.txt](owl_env/requirements.txt) siendo usuario windows basta con ejecutar el siguiente comando:
 
     ```cmd
     python -m pip install -r .\requirements.txt

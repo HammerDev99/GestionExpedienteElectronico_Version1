@@ -1,14 +1,12 @@
 # Byte-compiled / optimized / DLL files
 __pycache__/
-#black_box_test.py
-#Pasos manejo de archivos.md
 
 # Folder
 .vscode/
-test/
-
-# Jupyter Notebook
-#prueba_logica_archivos.ipynb
+owl_system/test/
 
 # Environments
 owl_env/
+
+# Python files
+test.py

@@ -19,7 +19,6 @@ class Application(ttk.Frame):
         main_window.geometry('350x165')
         self.create_oneProcessWidgets()
 
-    
     def create_oneProcessWidgets(self):
         """ 
         ### GUI GestionExpedienteElectronico_Version1
