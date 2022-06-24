@@ -5,18 +5,18 @@ from tkinter import ttk
 from tkinter import filedialog
 import os.path
 import webbrowser
-from AutomatizacionEmpleado import AutomatizacionEmpleado
+from automatizacionEmpleado import AutomatizacionEmpleado
 
 class Application(ttk.Frame):
 
     expediente = ''
     
-    def __init__(self, main_window):
+    def __init__(self, root):
 
-        super().__init__(main_window)
-        main_window.title('GestionExpedienteElectronico')
-        main_window.resizable(False, False)
-        main_window.geometry('350x165')
+        super().__init__(root)
+        root.title('GestionExpedienteElectronico')
+        root.resizable(False, False)
+        root.geometry('350x165')
         self.create_oneProcessWidgets()
 
     def create_oneProcessWidgets(self):
@@ -125,6 +125,11 @@ class Application(ttk.Frame):
             self.entry1.insert(0, items)
             self.entry1.config(state=tk.DISABLED)
 
-main_window = tk.Tk()
-app = Application(main_window)
+root = tk.Tk()
+app = Application(root)
 app.mainloop()
+
+""" if __name__ == '__main__':
+    root = tk.Tk()
+    obj = Application(root)
+    root.mainloop() """

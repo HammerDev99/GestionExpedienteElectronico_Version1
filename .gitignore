@@ -9,4 +9,7 @@ owl_system/test/
 owl_env/
 
 # Python files
-test.py
+owl_system/test.py
+
+# Notebooks
+prueba_logica_archivos.ipynb

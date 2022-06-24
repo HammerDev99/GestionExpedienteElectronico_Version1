@@ -10,13 +10,17 @@ import xlwings as xw
 import string
 import random
 import traceback
-from AutomatizacionData import AutomatizacionData
+from automatizacionData import AutomatizacionData
 
 class AutomatizacionEmpleado:
 
     ruta = ''
     indice = ''
     files = []
+    obj1 = AutomatizacionData()
+
+    """ def __init__(self) -> None: # Only for test
+        pass """
 
     def __init__(self, input: str, indice):
         # @param: input tipo str; Obtiene ruta de la carpeta a procesar
@@ -48,7 +52,7 @@ class AutomatizacionEmpleado:
         @param: files, nombresExtensiones (List), ruta (string)
         @modules: os
         """
-
+        
         for i in range(len(files)):
             fulldirct = os.path.join(ruta, files[i])
             if os.path.exists(fulldirct):

@@ -1,5 +1,6 @@
-import AutomatizacionGUI as obj
+import automatizacionGUI
 
 if __name__ == '__main__.py':
-    run = obj.__init__()
+    obj = automatizacionGUI()
+    obj.__init__()
    
