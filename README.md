@@ -139,8 +139,4 @@ Para reporte de fallos se ha dispuesto el siguiente [formulario](https://forms.g
 
 ## Descargar archivo .exe (Windows)
 
-<<<<<<< HEAD
 [link](https://)
-=======
-[link]()
->>>>>>> dbd7e1c951b2dedfacda630acf6b949c594118cb
