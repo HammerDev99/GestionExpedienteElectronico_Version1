@@ -125,11 +125,12 @@ class Application(ttk.Frame):
             self.entry1.insert(0, items)
             self.entry1.config(state=tk.DISABLED)
 
-root = tk.Tk()
+"""root = tk.Tk()
 app = Application(root)
 app.mainloop()
 
-""" if __name__ == '__main__':
+""" 
+if __name__ == '__main__':
     root = tk.Tk()
     obj = Application(root)
-    root.mainloop() """
+    root.mainloop()

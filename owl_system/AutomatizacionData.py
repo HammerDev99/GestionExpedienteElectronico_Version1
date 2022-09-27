@@ -7,6 +7,7 @@ import string
 import sys
 import warnings
 import PyPDF2 
+import random # importado por función duplicada
 
 class AutomatizacionData:
 
@@ -41,6 +42,42 @@ class AutomatizacionData:
                 self.renameFiles(list_files, nombresExtensiones, x)
                 observaciones.append('Número de archivos contenidos: '+str(number_files)+'. Formatos: '+str(extensiones))
         return fechamod, tama, cantidadpag, observaciones
+
+    """ ************ """
+    #Función duplicada
+    def separatePath(self, files):
+        """ 
+        @param: files (List)
+        @return: nombres, extensiones ambos de tipo List
+        @modules: os
+        """
+
+        nombres = []
+        extensiones = []
+        for x in files:
+            nombres.append(os.path.splitext(x)[0])
+            extensiones.append(os.path.splitext(x)[1])
+        return nombres, extensiones
+
+    #Función duplicada
+    def renameFiles(self, files, nombresExtensiones, ruta):
+        """ 
+        @param: files, nombresExtensiones (List), ruta (string)
+        @modules: os
+        """
+        
+        for i in range(len(files)):
+            fulldirct = os.path.join(ruta, files[i])
+            if os.path.exists(fulldirct):
+                os.rename(fulldirct, os.path.join(ruta, nombresExtensiones[i]))
+            else:
+                try:
+                    #number_of_strings = 3
+                    length_of_string = 3
+                    os.rename(ruta + chr(92) + files[i], ruta + chr(92) + os.path.splitext(nombresExtensiones[i])[0] + ''.join(random.choice(string.ascii_letters + string.digits) for _ in range(length_of_string)) + os.path.splitext(nombresExtensiones[i])[1])
+                except:
+                    print("Excepcion presentada: \n")
+    """ ************ """                    
 
     # VALIDAR ERROR CUANDO LOS NOMBRES SEAN DE SOLO NUMEROS
     def formatNames(self, ruta, files): 
