@@ -83,7 +83,15 @@ Una serie de pasos que se deben ejecutar para tener un entorno de ejecución ade
 
 ### Consideraciones antes de ejecutar
 
-Para el buen funcionamiento del programa deberá elegir la carpeta que contenga los archivos a gestionar, seguido deberá tener los archivos en orden numérico tal cual como desee que queden registrados en el índice electrónico.
+Para el buen funcionamiento del programa deberá seguir los siguientes pasos:
+
+1. Descargar en el equipo una copia de la carpeta que desee gestionar (verificar que no tenga **índice**).
+2. Los archivos deben estar en formato pdf, en caso contrario se deberá actualizar manualmente la cantidad de páginas de los archivos en formato .docx (word) dentro del índice electrónico.
+3. Antes de ejecutar deberá nombrar los archivos en orden numérico tal cual como desee que se registren en el índice electrónico.
+4. Cerrar todos los archivos de excel que tenga en ejecución.
+5. Luego de ejecutar el programa GestionExpedienteElectronico_Version1, elegirá la carpeta que contenga los archivos a gestionar con el botón "Agregar carpeta"
+6. Deberá confirmar la carpeta elegida.
+7. Al finalizar el proceso el sistema arrojará un mensaje que dice "El proceso ha finalizado"
 
 <!--
 Para el buen funcionamiento y ejecución de acuerdo con los parámetros establecidos en el "Protocolo de gestión del expediente electrónico" indicado en la descripción de este proyecto, deberá tener en cuenta las siguientes consideraciones:
@@ -92,7 +100,7 @@ Para el buen funcionamiento y ejecución de acuerdo con los parámetros establec
 2. Los archivos y carpetas al interior de la carpeta del expediente electrónico deberán estar nombrados en orden consecutivo (0001Archivo1).
 3. Las carpetas que contengan menos de 10 archivos deberán estár incluidos en la carpeta raíz del expediente electrónico
 4. Los archivos comprimidos que contengan menos de 10 archivos deberán descomprimirse y ubicarse en la carpeta raíz, de lo contrario se deberá crear una carpeta con el siguiente formato "AnexosMemorialAAAAMMDD" y alojarlos en ella.
--->
+
 ---
 
 ### Ejecutando el programa
@@ -100,7 +108,7 @@ Para el buen funcionamiento y ejecución de acuerdo con los parámetros establec
 Las siguientes instrucciones te permitirán obtener una ejecución sin errores del programa.
 
 **EN CONSTRUCCIÓN**
-
+-->
 ---
 
 ## Construido con
@@ -135,6 +143,6 @@ Para reporte de fallos se ha dispuesto el siguiente [formulario](https://forms.g
 
 [link directo](https://www.paypal.com/donate/?business=GSEPAASM658FY&no_recurring=0&item_name=Su+contribuci%C3%B3n+apoya+el+desarrollo+del+proyecto+%22GestionExpedienteElectronico_Version1%22&currency_code=USD)
 
-## Descargar archivo .exe
+## Descargar archivo .exe (Windows)
 
 [link]()
