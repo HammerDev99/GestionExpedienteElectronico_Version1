@@ -115,19 +115,14 @@ Las siguientes instrucciones te permitirán obtener una ejecución sin errores d
 
 - [Python](https://www.python.org/) versión 3.9.6
 
----
-
 ## Autor
 
 - **Daniel Arbelaez** - [HammerDev99](https://github.com/HammerDev99/)
-
----
 
 ## Licencia
 
 Este proyecto está bajo la Licencia MIT - mira el archivo [LICENCIA](https://github.com/HammerDev99/GestionExpedienteElectronico_Version1/blob/master/LICENCE) para detalles
 
----
 <!--
 ## Expresiones de Gratitud
 
