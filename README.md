@@ -8,7 +8,7 @@
   - [(README EN CONSTRUCCIÓN)](#readme-en-construcción)
   - [Tabla de contenidos](#tabla-de-contenidos)
   - [Descripción](#descripción)
-  - [Características de GestionExpedienteElectronico](#características-de-gestionexpedienteelectronico)
+  - [Características de GestionExpedienteElectronico_Version1](#características-de-gestionexpedienteelectronico_version1)
     - [Conceptos](#conceptos)
   - [Uso](#uso)
     - [Pre-requisitos](#pre-requisitos)
@@ -26,11 +26,11 @@
 ## Descripción
 
 Es una aplicación de escritorio que permite realizar de forma automatizada el *diligenciamiento
-estricto y actualización* del formato de índice electrónico con los metadatos de los documentos que conforman el expediente electrónico, asimismo permite la creación desde cero del índice del expediente electrónico que se encuentra estándarizado y regulado en el Plan Estratégico de Transformación Digital de la Rama Judicial, dentro del cual se contempla el programa de Expediente Electrónico. Los parámetros y estándares técnicos y funcionales del presente proyecto, coincide con lo indicado en el acuerdo PCSJA20-11567 de 2020 "Protocolo para la gestión de documentos electrónicos, digitalización y conformación del expediente electrónico" versión 2, el cual consiste en la producción, gestión y tratamiento estandarizado de los documentos y expedientes híbridos y electrónicos. Al documento estándar se puede acceder mediante el siguiente [link](https://www.ramajudicial.gov.co/documents/3196516/46103054/Protocolo+para+la+gesti%C3%B3n+de+documentos+electronicos.pdf/cb0d98ef-2844-4570-b12a-5907d76bc1a3).
+estricto y actualización* del formato de índice electrónico con los metadatos de los documentos que conforman el expediente electrónico, asimismo permite la creación **desde cero** del índice del expediente electrónico que se encuentra estándarizado en el Plan Estratégico de Transformación Digital de la Rama Judicial, dentro del cual se contempla el programa de Expediente Electrónico. Los parámetros y estándares técnicos y funcionales del presente proyecto, coincide con lo publicado en el acuerdo PCSJA20-11567 de 2020 "Protocolo para la gestión de documentos electrónicos, digitalización y conformación del expediente electrónico" versión 2<!--, el cual consiste en la producción, gestión y tratamiento estandarizado de los documentos y expedientes híbridos y electrónicos-->. Link directo al documento [estándar](https://www.ramajudicial.gov.co/documents/3196516/46103054/Protocolo+para+la+gesti%C3%B3n+de+documentos+electronicos.pdf/cb0d98ef-2844-4570-b12a-5907d76bc1a3).
 
 ---
 
-## Características de GestionExpedienteElectronico
+## Características de GestionExpedienteElectronico_Version1
 
 Esta aplicación de escritorio fue desarrollada para gestionar de forma automatizada el expediente electrónico y realizar los procedimientos que haría un empleado de forma manual.
 
@@ -83,15 +83,19 @@ Una serie de pasos que se deben ejecutar para tener un entorno de ejecución ade
 
 - Instalar...
 
+
 ### Consideraciones antes de ejecutar
 
+Para el buen funcionamiento del programa 
+
+<!--
 Para el buen funcionamiento y ejecución de acuerdo con los parámetros establecidos en el "Protocolo de gestión del expediente electrónico" indicado en la descripción de este proyecto, deberá tener en cuenta las siguientes consideraciones:
 
 1. El consecutivo de los archivos debe comprender 4 dígitos (0001Archivo.pdf, 0002Archivo.txt, 0003Archivo.docx)
 2. Los archivos y carpetas al interior de la carpeta del expediente electrónico deberán estar nombrados en orden consecutivo (0001Archivo1).
 3. Las carpetas que contengan menos de 10 archivos deberán estár incluidos en la carpeta raíz del expediente electrónico
 4. Los archivos comprimidos que contengan menos de 10 archivos deberán descomprimirse y ubicarse en la carpeta raíz, de lo contrario se deberá crear una carpeta con el siguiente formato "AnexosMemorialAAAAMMDD" y alojarlos en ella.
-
+-->
 ---
 
 ### Ejecutando el programa
@@ -132,7 +136,7 @@ Para reporte de fallos se ha dispuesto el siguiente [formulario](https://forms.g
 
 ## Donaciones
 
-[link directo](https://www.paypal.com/donate/?business=GSEPAASM658FY&no_recurring=0&item_name=Su+contribuci%C3%B3n+apoya+el+desarrollo+del+proyecto+%22owl_system%22&currency_code=USD)
+[link directo](https://www.paypal.com/donate/?business=GSEPAASM658FY&no_recurring=0&item_name=Su+contribuci%C3%B3n+apoya+el+desarrollo+del+proyecto+%22GestionExpedienteElectronico_Version1%22&currency_code=USD)
 
 ## Descargar archivo .exe
 
