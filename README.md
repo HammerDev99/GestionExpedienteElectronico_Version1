@@ -127,3 +127,7 @@ Este proyecto está bajo la Licencia MIT - mira el archivo [LICENCIA](https://gi
 ## Reporte de fallos
 
 Para reporte de fallos se ha dispuesto el siguiente [formulario](https://forms.gle/Rrt2CZbDfodNtn96A) donde podrá registrar la evidencia de forma detallada
+
+## Donaciones
+
+(link directo)[https://www.paypal.com/donate/?business=GSEPAASM658FY&no_recurring=0&item_name=Su+contribuci%C3%B3n+apoya+el+desarrollo+del+proyecto+%22owl_system%22&currency_code=USD]
