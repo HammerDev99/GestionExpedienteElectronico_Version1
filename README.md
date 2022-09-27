@@ -1,11 +1,8 @@
 # GestionExpedienteElectronico_Version1
 
-## (README EN CONSTRUCCIÓN)
-
 ## Tabla de contenidos
 
 - [GestionExpedienteElectronico_Version1](#gestionexpedienteelectronico_version1)
-  - [(README EN CONSTRUCCIÓN)](#readme-en-construcción)
   - [Tabla de contenidos](#tabla-de-contenidos)
   - [Descripción](#descripción)
   - [Características de GestionExpedienteElectronico_Version1](#características-de-gestionexpedienteelectronico_version1)
@@ -86,7 +83,7 @@ Una serie de pasos que se deben ejecutar para tener un entorno de ejecución ade
 
 ### Consideraciones antes de ejecutar
 
-Para el buen funcionamiento del programa 
+Para el buen funcionamiento del programa deberá elegir la carpeta que contenga los archivos a gestionar, seguido deberá tener los archivos en orden numérico tal cual como desee que queden registrados en el índice electrónico.
 
 <!--
 Para el buen funcionamiento y ejecución de acuerdo con los parámetros establecidos en el "Protocolo de gestión del expediente electrónico" indicado en la descripción de este proyecto, deberá tener en cuenta las siguientes consideraciones:
@@ -123,16 +120,16 @@ Las siguientes instrucciones te permitirán obtener una ejecución sin errores d
 Este proyecto está bajo la Licencia MIT - mira el archivo [LICENCIA](https://github.com/HammerDev99/GestionExpedienteElectronico_Version1/blob/master/LICENCE) para detalles
 
 ---
-
+<!--
 ## Expresiones de Gratitud
 
 - Gracias a los creadores de Python y los módulos [tk](https://docs.python.org/3/library/tk.html), [openpyxl](https://openpyxl.readthedocs.io/en/stable/), [pandas](https://pandas.pydata.org/docs/), [xlwings](https://docs.xlwings.org/en/stable/), [pyPDF2](https://pythonhosted.org/PyPDF2/)
 
 ---
-
+-->
 ## Reporte de fallos
 
-Para reporte de fallos se ha dispuesto el siguiente [formulario](https://forms.gle/Rrt2CZbDfodNtn96A) donde podrá registrar la evidencia de forma detallada
+Para reporte de fallos se ha dispuesto el siguiente [formulario](https://forms.gle/Rrt2CZbDfodNtn96A)
 
 ## Donaciones
 
