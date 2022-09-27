@@ -79,8 +79,7 @@ Una serie de pasos que se deben ejecutar para tener un entorno de ejecución ade
     python -m pip install -r .\requirements.txt
     ```
 -->
-- Instalar...
-
+- No requiere instalación...
 
 ### Consideraciones antes de ejecutar
 
