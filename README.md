@@ -98,6 +98,8 @@ Para el buen funcionamiento y ejecución de acuerdo con los parámetros establec
 
 Las siguientes instrucciones te permitirán obtener una ejecución sin errores del programa.
 
+**EN CONSTRUCCIÓN**
+
 ---
 
 ## Construido con
