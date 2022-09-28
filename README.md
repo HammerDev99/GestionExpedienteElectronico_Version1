@@ -10,33 +10,33 @@
   - [Uso](#uso)
     - [Instalación](#instalación)
     - [Consideraciones antes de ejecutar](#consideraciones-antes-de-ejecutar)
+    - [Ejecutando el programa](#ejecutando-el-programa)
   - [Construido con](#construido-con)
   - [Autor](#autor)
   - [Licencia](#licencia)
   - [Reporte de fallos](#reporte-de-fallos)
-  - [Donaciones](#donaciones)
-  - [Descargar archivo .exe (Windows)](#descargar-archivo-exe-windows)
 
 ---
 
 ## Descripción
 
-Es una aplicación de escritorio que permite realizar de forma automatizada el *diligenciamiento
-estricto y actualización* del formato de índice electrónico con los metadatos de los documentos que conforman el expediente electrónico, asimismo permite la creación **desde cero** del índice del expediente electrónico que se encuentra estándarizado en el Plan Estratégico de Transformación Digital de la Rama Judicial, dentro del cual se contempla el programa de Expediente Electrónico. Los parámetros y estándares técnicos y funcionales del presente proyecto, coincide con lo publicado en el acuerdo PCSJA20-11567 de 2020 "Protocolo para la gestión de documentos electrónicos, digitalización y conformación del expediente electrónico" versión 2<!--, el cual consiste en la producción, gestión y tratamiento estandarizado de los documentos y expedientes híbridos y electrónicos-->. Link directo al documento [estándar](https://www.ramajudicial.gov.co/documents/3196516/46103054/Protocolo+para+la+gesti%C3%B3n+de+documentos+electronicos.pdf/cb0d98ef-2844-4570-b12a-5907d76bc1a3).
+Se trata de una aplicación de escritorio que permite realizar de forma automatizada el *creación y diligenciamiento* del formato índice electrónico con los metadatos de los archivos alojados en una carpeta específica; aquellos archivos (documentos) conformarán un expediente electrónico y mediante este software se creará **desde cero** el índice del mismo. Dicho procedimiento se encuentra estándarizado en el Plan Estratégico de Transformación Digital de la Rama Judicial, dentro del cual se contempla el programa de Expediente Electrónico. El presente proyecto se amolda en mayor medida a los parámetros, estándares técnicos y funcionales del acuerdo PCSJA20-11567 de 2020 "Protocolo para la gestión de documentos electrónicos, digitalización y conformación del expediente electrónico" Versión 2<!--, el cual consiste en la producción, gestión y tratamiento estandarizado de los documentos y expedientes híbridos y electrónicos-->. [Link directo al Protocolo](https://www.ramajudicial.gov.co/documents/3196516/46103054/Protocolo+para+la+gesti%C3%B3n+de+documentos+electronicos.pdf/cb0d98ef-2844-4570-b12a-5907d76bc1a3).
 
 ---
 
 ## Características de GestionExpedienteElectronico_Version1
 
-Esta aplicación de escritorio fue desarrollada para gestionar de forma automatizada el expediente electrónico y realizar los procedimientos que haría un empleado de forma manual.
+Este proyecto fue desarrollado para gestionar una función específica que es de caracter adminsitrativo, coadyuvando los procedimientos que haría un empleado de forma manual mediante una aplicación de forma automatizada.
 
 ### Conceptos
 
-**Expediente Electrónico**: Conjunto de documentos electrónicos correspondientes a un mismo trámite o procedimiento, cualquiera que sea el tipo de información que contengan.
+**Expediente Electrónico**: Conjunto de documentos electrónicos correspondientes a un mismo trámite o procedimiento judicial.
 
-**Metadatos**: Información estructurada o semi estructurada que posibilita la creación, registro, clasificación, acceso, conservación y disposición de los documentos a lo largo del tiempo. Los metadatos incluyen una amplia información que se puede utilizar para identificar, autenticar y contextualizar los documentos, los procesos y sus relaciones. Los metadatos permiten asegurar la integridad, fiabilidad, disponibilidad y valor probatorio de los documentos.
+**Metadatos**: Información estructurada o semi estructurada que posibilita la creación, registro, clasificación, acceso, conservación y disposición de los documentos a lo **largo del tiempo**.
 
-**Metadatos de los documentos**: Describen la información de cada uno de los documentos que conforman el expediente, para asegurar su secuencialidad, integridad y disponibilidad. Algunos de los metadatos de los documentos que se registran en el libro índice son:
+> Los metadatos incluyen una amplia información que se puede utilizar para identificar, autenticar y contextualizar los documentos, los procesos y sus relaciones.
+
+**Metadatos de los documentos**: Describen la información de cada uno de los documentos que conforman el expediente, para asegurar la integridad, fiabilidad, disponibilidad y **valor probatorio de los documentos**. Algunos de los metadatos de los documentos que se registran en el libro índice son:
 
 - Nombre Documento
 - Fecha creación del documento
@@ -84,13 +84,11 @@ Una serie de pasos que se deben ejecutar para tener un entorno de ejecución ade
 
 Para el buen funcionamiento del programa deberá seguir los siguientes pasos:
 
-1. Descargar en el equipo una copia de la carpeta que desee gestionar (verificar que no tenga **índice**).
-2. Los archivos deben estar en formato pdf, en caso contrario se deberá actualizar manualmente la cantidad de páginas de los archivos en formato .docx (word) dentro del índice electrónico.
+1. Descargar en el equipo una copia de la carpeta que desee gestionar (NO DEBE CONTENER **ÍNDICE**).
+2. Los archivos deben estar en formato pdf, en caso contrario se deberá actualizar *manualmente* la *cantidad de páginas* de los archivos en formato .docx (word) dentro del índice electrónico.
 3. Antes de ejecutar deberá nombrar los archivos en orden numérico tal cual como desee que se registren en el índice electrónico.
 4. Cerrar todos los archivos de excel que tenga en ejecución.
-5. Luego de ejecutar el programa GestionExpedienteElectronico_Version1, elegirá la carpeta que contenga los archivos a gestionar con el botón "Agregar carpeta"
-6. Deberá confirmar la carpeta elegida.
-7. Al finalizar el proceso el sistema arrojará un mensaje que dice "El proceso ha finalizado"
+5. Al finalizar el procedimiento, los metadatos de "Fecha creación del documento" y "Fecha Incorporación Expediente" tendrán la fecha del archivo alojado en la carpeta seleccionada.
 
 <!--
 Para el buen funcionamiento y ejecución de acuerdo con los parámetros establecidos en el "Protocolo de gestión del expediente electrónico" indicado en la descripción de este proyecto, deberá tener en cuenta las siguientes consideraciones:
@@ -101,13 +99,17 @@ Para el buen funcionamiento y ejecución de acuerdo con los parámetros establec
 4. Los archivos comprimidos que contengan menos de 10 archivos deberán descomprimirse y ubicarse en la carpeta raíz, de lo contrario se deberá crear una carpeta con el siguiente formato "AnexosMemorialAAAAMMDD" y alojarlos en ella.
 
 ---
+-->
 
 ### Ejecutando el programa
 
 Las siguientes instrucciones te permitirán obtener una ejecución sin errores del programa.
 
-**EN CONSTRUCCIÓN**
--->
+1. Ejecutar el programa "GestionExpedienteElectronico_Version1", e
+2. Elegir la carpeta que contenga los archivos a gestionar con el botón "Agregar carpeta"
+3. Deberá confirmar la carpeta elegida seleccionando el botón "Aceptar".
+4. Al finalizar el proceso el sistema arrojará un mensaje que dice "El proceso ha finalizado". IMPORTANTE (No manipular la hoja de excel durante la ejecución del programa)
+
 ---
 
 ## Construido con
@@ -133,10 +135,12 @@ Este proyecto está bajo la Licencia MIT - mira el archivo [LICENCIA](https://gi
 
 Para reporte de fallos se ha dispuesto el siguiente [formulario](https://forms.gle/Rrt2CZbDfodNtn96A)
 
-## Donaciones
+---
 
-[link directo](https://www.paypal.com/donate/?business=GSEPAASM658FY&no_recurring=0&item_name=Su+contribuci%C3%B3n+apoya+el+desarrollo+del+proyecto+%22GestionExpedienteElectronico_Version1%22&currency_code=USD)
+<!--Crear link de descarga directa con Drive-->
 
-## Descargar archivo .exe (Windows)
+[Descargar archivo .exe (Windows)](https://)
 
-[link](https://)
+[Donar](https://www.paypal.com/donate/?business=GSEPAASM658FY&no_recurring=0&item_name=Su+contribuci%C3%B3n+apoya+el+desarrollo+del+proyecto+%22GestionExpedienteElectronico_Version1%22&currency_code=USD)
+
+> La cooperación con los demás constituye la base de la sociedad (extraído de "software libre para una comunidad libre" autor Richard M. Stallman)
