@@ -71,9 +71,9 @@ class AutomatizacionEmpleado:
         @modules: os, shutil
         """
 
-        ruta = os.path.dirname(os.path.abspath(__file__)) + r"\assets\0000IndiceElectronicoC0.xlsm"
+        ruta = os.path.dirname(os.path.abspath(__file__)) + r"\assets\000IndiceElectronicoC0.xlsm"
         shutil.copy(ruta, rutaFinal)
-        self.indice = os.path.join(rutaFinal, '0000IndiceElectronicoC0.xlsm')
+        self.indice = os.path.join(rutaFinal, '000IndiceElectronicoC0.xlsm')
 
     # Función pendiente de actualizar
     def createDataFrame(self, files, ruta):

@@ -20,13 +20,13 @@
 
 ## Descripción
 
-Se trata de una aplicación de escritorio que permite realizar de forma automatizada el *creación y diligenciamiento* del formato índice electrónico con los metadatos de los archivos alojados en una carpeta específica; aquellos archivos (documentos) conformarán un expediente electrónico y mediante este software se creará **desde cero** el índice del mismo. Dicho procedimiento se encuentra estándarizado en el Plan Estratégico de Transformación Digital de la Rama Judicial, dentro del cual se contempla el programa de Expediente Electrónico. El presente proyecto se amolda en mayor medida a los parámetros, estándares técnicos y funcionales del acuerdo PCSJA20-11567 de 2020 "Protocolo para la gestión de documentos electrónicos, digitalización y conformación del expediente electrónico" Versión 2<!--, el cual consiste en la producción, gestión y tratamiento estandarizado de los documentos y expedientes híbridos y electrónicos-->. [Link directo al Protocolo](https://www.ramajudicial.gov.co/documents/3196516/46103054/Protocolo+para+la+gesti%C3%B3n+de+documentos+electronicos.pdf/cb0d98ef-2844-4570-b12a-5907d76bc1a3).
+Se trata de una aplicación de escritorio que permite realizar de forma automatizada la *creación y diligenciamiento* del formato índice electrónico con los metadatos de los archivos alojados en una carpeta específica; aquellos archivos (documentos) conformarán un expediente electrónico y mediante este software se creará **desde cero** el índice del mismo. Dicho procedimiento se encuentra estándarizado en el Plan Estratégico de Transformación Digital de la Rama Judicial, dentro del cual se contempla el programa de Expediente Electrónico. El presente proyecto se amolda en mayor medida a los parámetros, estándares técnicos y funcionales del acuerdo PCSJA20-11567 de 2020 "Protocolo para la gestión de documentos electrónicos, digitalización y conformación del expediente electrónico" Versión 2<!--, el cual consiste en la producción, gestión y tratamiento estandarizado de los documentos y expedientes híbridos y electrónicos-->. [Link directo al Protocolo](https://www.ramajudicial.gov.co/documents/3196516/46103054/Protocolo+para+la+gesti%C3%B3n+de+documentos+electronicos.pdf/cb0d98ef-2844-4570-b12a-5907d76bc1a3).
 
 ---
 
 ## Características de GestionExpedienteElectronico_Version1
 
-Este proyecto fue desarrollado para gestionar una función específica que es de caracter adminsitrativo, coadyuvando los procedimientos que haría un empleado de forma manual mediante una aplicación de forma automatizada.
+Este proyecto fue desarrollado para gestionar una función específica de caracter adminsitrativo, coadyuvando los procedimientos que haría un empleado de forma manual mediante una aplicación de forma automatizada.
 
 ### Conceptos
 
@@ -105,7 +105,7 @@ Para el buen funcionamiento y ejecución de acuerdo con los parámetros establec
 
 Las siguientes instrucciones te permitirán obtener una ejecución sin errores del programa.
 
-1. Ejecutar el programa "GestionExpedienteElectronico_Version1", e
+1. Ejecutar el programa "GestionExpedienteElectronico_Version1"
 2. Elegir la carpeta que contenga los archivos a gestionar con el botón "Agregar carpeta"
 3. Deberá confirmar la carpeta elegida seleccionando el botón "Aceptar".
 4. Al finalizar el proceso el sistema arrojará un mensaje que dice "El proceso ha finalizado". IMPORTANTE (No manipular la hoja de excel durante la ejecución del programa)

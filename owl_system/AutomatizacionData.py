@@ -115,6 +115,9 @@ class AutomatizacionData:
                 result = re.sub('[^a-zA-Z0-9]+', '', nombres[x])
                 nombres[x] = result
                 ban=True
+            else:
+                # Entran los archivos sin extensión
+                print("entró: ",nombres[x])
             cont = 0
             for caracter in nombres[x]:
                 if caracter.isalpha():
@@ -127,7 +130,7 @@ class AutomatizacionData:
             nombres[x] = nombres[x][0:36]
             if nombres[x] == "":
                 nombres[x] = ("DocumentoElectronico")
-            nombres[x] = str(f"{x+1:04}")+nombres[x]
+            nombres[x] = str(f"{x+1:03}")+nombres[x]
         nombresExtensiones=[]
         for x in range(len(nombres)):
             if extensiones[x] != 'Carpeta':
@@ -200,9 +203,8 @@ class AutomatizacionData:
                         return pdf.getNumPages()
                     except:
                         return 0
-            elif extension == '.xls' or extension == '.xlsx' or extension == '.xlsm':
-                return(1)
-            elif (extension == '.bmp' or extension == '.jpeg' or extension == '.jpg' or extension == '.mp4' or
+            elif (extension == '.xls' or extension == '.xlsx' or extension == '.xlsm' or
+                extension == '.bmp' or extension == '.jpeg' or extension == '.jpg' or extension == '.mp4' or
                 extension == '.png' or extension == '.tif' or extension == '.textclipping' or
                 extension == '.wmv' or extension == '.eml' or extension == '.txt' or extension == '.gif' or 
                 extension == '.html'):
