@@ -108,6 +108,7 @@ class AutomatizacionData:
             else: 
                 nombres.append(x)
                 extensiones.append('Carpeta')
+                
         ban = False
         for x in range(len(nombres)):
             if not(nombres[x].isalnum()) or len(nombres[x])>40:

@@ -151,12 +151,12 @@ class AutomatizacionEmpleado:
             print("Excepcion presentada al intentar acceder al indice electronico\n")
             traceback.print_exc()
         df = self.createDataFrame(self.files, self.ruta)
-        self.updateXlsm(df, macro_vba, sheet)
+        self.createXlsm(df, macro_vba, sheet)
         wb.save()
         wb.close()
         return 1
         
-    def updateXlsm(self, df, macro_vba, sheet):
+    def createXlsm(self, df, macro_vba, sheet):
         """ 
         @param: df; contiene DataFrame con datos a registrar en excel
         @return: 
