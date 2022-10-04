@@ -135,9 +135,9 @@ Este proyecto está bajo la Licencia MIT - mira el archivo [LICENCIA](https://gi
 
 Para reporte de fallos se ha dispuesto el siguiente [formulario](https://forms.gle/Rrt2CZbDfodNtn96A)
 
----
+--- <!--https://drive.google.com/uc?id=1KyQdOIKmGl45PygF9tdQkv7A9pW9PlpS&export=download-->
 
-<a href="https://drive.google.com/uc?id=1KyQdOIKmGl45PygF9tdQkv7A9pW9PlpS&export=download" target="_blank">Descargar archivo .exe (Windows)</a>. Desde Google Chrome al momento de finalizar la descarga deberá seleccionar "Abrir ahora", luego si aparece el aviso de "SmartScreen" se debe seleccionar más información y luego "Ejecutar de todos modos".
+[Descargar archivo .exe (Windows)](https://bit.ly/3M4tt8F). Desde Google Chrome al momento de finalizar la descarga deberá seleccionar "Abrir ahora", luego si aparece el aviso de "SmartScreen" se debe seleccionar más información y luego "Ejecutar de todos modos".
 
 <!--[Donar](https://www.paypal.com/donate/?business=GSEPAASM658FY&no_recurring=0&item_name=Su+contribuci%C3%B3n+apoya+el+desarrollo+del+proyecto+%22GestionExpedienteElectronico_Version1%22&currency_code=USD)-->
 
