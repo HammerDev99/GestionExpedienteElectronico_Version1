@@ -135,7 +135,9 @@ Este proyecto está bajo la Licencia MIT - mira el archivo [LICENCIA](https://gi
 
 Para reporte de fallos se ha dispuesto el siguiente [formulario](https://forms.gle/Rrt2CZbDfodNtn96A)
 
---- <!--https://drive.google.com/uc?id=1KyQdOIKmGl45PygF9tdQkv7A9pW9PlpS&export=download-->
+---
+
+<!--https://drive.google.com/uc?id=1KyQdOIKmGl45PygF9tdQkv7A9pW9PlpS&export=download-->
 
 [Descargar archivo .exe (Windows)](https://bit.ly/3M4tt8F). Desde Google Chrome al momento de finalizar la descarga deberá seleccionar "Abrir ahora", luego si aparece el aviso de "SmartScreen" se debe seleccionar más información y luego "Ejecutar de todos modos".
 
