@@ -37,6 +37,7 @@ class AutomatizacionData:
                 cantidadpag.append('1')
                 list_files = os.listdir(x)
                 number_files = len(list_files)
+                # Agregar modificación para el dato de observaciones (Número de archivos contenidos) number_files extensiones
                 nombres, extensiones = self.separatePath(list_files)
                 nombresExtensiones, nombres, extensionesR, numeraciones = self.formatNames(x, list_files)
                 self.renameFiles(list_files, nombresExtensiones, x)

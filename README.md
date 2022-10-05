@@ -87,7 +87,7 @@ Para el buen funcionamiento del programa deberá seguir los siguientes pasos:
 
 1. Descargar en el equipo una copia de la carpeta que desee gestionar (NO DEBE CONTENER **ÍNDICE**).
 2. Los archivos deben estar en formato pdf. En caso contrario (o si el archivo pdf está protegido con firma electrónica) se deberá actualizar *manualmente* la *cantidad de páginas* dentro del índice electrónico.
-3. Antes de ejecutar deberá nombrar los archivos en orden numérico tal cual como desee que se registren en el índice electrónico (el nombre del archivo no puede contener únicamente números).
+3. Antes de ejecutar deberá nombrar los archivos en orden numérico tal cual como desee que se registren en el índice electrónico (el nombre del archivo debe contener al menos una letra).
 4. Cerrar todos los archivos de excel que tenga en ejecución.
 5. Al finalizar el procedimiento, los metadatos de "Fecha creación del documento" y "Fecha Incorporación Expediente" tendrán la fecha del archivo alojado en la carpeta seleccionada.
 
