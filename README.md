@@ -88,8 +88,9 @@ Para el buen funcionamiento del programa deberá seguir los siguientes pasos:
 1. Descargar en el equipo una copia de la carpeta que desee gestionar (NO DEBE CONTENER **ÍNDICE**).
 2. Los archivos deben estar en formato pdf. En caso contrario (o si el archivo pdf está protegido con firma electrónica) se deberá actualizar *manualmente* la *cantidad de páginas* dentro del índice electrónico.
 3. Antes de ejecutar deberá nombrar los archivos en orden numérico tal cual como desee que se registren en el índice electrónico (el nombre del archivo debe contener al menos una letra).
-4. Cerrar todos los archivos de excel que tenga en ejecución.
-5. Al finalizar el procedimiento, los metadatos de "Fecha creación del documento" y "Fecha Incorporación Expediente" tendrán la fecha del archivo alojado en la carpeta seleccionada.
+4. Antes de ejecutar en lo posible deberá cerrar todos los archivos de excel que tenga en ejecución.
+5. **IMPORTANTE** Durante la ejecución del programa aparecerá en pantalla la plantilla del índice electrónico; en lo posible no debe manipularse hasta que aparezca el mensaje que indica "El proceso ha finalizado".
+6. Al finalizar el procedimiento, los metadatos de "Fecha creación del documento" y "Fecha Incorporación Expediente" tendrán la fecha del archivo alojado en la carpeta seleccionada.
 
 <!--
 Para el buen funcionamiento y ejecución de acuerdo con los parámetros establecidos en el "Protocolo de gestión del expediente electrónico" indicado en la descripción de este proyecto, deberá tener en cuenta las siguientes consideraciones:
@@ -106,10 +107,10 @@ Para el buen funcionamiento y ejecución de acuerdo con los parámetros establec
 
 Las siguientes instrucciones te permitirán obtener una ejecución sin errores del programa.
 
-1. Ejecutar el programa "GestionExpedienteElectronico_Version1"
-2. Elegir la carpeta que contenga los archivos a gestionar con el botón "Agregar carpeta"
-3. Deberá confirmar la carpeta elegida seleccionando el botón "Aceptar".
-4. Al finalizar el proceso el sistema arrojará un mensaje que dice "El proceso ha finalizado". IMPORTANTE (No manipular la hoja de excel durante la ejecución del programa)
+1. Ejecutar el programa "GestionExpedienteElectronico_Version1.exe".
+2. Elegir la carpeta que contenga los archivos a gestionar con el botón "Agregar carpeta".
+3. Deberá confirmar la carpeta elegida seleccionando el botón "Sí".
+4. Al finalizar el proceso el sistema arrojará un mensaje que dice "El proceso ha finalizado".
 
 ---
 

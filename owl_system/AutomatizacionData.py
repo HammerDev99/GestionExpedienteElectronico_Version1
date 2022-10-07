@@ -8,6 +8,7 @@ import sys
 import warnings
 import PyPDF2 
 import random # importado por función duplicada
+from collections import Counter
 
 class AutomatizacionData:
 
@@ -36,13 +37,26 @@ class AutomatizacionData:
                 tama.append('-')
                 cantidadpag.append('1')
                 list_files = os.listdir(x)
-                number_files = len(list_files)
-                # Agregar modificación para el dato de observaciones (Número de archivos contenidos) number_files extensiones
                 nombres, extensiones = self.separatePath(list_files)
-                nombresExtensiones, nombres, extensionesR, numeraciones = self.formatNames(x, list_files)
+                comments = dict(zip(extensiones,map(lambda x: extensiones.count(x),extensiones))) # combinar los valores para posteriormente pasarlo a un diccionario. Utilizamos map() y le aplicamos una lambda esta lambda obtendrá la veces que se repite un valor, esto para cada valer de la lista. Luego se utiliza zip() para mezclar ambos datos y obtener una tapa para posteriormente pasarlo a un diccionario.
+                nombresExtensiones, nombres, extensionesR, numeraciones, ban = self.formatNames(x, list_files)
                 self.renameFiles(list_files, nombresExtensiones, x)
-                observaciones.append('Número de archivos contenidos: '+str(number_files)+'. Formatos: '+str(extensiones))
+                observaciones.append('Archivos contenidos: ' + str(comments))
         return fechamod, tama, cantidadpag, observaciones
+
+    def set_comments_folder(self, extensiones):
+
+        resultado = dict(zip(extensiones,map(lambda x: extensiones.count(x),extensiones)))
+
+        return resultado
+        """ conteo=Counter(extensiones)
+
+        resultado={}
+        for clave in conteo:  
+            valor = conteo[clave]
+            if valor != 1:
+                resultado[clave] = valor
+        return(resultado) """
 
     """ ************ """
     #Función duplicada
@@ -119,7 +133,8 @@ class AutomatizacionData:
                 ban=True
             else:
                 # Entran los archivos sin extensión
-                print("entró: ",nombres[x])
+                #print("entró: ",nombres[x])
+                pass
             cont = 0
             for caracter in nombres[x]:
                 if caracter.isalpha():
