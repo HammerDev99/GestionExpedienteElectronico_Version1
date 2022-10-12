@@ -8,8 +8,7 @@
   - [Características de GestionExpedienteElectronico_Version1](#características-de-gestionexpedienteelectronico_version1)
     - [Conceptos](#conceptos)
   - [Uso](#uso)
-    - [Instalación](#instalación)
-    - [Consideraciones antes de ejecutar](#consideraciones-antes-de-ejecutar)
+    - [Consideraciones antes de ejecutar el archivo de Descarga](#consideraciones-antes-de-ejecutar-el-archivo-de-descarga)
     - [Ejecutando el programa](#ejecutando-el-programa)
   - [Construido con](#construido-con)
   - [Autor](#autor)
@@ -68,9 +67,9 @@ Este proyecto fue desarrollado para gestionar una función específica de caract
 -->
 <!-- - Adicional debes de tener instalado el pograma de **Microsoft Excel**. (Validar si es necesario el programa) -->
 
-### Instalación
-
 <!--
+### Instalación del proyecto del repo
+
 Una serie de pasos que se deben ejecutar para tener un entorno de ejecución adecuado:
 
 - Para la instalación de los módulos ([requirements.txt](owl_env/requirements.txt) siendo usuario windows basta con ejecutar el siguiente comando:
@@ -79,29 +78,18 @@ Una serie de pasos que se deben ejecutar para tener un entorno de ejecución ade
     python -m pip install -r .\requirements.txt
     ```
 -->
-- No requiere instalación...
 
-### Consideraciones antes de ejecutar
+### Consideraciones antes de ejecutar el archivo de [Descarga](#descarga)
 
 Para el buen funcionamiento del programa deberá seguir los siguientes pasos:
 
-1. Descargar en el equipo una copia de la carpeta que desee gestionar (NO DEBE CONTENER **ÍNDICE**).
-2. Los archivos deben estar en formato pdf. En caso contrario (o si el archivo pdf está protegido con firma electrónica) se deberá actualizar *manualmente* la *cantidad de páginas* dentro del índice electrónico.
-3. Antes de ejecutar deberá nombrar los archivos en orden numérico tal cual como desee que se registren en el índice electrónico (el nombre del archivo debe contener al menos una letra).
-4. Antes de ejecutar en lo posible deberá cerrar todos los archivos de excel que tenga en ejecución.
-5. **IMPORTANTE** Durante la ejecución del programa aparecerá en pantalla la plantilla del índice electrónico; en lo posible no debe manipularse hasta que aparezca el mensaje que indica "El proceso ha finalizado".
-6. Al finalizar el procedimiento, los metadatos de "Fecha creación del documento" y "Fecha Incorporación Expediente" tendrán la fecha del archivo alojado en la carpeta seleccionada.
-
-<!--
-Para el buen funcionamiento y ejecución de acuerdo con los parámetros establecidos en el "Protocolo de gestión del expediente electrónico" indicado en la descripción de este proyecto, deberá tener en cuenta las siguientes consideraciones:
-
-1. El consecutivo de los archivos debe comprender 4 dígitos (0001Archivo.pdf, 0002Archivo.txt, 0003Archivo.docx)
-2. Los archivos y carpetas al interior de la carpeta del expediente electrónico deberán estar nombrados en orden consecutivo (0001Archivo1).
-3. Las carpetas que contengan menos de 10 archivos deberán estár incluidos en la carpeta raíz del expediente electrónico
-4. Los archivos comprimidos que contengan menos de 10 archivos deberán descomprimirse y ubicarse en la carpeta raíz, de lo contrario se deberá crear una carpeta con el siguiente formato "AnexosMemorialAAAAMMDD" y alojarlos en ella.
-
----
--->
+1. No requiere instalación
+2. Descargar en el equipo una copia de la carpeta que desee gestionar (NO DEBE CONTENER **ÍNDICE**).
+3. Los archivos deben estar en formato pdf. En caso contrario (o si el archivo pdf está protegido con firma electrónica) se deberá actualizar *manualmente* la *cantidad de páginas* dentro del índice electrónico.
+4. Antes de ejecutar deberá nombrar los archivos en orden numérico tal cual como desee que se registren en el índice electrónico (el nombre del archivo debe contener al menos una letra).
+5. Antes de ejecutar en lo posible deberá cerrar todos los archivos de excel que tenga en ejecución.
+6. **IMPORTANTE** Durante la ejecución del programa aparecerá en pantalla la plantilla del índice electrónico, no debe manipularse hasta que aparezca el mensaje que indica "El proceso ha finalizado".
+7. Al finalizar el procedimiento, los metadatos de "Fecha creación del documento" y "Fecha Incorporación Expediente" tendrán la fecha del archivo alojado en la carpeta seleccionada.
 
 ### Ejecutando el programa
 
@@ -116,49 +104,52 @@ Las siguientes instrucciones te permitirán obtener una ejecución sin errores d
 
 ## Construido con
 
-- [Python](https://www.python.org/) versión 3.9.6
+[Python](https://www.python.org/) versión 3.9.6
+[tk](https://docs.python.org/3/library/tk.html)
+[openpyxl](https://openpyxl.readthedocs.io/en/able/)
+[pandas](https://pandas.pydata.org/docs/)
+[xlwings](https://docs.xlwings.org/en/stable/)
+[pyPDF2](https://pythonhosted.org/PyPDF2/)
 
 ## Autor
 
-- **Daniel Arbelaez** - [HammerDev99](https://github.com/HammerDev99/)
+**Daniel Arbelaez** - [HammerDev99](https://github.com/HammerDev99/)
 
 ## Licencia
 
 Este proyecto está bajo la Licencia MIT - mira el archivo [LICENCIA](https://github.com/HammerDev99/GestionExpedienteElectronico_Version1/blob/master/LICENCE) para detalles
 
-<!--
-## Expresiones de Gratitud
-
-- Gracias a los creadores de Python y los módulos [tk](https://docs.python.org/3/library/tk.html), [openpyxl](https://openpyxl.readthedocs.io/en/stable/), [pandas](https://pandas.pydata.org/docs/), [xlwings](https://docs.xlwings.org/en/stable/), [pyPDF2](https://pythonhosted.org/PyPDF2/)
-
----
--->
 ## Reporte de fallos
 
 Para reporte de fallos se ha dispuesto el siguiente [formulario](https://forms.gle/Rrt2CZbDfodNtn96A)
 
 ---
 
-<!--https://drive.google.com/uc?id=1KyQdOIKmGl45PygF9tdQkv7A9pW9PlpS&export=download-->
-
 ## Descarga
 
-[Descargar archivo .exe (Windows)](https://bit.ly/3M4tt8F). Desde Google Chrome al momento de finalizar la descarga deberá seleccionar "Abrir ahora", luego si aparece el aviso de "SmartScreen" se debe seleccionar más información y luego "Ejecutar de todas formas".
+[Descargar archivo .exe (Windows)](https://bit.ly/3M4tt8F)<!--https://drive.google.com/uc?id=1KyQdOIKmGl45PygF9tdQkv7A9pW9PlpS&export=download-->. Desde Google Chrome al momento de finalizar la descarga deberá seleccionar "Abrir ahora", luego si aparece el aviso de "SmartScreen" se debe seleccionar más información y luego "Ejecutar de todas formas".
 
-¡POR FAVOR, COMPRUEBE SIEMPRE EL CÓDIGO HASH MD5 DE SU DESCARGA!
-
-```HASH
-SHA1:
-A72769B51C0D6D7D26F786B81BC44087CE962E5A
-
-SHA256:
-00A0E3BF27137F9F42AA4FDE5317F9251C6AD332238F17741984FAEB933B687B
+¡POR FAVOR, COMPRUEBE SIEMPRE EL CÓDIGO HASH DE SU DESCARGA!
 
 MD5:
+
+```HASH
 4FA50BB14833BFA9FD04DC3910462B48
 ```
 
-Si es diferente del MD5/SHA1 oficial, tal vez haya un problema con su .exe descargado.
+SHA1:
+
+```HASH
+A72769B51C0D6D7D26F786B81BC44087CE962E5A
+```
+
+SHA256:
+
+```HASH
+00A0E3BF27137F9F42AA4FDE5317F9251C6AD332238F17741984FAEB933B687B
+```
+
+Si es diferente del MD5/SHA1/SHA256 oficial, tal vez haya un problema con su .exe descargado.
 
 <!--[Donar](https://www.paypal.com/donate/?business=GSEPAASM658FY&no_recurring=0&item_name=Su+contribuci%C3%B3n+apoya+el+desarrollo+del+proyecto+%22GestionExpedienteElectronico_Version1%22&currency_code=USD)-->
 
