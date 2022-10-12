@@ -145,6 +145,21 @@ Para reporte de fallos se ha dispuesto el siguiente [formulario](https://forms.g
 
 [Descargar archivo .exe (Windows)](https://bit.ly/3M4tt8F). Desde Google Chrome al momento de finalizar la descarga deberá seleccionar "Abrir ahora", luego si aparece el aviso de "SmartScreen" se debe seleccionar más información y luego "Ejecutar de todas formas".
 
+¡POR FAVOR, COMPRUEBE SIEMPRE EL CÓDIGO HASH MD5 DE SU DESCARGA!
+
+```HASH
+SHA1:
+A72769B51C0D6D7D26F786B81BC44087CE962E5A
+
+SHA256:
+00A0E3BF27137F9F42AA4FDE5317F9251C6AD332238F17741984FAEB933B687B
+
+MD5:
+4FA50BB14833BFA9FD04DC3910462B48
+```
+
+Si es diferente del MD5/SHA1 oficial, tal vez haya un problema con su .exe descargado.
+
 <!--[Donar](https://www.paypal.com/donate/?business=GSEPAASM658FY&no_recurring=0&item_name=Su+contribuci%C3%B3n+apoya+el+desarrollo+del+proyecto+%22GestionExpedienteElectronico_Version1%22&currency_code=USD)-->
 
 > La cooperación con los demás constituye la base de la sociedad (extraído de "software libre para una comunidad libre" autor Richard M. Stallman)
