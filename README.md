@@ -8,13 +8,13 @@
   - [Características de GestionExpedienteElectronico_Version1](#características-de-gestionexpedienteelectronico_version1)
     - [Conceptos](#conceptos)
   - [Uso](#uso)
-    - [Consideraciones antes de ejecutar el archivo de Descarga](#consideraciones-antes-de-ejecutar-el-archivo-de-descarga)
-    - [Ejecutando el programa](#ejecutando-el-programa)
+    - [Consideraciones antes de ejecutar el programa](#consideraciones-antes-de-ejecutar-el-programa)
+    - [Descarga y ejecución del Ejecutable](#descarga-y-ejecución-del-ejecutable)
   - [Construido con](#construido-con)
   - [Autor](#autor)
   - [Licencia](#licencia)
   - [Reporte de fallos](#reporte-de-fallos)
-  - [Descarga](#descarga)
+  - [Ejecutable](#ejecutable)
 
 ---
 
@@ -54,7 +54,7 @@ Este proyecto fue desarrollado para gestionar una función específica de caract
 
 ## Uso
 <!--
-### Pre-requisitos
+### Pre-requisitos para isntalar repo
 
 - Para hacer uso del aplicativo, el usuario deberá descargar en su dispositivo la carpeta del expediente electrónico que requiera gestionar.
 - Adicional si se tiene sincronizada la nube en el dispositivo, para evitar errores no deseados deberá pausar la sincronización en la nube.
@@ -79,37 +79,34 @@ Una serie de pasos que se deben ejecutar para tener un entorno de ejecución ade
     ```
 -->
 
-### Consideraciones antes de ejecutar el archivo de [Descarga](#descarga)
+### Consideraciones antes de ejecutar el programa
 
-Para el buen funcionamiento del programa deberá seguir los siguientes pasos:
+Para garantizar la creación estandarizada del índice del expediente electrónico, deberá tener en cuenta los siguientes consideraciones:
 
-1. No requiere instalación
-2. Descargar en el equipo una copia de la carpeta que desee gestionar (NO DEBE CONTENER **ÍNDICE**).
-3. Los archivos deben estar en formato pdf. En caso contrario (o si el archivo pdf está protegido con firma electrónica) se deberá actualizar *manualmente* la *cantidad de páginas* dentro del índice electrónico.
-4. Antes de ejecutar deberá nombrar los archivos en orden numérico tal cual como desee que se registren en el índice electrónico (el nombre del archivo debe contener al menos una letra).
-5. Antes de ejecutar en lo posible deberá cerrar todos los archivos de excel que tenga en ejecución.
-6. **IMPORTANTE** Durante la ejecución del programa aparecerá en pantalla la plantilla del índice electrónico, no debe manipularse hasta que aparezca el mensaje que indica "El proceso ha finalizado".
-7. Al finalizar el procedimiento, los metadatos de "Fecha creación del documento" y "Fecha Incorporación Expediente" tendrán la fecha del archivo alojado en la carpeta seleccionada.
+1. Descargar en el equipo una copia de la carpeta que desee gestionar (NO DEBE CONTENER **ÍNDICE**).
+2. Los archivos deben estar en formato pdf. En caso contrario (o si el archivo pdf está protegido con firma electrónica) se deberá actualizar *manualmente* la *cantidad de páginas* dentro del índice electrónico.
+3. Antes de ejecutar deberá nombrar los archivos en orden numérico tal cual como desee que se registren en el índice electrónico (el nombre del archivo debe contener al menos una letra).
+4. Antes de ejecutar en lo posible deberá cerrar todos los archivos de excel que tenga en ejecución.
+5. **IMPORTANTE** Durante la ejecución del programa aparecerá en pantalla la plantilla del índice electrónico, no debe manipularse hasta que aparezca el mensaje que indica "El proceso ha finalizado".
+6. Al finalizar el procedimiento, los metadatos de "Fecha creación del documento" y "Fecha Incorporación Expediente" tendrán la fecha del archivo alojado en la carpeta seleccionada.
 
-### Ejecutando el programa
+### Descarga y ejecución del [Ejecutable](#Ejecutable)
 
 Las siguientes instrucciones te permitirán obtener una ejecución sin errores del programa.
 
-1. Ejecutar el programa "GestionExpedienteElectronico_Version1.exe".
-2. Elegir la carpeta que contenga los archivos a gestionar con el botón "Agregar carpeta".
-3. Deberá confirmar la carpeta elegida seleccionando el botón "Sí".
-4. Al finalizar el proceso el sistema arrojará un mensaje que dice "El proceso ha finalizado".
+1. Desde Google Chrome al momento de finalizar la descarga deberá seleccionar "Abrir ahora", luego si aparece el aviso de "SmartScreen" se debe seleccionar más información y luego "Ejecutar de todas formas"
+2. **¡POR FAVOR, COMPRUEBE SIEMPRE EL CÓDIGO HASH DE SU DESCARGA!**
+3. No requiere instalación
+4. Ejecutar el programa "GestionExpedienteElectronico_Version1.exe".
+5. Elegir la carpeta que contenga los archivos a gestionar con el botón "Agregar carpeta".
+6. Deberá confirmar la carpeta elegida seleccionando el botón "Sí".
+7. Al finalizar el proceso el sistema arrojará un mensaje que dice "El proceso ha finalizado".
 
 ---
 
 ## Construido con
 
-[Python](https://www.python.org/) versión 3.9.6
-[tk](https://docs.python.org/3/library/tk.html)
-[openpyxl](https://openpyxl.readthedocs.io/en/able/)
-[pandas](https://pandas.pydata.org/docs/)
-[xlwings](https://docs.xlwings.org/en/stable/)
-[pyPDF2](https://pythonhosted.org/PyPDF2/)
+[Python](https://www.python.org/) versión 3.9.6, [tk](https://docs.python.org/3/library/tk.html), [openpyxl](https://openpyxl.readthedocs.io/en/able/), [pandas](https://pandas.pydata.org/docs/), [xlwings](https://docs.xlwings.org/en/stable/), [pyPDF2](https://pythonhosted.org/PyPDF2/)
 
 ## Autor
 
@@ -117,7 +114,7 @@ Las siguientes instrucciones te permitirán obtener una ejecución sin errores d
 
 ## Licencia
 
-Este proyecto está bajo la Licencia MIT - mira el archivo [LICENCIA](https://github.com/HammerDev99/GestionExpedienteElectronico_Version1/blob/master/LICENCE) para detalles
+Este proyecto está bajo la Licencia MIT - mira el archivo [LICENCIA](https://github.com/HammerDev99/GestionExpedienteElectronico_Version1/blob/master/LICENCE) para más detalles.
 
 ## Reporte de fallos
 
@@ -125,11 +122,9 @@ Para reporte de fallos se ha dispuesto el siguiente [formulario](https://forms.g
 
 ---
 
-## Descarga
+## Ejecutable
 
-[Descargar archivo .exe (Windows)](https://bit.ly/3M4tt8F)<!--https://drive.google.com/uc?id=1KyQdOIKmGl45PygF9tdQkv7A9pW9PlpS&export=download-->. Desde Google Chrome al momento de finalizar la descarga deberá seleccionar "Abrir ahora", luego si aparece el aviso de "SmartScreen" se debe seleccionar más información y luego "Ejecutar de todas formas".
-
-¡POR FAVOR, COMPRUEBE SIEMPRE EL CÓDIGO HASH DE SU DESCARGA!
+Descargar versión ejecutable para Windows (.exe) [link directo](https://bit.ly/3M4tt8F)<!--https://drive.google.com/uc?id=1KyQdOIKmGl45PygF9tdQkv7A9pW9PlpS&export=download-->.
 
 MD5:
 
