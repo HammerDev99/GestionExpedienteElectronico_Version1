@@ -26,7 +26,7 @@ Se trata de una aplicación de escritorio (versión Beta) que permite realizar d
 
 ## Características de GestionExpedienteElectronico_Version1
 
-Este proyecto fue desarrollado para gestionar una función específica de caracter adminsitrativo, coadyuvando los procedimientos que haría un empleado de forma manual mediante una aplicación de forma automatizada.
+Este proyecto fue desarrollado para gestionar una función específica de caracter administrativo, asistiendo los procedimientos que haría un empleado de forma manual mediante una aplicación de forma automatizada.
 
 ### Conceptos
 
@@ -124,7 +124,9 @@ Para reporte de fallos se ha dispuesto el siguiente [formulario](https://forms.g
 
 ## Ejecutable
 
-Descargar versión ejecutable para Windows (.exe) [link directo](https://bit.ly/3M4tt8F)<!--https://drive.google.com/uc?id=1KyQdOIKmGl45PygF9tdQkv7A9pW9PlpS&export=download-->.
+Versión para Windows (.exe) [link directo](https://bit.ly/3M4tt8F).
+<!--
+https://drive.google.com/uc?id=1KyQdOIKmGl45PygF9tdQkv7A9pW9PlpS&export=download
 
 MD5:
 
@@ -137,6 +139,7 @@ SHA1:
 ```HASH
 A72769B51C0D6D7D26F786B81BC44087CE962E5A
 ```
+-->
 
 SHA256:
 
