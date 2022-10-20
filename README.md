@@ -24,6 +24,10 @@ Se trata de una aplicación de escritorio (versión Beta) que permite realizar d
 
 ---
 
+![alt](owl_system/assets/Demo.gif)
+
+---
+
 ## Características de GestionExpedienteElectronico_Version1
 
 Este proyecto fue desarrollado para gestionar una función específica de caracter administrativo, asistiendo los procedimientos que haría un empleado de forma manual mediante una aplicación de forma automatizada.

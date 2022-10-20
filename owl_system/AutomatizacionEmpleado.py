@@ -153,7 +153,7 @@ class AutomatizacionEmpleado:
         df = self.createDataFrame(self.files, self.ruta)
         self.createXlsm(df, macro_vba, sheet)
         wb.save()
-        wb.close()
+        #wb.close()
         return 1
         
     def createXlsm(self, df, macro_vba, sheet):
