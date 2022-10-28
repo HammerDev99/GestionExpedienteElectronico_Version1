@@ -156,8 +156,6 @@ SHA256:
 
 Si es diferente del MD5/SHA1/SHA256 oficial, tal vez haya un problema con su .exe descargado.
 
-[Invítame a un café](https://www.paypal.com/donate/?business=GSEPAASM658FY&no_recurring=0&item_name=Su+contribuci%C3%B3n+apoya+el+desarrollo+del+proyecto+%22GestionExpedienteElectronico_Version1%22&currency_code=USD)
-
 <a href="https://www.paypal.com/donate/?business=GSEPAASM658FY&no_recurring=0&item_name=Inv%C3%ADtame+a+un+caf%C3%A9.+Contribuyo+a+que+los+humanos+dejen+de+pensar+como+robots+y+piensen+m%C3%A1s+como+humanos+ig:+@daainti&currency_code=USD" target="_blank"><img src="https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png" alt="Buy Me A Coffee" style="height: 41px !important;width: 174px !important;box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;-webkit-box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;" ></a>
 
 > La cooperación con los demás constituye la base de la sociedad (extraído de "software libre para una comunidad libre" autor Richard M. Stallman)
