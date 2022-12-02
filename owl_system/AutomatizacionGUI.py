@@ -126,14 +126,13 @@ class Application(ttk.Frame):
             self.entry1.config(state=tk.DISABLED)
 
 # Quitar comentario si se ejecuta desde el __main__.py
-"""
+            
 root = tk.Tk()
 app = Application(root)
 app.mainloop()
-""" 
 
 # Punto de entrada sin __main__.py
-if __name__ == '__main__':
+""" if __name__ == '__main__':
     root = tk.Tk()
     obj = Application(root)
-    root.mainloop()
+    root.mainloop() """

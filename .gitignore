@@ -1,15 +1,15 @@
 # Byte-compiled / optimized / DLL files
 __pycache__/
+.vscode/
+owl_system/__pycache__
 
 # Folder
-.vscode/
-owl_system/test/
+venv/
 
-# Environments
-owl_env/
-
-# Python files
+# Files
 owl_system/test.py
-
-# Notebooks
-prueba_logica_archivos.ipynb
+owl_system/assets/Pasos manejo de archivos.md
+owl_system/assets/004-2022-00023 (Pame-SALIÓ) impugnada.txt
+owl_system/assets/chain_text_test00.ipynb
+owl_system/assets/chain_text_test01.ipynb
+owl_system/assets/Demo.gif
