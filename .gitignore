@@ -7,7 +7,7 @@ owl_system/__pycache__
 venv/
 
 # Files
-initial_commands.txt/
+initial_commands.txt
 owl_system/test.py
 owl_system/assets/Pasos manejo de archivos.md
 owl_system/assets/004-2022-00023 (Pame-SALIÓ) impugnada.txt
