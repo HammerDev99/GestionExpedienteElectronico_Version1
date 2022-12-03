@@ -65,6 +65,7 @@ class AutomatizacionEmpleado:
                 except:
                     print("Excepcion presentada: \n")
 
+    # Validar sistema de archivos segun SO
     def copyXlsm(self, rutaFinal):
         """ 
         @param: rutaFinal tipo string; contiene ruta expediente
@@ -72,7 +73,7 @@ class AutomatizacionEmpleado:
         """
 
         ruta = os.path.dirname(os.path.abspath(__file__)) + r"\assets\000IndiceElectronicoC0.xlsm"
-        shutil.copy(ruta, rutaFinal)
+        shutil.copy(ruta, rutaFinal) 
         self.indice = os.path.join(rutaFinal, '000IndiceElectronicoC0.xlsm')
 
     # Función pendiente de actualizar
