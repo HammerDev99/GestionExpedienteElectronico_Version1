@@ -1,0 +1,8 @@
+services:
+  gestionexpedienteelectronico_version1:
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    volumes: 
+      - .:/gestionexpedienteelectronico_version1
+    

@@ -2,34 +2,30 @@
 
 ## Tabla de contenidos
 
-- [GestionExpedienteElectronico_Version1](#gestionexpedienteelectronico_version1)
+- [GestionExpedienteElectronico\_Version1](#gestionexpedienteelectronico_version1)
   - [Tabla de contenidos](#tabla-de-contenidos)
   - [Descripción](#descripción)
   - [Demo](#demo)
-  - [Características de GestionExpedienteElectronico_Version1](#características-de-gestionexpedienteelectronico_version1)
+  - [Características de GestionExpedienteElectronico\_Version1](#características-de-gestionexpedienteelectronico_version1)
     - [Conceptos](#conceptos)
-  - [Uso](#uso)
-    - [Consideraciones antes de ejecutar el programa](#consideraciones-antes-de-ejecutar-el-programa)
-    - [Descarga y ejecución del Ejecutable](#descarga-y-ejecución-del-ejecutable)
+  - [Instalación](#instalación)
+    - [GitHub](#github)
+      - [Obtener copia del repositorio](#obtener-copia-del-repositorio)
+      - [Preparar y ejecutar](#preparar-y-ejecutar)
   - [Construido con](#construido-con)
-  - [Autor](#autor)
-  - [Licencia](#licencia)
-  - [Reporte de fallos](#reporte-de-fallos)
+  - [Registro de cambios](#registro-de-cambios)
   - [Ejecutable](#ejecutable)
+  - [Autor](#autor)
 
 ---
 
 ## Descripción
 
-Se trata de una solución RDA (Robotic Desktop Automation versión Beta) que permite realizar de forma automatizada la *creación y diligenciamiento* del formato índice electrónico con los metadatos de los archivos alojados en una carpeta específica; aquellos archivos (documentos) conformarán un expediente electrónico y mediante este software se creará **desde cero** el índice del mismo. Dicho procedimiento se encuentra estándarizado en el Plan Estratégico de Transformación Digital de la Rama Judicial, dentro del cual se contempla el programa de Expediente Electrónico. El presente proyecto se amolda en mayor medida a los parámetros, estándares técnicos y funcionales del acuerdo PCSJA20-11567 de 2020 "Protocolo para la gestión de documentos electrónicos, digitalización y conformación del expediente electrónico" Versión 2<!--, el cual consiste en la producción, gestión y tratamiento estandarizado de los documentos y expedientes híbridos y electrónicos-->. [Link directo al Protocolo](https://www.ramajudicial.gov.co/documents/3196516/46103054/Protocolo+para+la+gesti%C3%B3n+de+documentos+electronicos.pdf/cb0d98ef-2844-4570-b12a-5907d76bc1a3).
-
----
+Se trata de una solución RDA (Robotic Desktop Automation versión Beta) que permite realizar de forma automatizada la *creación y diligenciamiento* del formato índice electrónico con los metadatos de los archivos alojados en una carpeta específica; aquellos archivos (documentos) conformarán un expediente electrónico y mediante este software se creará **desde cero** el índice del mismo. Dicho procedimiento se encuentra estándarizado en el Plan Estratégico de Transformación Digital de la Rama Judicial, dentro del cual se contempla el programa de Expediente Electrónico. El presente proyecto se amolda en mayor medida a los parámetros, estándares técnicos y funcionales del acuerdo PCSJA20-11567 de 2020 "Protocolo para la gestión de documentos electrónicos, digitalización y conformación del expediente electrónico" Versión 2. [Link directo al Protocolo](https://www.ramajudicial.gov.co/documents/3196516/46103054/Protocolo+para+la+gesti%C3%B3n+de+documentos+electronicos.pdf/cb0d98ef-2844-4570-b12a-5907d76bc1a3).
 
 ## Demo
 
-![alt](owl_system/assets/Demo.gif)
-
----
+![alt](app_package/assets/Demo.gif)
 
 ## Características de GestionExpedienteElectronico_Version1
 
@@ -59,94 +55,82 @@ Este proyecto fue desarrollado para gestionar una función específica de caract
 
 ---
 
-## Uso
-<!--
-### Pre-requisitos para isntalar repo
+## Instalación
 
-- Para hacer uso del aplicativo, el usuario deberá descargar en su dispositivo la carpeta del expediente electrónico que requiera gestionar.
-- Adicional si se tiene sincronizada la nube en el dispositivo, para evitar errores no deseados deberá pausar la sincronización en la nube.
-- Para el buen funcionamiento del aplicativo deberás hacer uso de los siguientes módulos que serán instalados antes de ejecutar el programa:
-  - tk==0.1.0
-  - openpyxl==3.0.7
-  - pandas==1.3.2
-  - xlwings==0.24.9
-  - pyPDF2==1.26.0
--->
-<!-- - Adicional debes de tener instalado el pograma de **Microsoft Excel**. (Validar si es necesario el programa) -->
+### GitHub
 
-<!--
-### Instalación del proyecto del repo
+#### Obtener copia del repositorio
 
-Una serie de pasos que se deben ejecutar para tener un entorno de ejecución adecuado:
+1. Descargalo directamente a tu computador o ejecuta el siguiente comando en la terminal para clonar el repositorio de GitHub en tu equipo:
+  
+  ```BASH
+  git clone https://github.com/HammerDev99/GestionExpedienteElectronico_Version1.git
+  ```
+  
+2. Navega hacia el directorio del repositorio que acabas de clonar:
 
-- Para la instalación de los módulos ([requirements.txt](owl_env/requirements.txt) siendo usuario windows basta con ejecutar el siguiente comando:
+  ```BASH
+  cd GestionExpedienteElectronico_Version1
+  ```
 
-    ```cmd
-    python -m pip install -r .\requirements.txt
-    ```
--->
+3. Ahora, debes vincular tu repositorio local con el repositorio del fork que quieres hacer en tu cuenta de GitHub. Para ello, ejecuta el siguiente comando:
 
-### Consideraciones antes de ejecutar el programa
+  ```BASH
+  git remote add fork https://github.com/tu-nombre-de-usuario/GestionExpedienteElectronico_Version1.git
+  ```
 
-Para garantizar la creación estandarizada del índice del expediente electrónico, deberá tener en cuenta los siguientes consideraciones:
+  Sustituye "tu-nombre-de-usuario" por el usuario que llevas en github.
 
-1. Descargar en el equipo una copia de la carpeta que desee gestionar (NO DEBE CONTENER **ÍNDICE**).
-2. Los archivos deben estar en formato pdf. En caso contrario (o si el archivo pdf está protegido con firma electrónica) se deberá actualizar *manualmente* la *cantidad de páginas* dentro del índice electrónico.
-3. Antes de ejecutar deberá nombrar los archivos en orden numérico tal cual como desee que se registren en el índice electrónico (el nombre del archivo debe contener al menos una letra).
-4. Antes de ejecutar en lo posible deberá cerrar todos los archivos de excel que tenga en ejecución.
-5. **IMPORTANTE** Durante la ejecución del programa aparecerá en pantalla la plantilla del índice electrónico, no debe manipularse hasta que aparezca el mensaje que indica "El proceso ha finalizado".
-6. Al finalizar el procedimiento, los metadatos de "Fecha creación del documento" y "Fecha Incorporación Expediente" tendrán la fecha del archivo alojado en la carpeta seleccionada.
+4. Luego, ejecuta el siguiente comando para enviar todos los cambios del repositorio local al repositorio del fork en tu cuenta de GitHub:
 
-### Descarga y ejecución del [Ejecutable](#Ejecutable)
+  ```Bash
+  git push fork master
+  ```
 
-Las siguientes instrucciones te permitirán obtener una ejecución sin errores del programa.
+Con estos pasos, deberías haber creado un fork del repositorio original en tu cuenta de GitHub. Recuerda que un fork es una copia del repositorio original que puedes usar para hacer cambios sin afectar el repositorio original. Puedes enviar tus cambios de vuelta al repositorio original a través de un "pull request".
 
-1. Desde Google Chrome al momento de finalizar la descarga deberá seleccionar "Abrir ahora", luego si aparece el aviso de "SmartScreen" se debe seleccionar más información y luego "Ejecutar de todas formas"
-2. **¡POR FAVOR, COMPRUEBE SIEMPRE EL CÓDIGO HASH DE SU DESCARGA!**
-3. No requiere instalación
-4. Ejecutar el programa "GestionExpedienteElectronico_Version1.exe".
-5. Elegir la carpeta que contenga los archivos a gestionar con el botón "Agregar carpeta".
-6. Deberá confirmar la carpeta elegida seleccionando el botón "Sí".
-7. Al finalizar el proceso el sistema arrojará un mensaje que dice "El proceso ha finalizado".
+#### Preparar y ejecutar
+
+1. Para preparar el programa con buenas prácticas debes de crear el ambiente virtual con el siguiente comando:
+  
+  ```BASH
+  python3 -m venv venv
+  ```
+
+  Para activar el ambiente virtual usa:
+
+  ```BASH
+  source venv/bin/activate
+  ```
+  
+2. Luego instala las dependencias necesarias:
+
+   ```BASH
+   pip install --no-cache-dir --upgrade -r /gestionexpedienteelectronico_version1/requirements.txt
+   ```
+
+3. Una vez instalados los modulos, puedes ejecutar el programa:
+
+   ```BASH
+   python3 ./app_package/main.py
+   ```
+
+4. Por último, debes comprobar que tengas **Microsoft Excel** instalado en tu computador.
 
 ---
 
 ## Construido con
 
-[Python](https://www.python.org/) versión 3.9.6, [tk](https://docs.python.org/3/library/tk.html), [openpyxl](https://openpyxl.readthedocs.io/en/able/), [pandas](https://pandas.pydata.org/docs/), [xlwings](https://docs.xlwings.org/en/stable/), [pyPDF2](https://pythonhosted.org/PyPDF2/)
+[Python](https://www.python.org/) versión 3.9.6
 
-## Autor
+## Registro de cambios
 
-**Daniel Arbelaez** - [HammerDev99](https://github.com/HammerDev99/)
-
-## Licencia
-
-Este proyecto está bajo la Licencia MIT - mira el archivo [LICENCIA](https://github.com/HammerDev99/GestionExpedienteElectronico_Version1/blob/master/LICENCE) para más detalles.
-
-## Reporte de fallos
-
-Para reporte de fallos se ha dispuesto el siguiente [formulario](https://forms.gle/Rrt2CZbDfodNtn96A)
-
----
+- 2022-12-2 Update folder schema
+- 2022-10-26 First release
 
 ## Ejecutable
 
 Versión para Windows (.exe) [Descargar](https://bit.ly/3M4tt8F).
-<!--
-https://drive.google.com/uc?id=1KyQdOIKmGl45PygF9tdQkv7A9pW9PlpS&export=download
-
-MD5:
-
-```HASH
-4FA50BB14833BFA9FD04DC3910462B48
-```
-
-SHA1:
-
-```HASH
-A72769B51C0D6D7D26F786B81BC44087CE962E5A
-```
--->
 
 SHA256:
 
@@ -155,6 +139,10 @@ SHA256:
 ```
 
 Si es diferente del MD5/SHA1/SHA256 oficial, tal vez haya un problema con su .exe descargado.
+
+## Autor
+
+**Daniel Arbelaez** - [HammerDev99](https://github.com/HammerDev99/)
 
 <a href="https://www.paypal.com/donate/?business=GSEPAASM658FY&no_recurring=0&item_name=Inv%C3%ADtame+a+un+caf%C3%A9.+Contribuyo+a+que+los+humanos+dejen+de+pensar+como+robots+y+piensen+m%C3%A1s+como+humanos+ig:+@daainti&currency_code=USD" target="_blank"><img src="https://ginesrom.es/wp-content/uploads/2021/03/Invitame-a-un-cafe-gines-romero.png" alt="Buy Me A Coffee" style="height: 41px !important;width: 174px !important;box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;-webkit-box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;" ></a>
 
