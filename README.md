@@ -97,7 +97,7 @@ Con estos pasos, deberías haber creado un fork del repositorio original en tu c
 python3 -m venv venv
 ```
 
-Para activar el ambiente virtual usa:
+  Para activar el ambiente virtual usa:
 
 ```BASH
 source venv/bin/activate
