@@ -7,7 +7,6 @@ app_package/__pycache__
 venv/
 
 # Files
-initial_commands.txt
 app_package/test.py
 app_package/assets/Pasos manejo de archivos.md
 app_package/assets/004-2022-00023 (Pame-SALIÓ) impugnada.txt

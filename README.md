@@ -97,7 +97,7 @@ Con estos pasos, deberías haber creado un fork del repositorio original en tu c
 python3 -m venv venv
 ```
 
-Para activar el ambiente virtual usa:
+  Para activar el ambiente virtual usa:
 
 ```BASH
 source venv/bin/activate
@@ -106,13 +106,13 @@ source venv/bin/activate
 2. Luego instala las dependencias necesarias:
 
 ```BASH
-pip install --no-cache-dir --upgrade -r /gestionexpedienteelectronico_version1/requirements.txt
+pip install --upgrade -r requirements.txt
 ```
 
 3. Una vez instalados los modulos, puedes ejecutar el programa:
 
 ```BASH
-python3 ./app_package/main.py
+python app_package/main.py
 ```
 
 4. Por último, debes comprobar que tengas **Microsoft Excel** instalado en tu computador.
