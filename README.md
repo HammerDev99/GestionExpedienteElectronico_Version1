@@ -12,10 +12,9 @@
     - [GitHub](#github)
       - [Obtener copia del repositorio](#obtener-copia-del-repositorio)
       - [Preparar y ejecutar](#preparar-y-ejecutar)
-  - [Construido con](#construido-con)
   - [Registro de cambios](#registro-de-cambios)
+  - [Construido con](#construido-con)
   - [Ejecutable](#ejecutable)
-  - [Autor](#autor)
 
 ---
 
@@ -119,30 +118,18 @@ python app_package/main.py
 
 ---
 
+## Registro de cambios
+
+- 2022-12-02 Update folder schema
+- 2022-10-26 First release
+
 ## Construido con
 
 [Python](https://www.python.org/) versión 3.9.6
 
-## Registro de cambios
-
-- 2022-12-2 Update folder schema
-- 2022-10-26 First release
-
 ## Ejecutable
 
-Versión para Windows (.exe) [Descargar](https://bit.ly/3M4tt8F).
-
-SHA256:
-
-```HASH
-00A0E3BF27137F9F42AA4FDE5317F9251C6AD332238F17741984FAEB933B687B
-```
-
-Si es diferente del MD5/SHA1/SHA256 oficial, tal vez haya un problema con su .exe descargado.
-
-## Autor
-
-**Daniel Arbelaez** - [HammerDev99](https://github.com/HammerDev99/)
+Puedes revisar todas las versiones en el siguiente [link](https://github.com/HammerDev99/GestionExpedienteElectronico_Version1/releases/tag/published)
 
 <a href="https://www.paypal.com/donate/?business=GSEPAASM658FY&no_recurring=0&item_name=Inv%C3%ADtame+a+un+caf%C3%A9.+Contribuyo+a+que+los+humanos+dejen+de+pensar+como+robots+y+piensen+m%C3%A1s+como+humanos+ig:+@daainti&currency_code=USD" target="_blank"><img src="https://ginesrom.es/wp-content/uploads/2021/03/Invitame-a-un-cafe-gines-romero.png" alt="Buy Me A Coffee" style="height: 41px !important;width: 174px !important;box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;-webkit-box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;" ></a>
 
