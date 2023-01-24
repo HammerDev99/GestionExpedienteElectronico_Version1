@@ -1,5 +1,3 @@
-#pip install pyPDF2
-
 import datetime
 import re
 import os

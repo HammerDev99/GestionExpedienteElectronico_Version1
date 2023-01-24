@@ -1,6 +1,3 @@
-#pip install pandas
-#pip install xlwings
-
 import os
 import pandas as pd
 import shutil 
