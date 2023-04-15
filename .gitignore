@@ -1,17 +1,18 @@
 # Byte-compiled / optimized / DLL files
 __pycache__/
 .vscode/
-app_package/__pycache__
+app/__pycache__
 
 # Folder
 venv/
 
 # Files
-app_package/test.py
-app_package/assets/Pasos manejo de archivos.md
-app_package/assets/004-2022-00023 (Pame-SALIÓ) impugnada.txt
-app_package/assets/chain_text_test00.ipynb
-app_package/assets/chain_text_test01.ipynb
+test/test.py
+app/assets/Pasos manejo de archivos.md
+app/assets/004-2022-00023 (Pame-SALIÓ) impugnada.txt
+app/assets/chain_text_test00.ipynb
+app/assets/chain_text_test01.ipynb
+app/assets/textchain.py
 
 #########
 

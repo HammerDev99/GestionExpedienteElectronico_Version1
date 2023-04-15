@@ -129,7 +129,7 @@ python app_package/main.py
 
 ## Descargar
 
-Para recibir actualizaciones de las novedades y cambios que se realicen al programa puedes registrar tu correo en el siguiente formulario: [link](https://forms.gle/kNkKY6zMVfeVUmu18)
+Para recibir actualizaciones de las novedades y cambios que se realicen al programa puedes registrar tu correo en el siguiente [formulario](https://forms.gle/kNkKY6zMVfeVUmu18).
 
 Puedes descargar el programa en este [link](https://github.com/HammerDev99/GestionExpedienteElectronico_Version1/releases/tag/published).
 
