@@ -60,6 +60,7 @@ class Application(ttk.Frame):
 
         webbrowser.open_new(url)
 
+    # SI debería estar en esta clase llamado seleccionar carpeta
     def obtenerExpediente(self):
         """ 
         - Obtiene ruta seleccionada por usuario, 
