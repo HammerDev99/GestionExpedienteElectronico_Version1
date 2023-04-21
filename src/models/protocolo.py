@@ -15,7 +15,7 @@ class Protocolo():
     def __init__(self) -> None:
         super().__init__()
 
-    # getters y setters
+    # ________________________ Separa código refactorizado ⬆️ (Pendiente ⬇️)
 
     def get_ruta(self):
         return self.ruta

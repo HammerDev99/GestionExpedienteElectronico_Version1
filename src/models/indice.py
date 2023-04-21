@@ -2,16 +2,10 @@
 
 class Indice():
 
-    ruta = ""
-
     def __init__(self):
         pass
 
-    def set_ruta(self, ruta):
-        self.ruta = ruta
-
-    def get_ruta(self):
-        return self.ruta
+    # ________________________ Separa código refactorizado ⬆️ (Pendiente ⬇️)
 
     def copyXlsm(self, rutaFinal):
         """ 
@@ -48,6 +42,8 @@ class Indice():
             for j in range(len(columnas)):
                 sheet.range(columnas[j]+str(contFila)).value = df.iloc[i,j]
             contFila = contFila + 1
+
+    # Funciones futuras
 
     def read_xlsm():
         pass

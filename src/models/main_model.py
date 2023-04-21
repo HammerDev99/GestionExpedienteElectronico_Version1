@@ -1,39 +1,11 @@
-""" Esta clase gestiona los datos y la lógica de negocio, entre otros, la lógica para manejar los archivos del expediente electronico """
+""" Esta clase gestiona los datos y la lógica de negocio, entre otros, la lógica para manejar los archivos del expediente electronico, es decir, va a orquestar el entre el índice del expediente y el protocolo de expediente """
 
 class Main_model():
 
-    def leer_archivo(): # para leer los metadatos de un archivo.
+    def __init__(self):
         pass
 
-    def modificar_nombre_archivo(): # para modificar el nombre de un archivo.
-        pass
-
-    def leer_excel(): # para leer los datos de un archivo de Excel.
-        pass
-    
-    def escribir_excel(): # para escribir los datos en un archivo de Excel.
-        pass
-
-    def cantidad_digitos_consecutivo(): # Para controlar la cantidad de digitos del consecutivo
-        pass
-
-    def renameFiles(self, files, nombresExtensiones, ruta):
-        """ 
-        @param: files, nombresExtensiones (List), ruta (string)
-        @modules: os
-        """
-        
-        for i in range(len(files)):
-            fulldirct = os.path.join(ruta, files[i])
-            if os.path.exists(fulldirct):
-                os.rename(fulldirct, os.path.join(ruta, nombresExtensiones[i]))
-            else:
-                try:
-                    #number_of_strings = 3
-                    length_of_string = 3
-                    os.rename(ruta + chr(92) + files[i], ruta + chr(92) + os.path.splitext(nombresExtensiones[i])[0] + ''.join(random.choice(string.ascii_letters + string.digits) for _ in range(length_of_string)) + os.path.splitext(nombresExtensiones[i])[1])
-                except:
-                    print("Excepcion presentada: \n")
+    # ________________________ Separa código refactorizado ⬆️ (Pendiente ⬇️)
 
     # Probar usando el modulo OpenPyXl para manipular los archivos de excel
     # https://programacion.net/articulo/como_trabajar_con_archivos_excel_utilizando_python_1419
@@ -66,51 +38,6 @@ class Main_model():
         #wb.close()
         return 1
 
-    def separatePath(self, files):
-        """ 
-        @param: files (List)
-        @return: nombres, extensiones ambos de tipo List
-        @modules: os
-        """
-
-        nombres = []
-        extensiones = []
-        for x in files:
-            nombres.append(os.path.splitext(x)[0])
-            extensiones.append(os.path.splitext(x)[1])
-        return nombres, extensiones
-
-    def isOrderCorrect(self, files, nombresExtensiones):
-        """ 
-        @param: files, nombresExtensiones
-        @return: Bool
-        - Verifica el orden de los consecutivos de los archivos
-        """
-
-        cont = 0
-        for i in files:
-            for j in nombresExtensiones:
-                if i!=j:
-                    cont = cont + 1
-        if cont!=0:
-            return True
-        else:
-            return False
-
-    def fullFilePath(self, files, ruta):
-        """ 
-        @param: files (List); ruta (string)
-        @return: pathArchivos tipo List
-        """
-
-        pathArchivos = []
-        for y in files:
-            fulldirct = os.path.join(ruta, y)
-            fulldirct.replace("/","\\")
-            pathArchivos.append(fulldirct)
-        return pathArchivos
-
-
     def getMetadata(self, files):
         """
         @param: files (List)
@@ -139,4 +66,6 @@ class Main_model():
                 self.renameFiles(list_files, nombresExtensiones, x)
                 observaciones.append('Archivos contenidos: ' + str(comments))
         return fechamod, tama, cantidadpag, observaciones
+
+    # Posibles funciones futuras
 
