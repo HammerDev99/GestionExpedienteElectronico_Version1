@@ -7,7 +7,7 @@ app/__pycache__
 venv/
 
 # Files
-test/caja_negra_test.py
+test/
 assets/Pasos manejo de archivos.md
 
 #########

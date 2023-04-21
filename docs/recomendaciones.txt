@@ -1,0 +1,1 @@
+Se requieren los docstrings de cada funcion para poder actualizar de forma automática la documentación con la herramienta Sphinx

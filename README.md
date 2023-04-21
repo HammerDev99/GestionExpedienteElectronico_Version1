@@ -24,7 +24,7 @@ Se trata de una solución RDA (Robotic Desktop Automation versión Beta) que per
 
 ## Demo
 
-![alt](app/assets/Demo.gif)
+![alt](assets/Demo.gif)
 
 ## Características de GestionExpedienteElectronico_Version1
 
@@ -120,6 +120,7 @@ python app_package/main.py
 
 ## Registro de cambios
 
+- 2023-04-12 Start refactoring process
 - 2022-12-02 Update folder schema
 - 2022-10-26 First release
 

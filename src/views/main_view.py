@@ -1,4 +1,4 @@
-""" Esta clase se encarga de la interfaz de usuario """
+""" Esta clase se encarga de gestionar la interfaz de usuario """
 
 class Main_view():
 
