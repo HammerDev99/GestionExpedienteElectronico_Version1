@@ -1,0 +1,1 @@
+La carpeta bin es donde se almacenan los archivos binarios o ejecutables de la aplicación, que se compilan a partir del código fuente de la carpeta src.

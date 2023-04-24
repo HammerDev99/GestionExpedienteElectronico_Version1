@@ -1,11 +1,11 @@
-""" Esta clase se encarga de gestionar la interfaz de usuario, contiene la interfaz gráfica de usuario para seleccionar archivos y mostrar los resultados """
 
 import tkinter as tk
 from tkinter import ttk
 from tkinter import filedialog
 import webbrowser
 
-class Gui(ttk.Frame):
+class Main_view(ttk.Frame):
+    """ Esta clase se encarga de gestionar la interfaz de usuario, contiene la interfaz gráfica de usuario para seleccionar archivos y mostrar los resultados """
 
     def __init__(self, root):
         super().__init__(root)
@@ -14,7 +14,7 @@ class Gui(ttk.Frame):
         root.geometry('350x165')
         self.create_oneProcessWidgets()
 
-    # ________________________ Separa código refactorizado ⬆️ (Pendiente ⬇️)
+    # ________________________ código refactorizado ⬆️ (Pendiente ⬇️)
     
     def create_oneProcessWidgets(self):
         """ 

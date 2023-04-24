@@ -1,18 +1,32 @@
-""" 
-- Esta clase se encarga de manejar la interacción entre el modelo y la vista
-- ControladorExpediente maneja la lógica de negocio relacionada con los expedientes y actualiza la vista en consecuencias
-- También se encarga de la captura y edición de archivos por tratarse de la interacción del usuario con la aplicación
-- Controla las configuraciones del programa para gestionar entre otros la cantidad de dígitos del consecutivo conectado con la vista y el modelo
-"""
-
 class Main_controller:
+    """ Controlador principal 
+    
+    - Se encarga de manejar la interacción entre el modelo y la vista
+    - Maneja la lógica de negocio relacionada con los expedientes y actualiza la vista en consecuencia
+    - Se encarga de la captura y edición de archivos por tratarse de la interacción del usuario con la aplicación
+    - Controla las configuraciones del programa para gestionar entre otros la cantidad de dígitos del consecutivo conectado con la vista y el modelo
+
+    Attributes:
+        abcdef
+    """
 
     def __init__(self, model, view):
+        """ Inicializa el controlador
+        
+        Args:
+            model: Main_model
+            view: Main_view
+        
+        Returns:
+            None
+
+        Raises:
+            None
+        """
         self.model = model
         self.view = view
-        pass
     
-    # ________________________ Separa código refactorizado ⬆️ (Pendiente ⬇️)
+    # ________________________ código refactorizado ⬆️ (Pendiente ⬇️)
 
     def obtenerExpediente(self):
         """ 
@@ -151,3 +165,36 @@ class Main_controller:
 
     def cantidad_digitos_consecutivo(): # Para controlar la cantidad de digitos del consecutivo
         pass
+
+    def manejo_archivos_multipltaforma():
+        # import os
+
+        # Obtener la ruta actual del archivo
+        current_dir = os.getcwd()
+
+        # Unir dos partes de una ruta de archivo
+        file_path = os.path.join(current_dir, 'data', 'file.txt')
+
+        # Abrir un archivo en modo lectura en una forma multiplataforma
+        with open(file_path, 'r', newline='', encoding='utf-8') as file:
+            # Hacer algo con el archivo
+            pass
+
+        # Crear una carpeta en una forma multiplataforma
+        new_dir = os.path.join(current_dir, 'output')
+        os.makedirs(new_dir, exist_ok=True)
+
+        # Crear un archivo en una forma multiplataforma
+        new_file_path = os.path.join(new_dir, 'new_file.txt')
+        with open(new_file_path, 'w', newline='', encoding='utf-8') as file:
+            # Escribir algo en el archivo
+            file.write('Hola, mundo!\n')
+
+        # Copiar el archivo 
+        # import shutil
+        # Rutas de archivo origen y destino
+        source_file = os.path.join(current_dir, 'data', 'source.txt')
+        dest_file = os.path.join(current_dir, 'output', 'dest.txt')
+
+        # Copiar el archivo
+        shutil.copy(source_file, dest_file)

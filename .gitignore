@@ -8,8 +8,9 @@ app/__pycache__
 venv/
 
 # Files
-test/
-assets/Pasos manejo de archivos.md
+src/test/
+src/resources/Pasos manejo de archivos.md
+src/resources/example.py
 
 #########
 

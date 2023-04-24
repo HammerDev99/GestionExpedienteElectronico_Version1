@@ -5,7 +5,7 @@ class Indice():
     def __init__(self):
         pass
 
-    # ________________________ Separa código refactorizado ⬆️ (Pendiente ⬇️)
+    # ________________________ código refactorizado ⬆️ (Pendiente ⬇️)
 
     def copyXlsm(self, rutaFinal):
         """ 

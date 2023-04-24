@@ -1,11 +1,11 @@
-""" Esta clase gestiona los datos y la lógica de negocio, entre otros, la lógica para manejar los archivos del expediente electronico, es decir, va a orquestar el entre el índice del expediente y el protocolo de expediente """
 
 class Main_model():
+    """ Esta clase gestiona los datos y la lógica de negocio, entre otros, la lógica para manejar los archivos del expediente electronico, es decir, va a orquestar el entre el índice del expediente y el protocolo de expediente """
 
     def __init__(self):
         pass
 
-    # ________________________ Separa código refactorizado ⬆️ (Pendiente ⬇️)
+    # ________________________ código refactorizado ⬆️ (Pendiente ⬇️)
 
     # Probar usando el modulo OpenPyXl para manipular los archivos de excel
     # https://programacion.net/articulo/como_trabajar_con_archivos_excel_utilizando_python_1419

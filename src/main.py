@@ -1,12 +1,23 @@
 from controllers import main_controller
 
 def main():
+    """ Clase principal 
+    
+    Se encarga de inicializar la aplicación aplicando el patrón de diseño Factory Method
+
+    Attributes:
+        model: Main_model
+        view: Main_view
+        controller: Main_controller
+        factory: Factory_method
+        concrete_factory: Concrete_factory
+    """
+
     """ # Creamos una instancia del Factory Method
-    factory = ConcreteFactory()
+    factory = Concrete_factory()
 
     # Creamos una instancia del Modelo
     model = factory.create_model()
-
     # Creamos una instancia de la Vista
     view = View()
 

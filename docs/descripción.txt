@@ -1,0 +1,3 @@
+La carpeta docs contiene la documentación de la aplicación, que puede incluir la documentación técnica, el manual de usuario y otros documentos importantes.
+
+Se requieren los docstrings """args, modules, description""" de cada funcion para poder actualizar de forma automática la documentación con la herramienta Sphinx

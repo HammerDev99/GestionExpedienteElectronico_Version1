@@ -15,7 +15,7 @@ class Protocolo():
     def __init__(self) -> None:
         super().__init__()
 
-    # ________________________ Separa código refactorizado ⬆️ (Pendiente ⬇️)
+    # ________________________ código refactorizado ⬆️ (Pendiente ⬇️)
 
     def get_ruta(self):
         return self.ruta
