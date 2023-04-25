@@ -1,5 +1,5 @@
 
-class Main_model():
+class MainModel():
     """ Esta clase gestiona los datos y la lógica de negocio, entre otros, la lógica para manejar los archivos del expediente electronico, es decir, va a orquestar el entre el índice del expediente y el protocolo de expediente """
 
     def __init__(self):

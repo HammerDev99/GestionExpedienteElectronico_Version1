@@ -11,6 +11,7 @@ venv/
 src/test/
 src/resources/Pasos manejo de archivos.md
 src/resources/example.py
+src/views/prueba.py
 
 #########
 

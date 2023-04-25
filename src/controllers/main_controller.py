@@ -1,4 +1,4 @@
-class Main_controller:
+class MainController:
     """ Controlador principal 
     
     - Se encarga de manejar la interacción entre el modelo y la vista
@@ -27,6 +27,9 @@ class Main_controller:
         self.view = view
     
     # ________________________ código refactorizado ⬆️ (Pendiente ⬇️)
+
+    def run(self):
+        pass
 
     def obtenerExpediente(self):
         """ 

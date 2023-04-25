@@ -2,18 +2,17 @@
 
 class Protocolo():
 
-    ruta = ""
-    nombre = ""
-    fecha = ""
-    posicion = ""
-    paginas = ""
-    extension = ""
-    tamano = ""
-    origen = ""
-    observaciones = ""
-
     def __init__(self) -> None:
         super().__init__()
+        self.ruta = ""
+        self.nombre = ""
+        self.fecha = ""
+        self.posicion = ""
+        self.paginas = ""
+        self.extension = ""
+        self.tamano = ""
+        self.origen = ""
+        self.observaciones = ""
 
     # ________________________ código refactorizado ⬆️ (Pendiente ⬇️)
 
