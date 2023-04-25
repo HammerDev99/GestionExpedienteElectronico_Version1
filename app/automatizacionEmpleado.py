@@ -71,7 +71,7 @@ class AutomatizacionEmpleado:
         current_dir = os.getcwd()
 
         # Unir dos partes de una ruta de archivo
-        ruta = os.path.join(current_dir, 'app/assets', '000IndiceElectronicoC0.xlsm')
+        ruta = os.path.join(current_dir, 'assets', '000IndiceElectronicoC0.xlsm')
         print(ruta + "\n" + rutaFinal)
         # Copiar el archivo xlsm
         shutil.copy(ruta, rutaFinal) 
