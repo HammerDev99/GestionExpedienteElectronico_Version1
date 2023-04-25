@@ -67,7 +67,13 @@ class AutomatizacionEmpleado:
         @modules: os, shutil
         """
 
-        ruta = os.path.dirname(os.path.abspath(__file__)) + r"\assets\000IndiceElectronicoC0.xlsm"
+        # Obtener la ruta actual del archivo
+        current_dir = os.getcwd()
+
+        # Unir dos partes de una ruta de archivo
+        ruta = os.path.join(current_dir, 'app/assets', '000IndiceElectronicoC0.xlsm')
+        print(ruta + "\n" + rutaFinal)
+        # Copiar el archivo xlsm
         shutil.copy(ruta, rutaFinal) 
         self.indice = os.path.join(rutaFinal, '000IndiceElectronicoC0.xlsm')
 

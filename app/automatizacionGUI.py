@@ -67,7 +67,7 @@ class Application(ttk.Frame):
         Ejecuta funcion agregaNombreBase enviando la ruta y parametro False
          """
 
-        folder_selected = filedialog.askdirectory()
+        folder_selected = os.path.normpath(filedialog.askdirectory())
         self.expediente = folder_selected
         self.agregaNombreBase(folder_selected, False)
 
