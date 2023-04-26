@@ -4,7 +4,7 @@ from views import main_view
 
 def main():
     """
-    Se encarga de inicializar la aplicación aplicando el patrón de diseño Factory Method
+    Se encarga de inicializar objetos de la aplicación aplicando el patrón de arquitectura MVC
 
     Attributes:
         model: Main_model
