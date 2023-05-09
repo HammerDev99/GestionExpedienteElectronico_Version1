@@ -131,7 +131,7 @@ python app_package/main.py
 
 **[Descargar APP](https://github.com/HammerDev99/GestionExpedienteElectronico_Version1/releases/tag/published).**
 
-Para recibir actualizaciones de las novedades y cambios que se realicen al programa puedes registrar tu correo en el siguiente [formulario](https://forms.gle/kNkKY6zMVfeVUmu18) o seguir la cuenta de [@daainti](https://www.twitter.com/daainti) en twitter dónde se comparte su creación en público.
+Para recibir actualizaciones de las novedades y cambios sígueme en la cuenta de twitter [@daainti](https://www.twitter.com/daainti) dónde comparto la creación en público.
 
 ---
 
