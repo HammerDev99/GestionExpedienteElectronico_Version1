@@ -71,7 +71,7 @@ class AutomatizacionEmpleado:
         current_dir = os.getcwd()
 
         # Unir dos partes de una ruta de archivo
-        ruta = os.path.join(current_dir, 'assets', '000IndiceElectronicoC0.xlsm')
+        ruta = os.path.join(current_dir, 'app/assets', '000IndiceElectronicoC0.xlsm')
         print(ruta + "\n" + rutaFinal)
         # Copiar el archivo xlsm
         shutil.copy(ruta, rutaFinal) 
@@ -94,6 +94,7 @@ class AutomatizacionEmpleado:
         #*********************************************
         #Separar instrucciones en funcion a parte
         nombresExtensiones, nombres, extensiones, numeraciones, ban = self.obj1.formatNames(ruta, files)
+
         if ban: 
             self.renameFiles(files, nombresExtensiones, ruta)
         fullFilePaths = self.fullFilePath(nombresExtensiones, ruta)
