@@ -60,6 +60,26 @@ class AutomatizacionEmpleado:
                 except:
                     print("Excepcion presentada: \n")
 
+    def renameFiles2(self, files, nombresExtensiones, ruta):
+        """
+        Renombra los archivos en la ruta especificada.
+        @param: files, nombresExtensiones (List), ruta (string)
+        """
+        for i in range(len(files)):
+            fulldirct = os.path.join(ruta, files[i])
+            if os.path.exists(fulldirct):
+                new_file_path = os.path.join(ruta, nombresExtensiones[i])
+                os.rename(fulldirct, new_file_path)
+            else:
+                try:
+                    length_of_string = 3
+                    file_name, file_ext = os.path.splitext(nombresExtensiones[i])
+                    new_file_name = file_name + ''.join(random.choice(string.ascii_letters + string.digits) for _ in range(length_of_string)) + file_ext
+                    new_file_path = os.path.join(ruta, new_file_name)
+                    os.rename(os.path.join(ruta, files[i]), new_file_path)
+                except Exception as e:
+                    print("Excepcion presentada:", e)
+
     # Validar sistema de archivos segun SO
     def copyXlsm(self, rutaFinal):
         """ 
@@ -93,7 +113,12 @@ class AutomatizacionEmpleado:
 
         #*********************************************
         #Separar instrucciones en funcion a parte
-        nombresExtensiones, nombres, extensiones, numeraciones, ban = self.obj1.formatNames(ruta, files)
+        nombresExtensiones, nombres, extensiones, numeraciones, ban, 
+        nombres_indice = self.obj1.formatNames(ruta, files)
+
+        """ print(files)
+        print(nombresExtensiones)
+        print(ruta) """
 
         if ban: 
             self.renameFiles(files, nombresExtensiones, ruta)
@@ -111,7 +136,7 @@ class AutomatizacionEmpleado:
         df['Origen'] = None
         df['Observaciones'] = None
         for y in range(len(nombres)):  
-            nueva_fila = pd.Series([str(nombres[y]), str(fechamod[y]), str(numeraciones[y]), str(cantidadpag[y]), str(extensiones[y].replace('.',"")), str(tama[y]), 'Electrónico', str(observaciones[y])], index=df.columns)
+            nueva_fila = pd.Series([str(nombres_indice[y]), str(fechamod[y]), str(numeraciones[y]), str(cantidadpag[y]), str(extensiones[y].replace('.',"")), str(tama[y]), 'Electrónico', str(observaciones[y])], index=df.columns)
             df = df.append(nueva_fila, ignore_index=True)
         return df
 

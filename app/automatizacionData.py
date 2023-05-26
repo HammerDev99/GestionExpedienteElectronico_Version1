@@ -99,7 +99,7 @@ class AutomatizacionData:
     def formatNames(self, ruta, files): 
         """ 
         @param: ruta, files
-        @return: nombresExtensiones, nombres, extensiones, numeraciones, ban
+        @return: nombresExtensiones, nombres, extensiones, numeraciones, ban, nombres_indice
         @modules: re, os, string
 
         - Separa el nombre y la extension, validando si es carpeta
@@ -114,9 +114,9 @@ class AutomatizacionData:
         - Valida con isorderCorrect si los archivos estan en orden, en caso negativo ban = true
          """
 
-        print(files)
+        #print(files)
         nombres_indice = self.separa_cadena(files)
-        print(nombres_indice)
+        #print(nombres_indice)
 
         nombres = []
         extensiones = []
@@ -173,18 +173,15 @@ class AutomatizacionData:
     def separa_cadena(self, files):
         for i in range(len(files)):
             cadena = files[i]
-
-            # Aplicar expresión regular para extraer las palabras
-            palabras = re.findall(r'[A-Za-z]+', cadena)
-
-            # Unir las palabras en una sola cadena con espacios entre ellas
-            resultado = ' '.join(palabras)
-
-            # Aplicar capitalización en cada palabra
-            resultado = resultado.title()
-
-            # Modificar la cadena de la lista
-            files[i] = resultado
+            if ' ' in cadena:    
+                cadena = os.path.splitext(cadena)[0] # Separa el nombre de la extensión
+                palabras = re.findall(r'[A-Za-z]+', cadena)                # Aplicar expresión regular para extraer las palabras
+                resultado = ' '.join(palabras)# Unir las palabras en una sola cadena con espacios entre ellas
+            else:
+                palabras = re.findall('[A-Z][a-z]*', cadena)  # Encuentra las palabras en la cadena que comienzan con una letra mayúscula seguida de letras minúsculas
+                resultado = ' '.join(palabras)  # Une las palabras con espacios para formar la cadena resultante
+            resultado = resultado.title() # Aplicar capitalización en cada palabra
+            files[i] = resultado # Modificar la cadena de la lista
         return files
 
     def isOrderCorrect(self, files, nombresExtensiones):
