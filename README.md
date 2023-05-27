@@ -129,6 +129,8 @@ python app_package/main.py
 
 ## Descargar
 
+**[Descargar APP](https://github.com/HammerDev99/GestionExpedienteElectronico_Version1/releases/tag/published).**
+
 Para recibir actualizaciones de las novedades y cambios que se realicen al programa puedes seguirme en la cuenta de twitter [@hammerdev99](https://www.twitter.com/hammerdev99) dónde se comparte su creación en público.
 
 ---

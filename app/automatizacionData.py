@@ -93,9 +93,6 @@ class AutomatizacionData:
     """ ************ """                    
 
     # VALIDAR ERROR CUANDO LOS NOMBRES SEAN DE SOLO NUMEROS
-    # Modificar la estructura del nombre, devolver variable con nombres separados y sin el consecutivo para el índice
-    # Separar función en funciones más pequeñas
-    """ La solucion más efectiva es crear una funcion principal que cuente con un ciclo y envie cada nombre de archivo llamando a otra funcion que luego controle cada palabra del nombre del archivo y así gestionar hasta el detalle más mínimo  """
     def formatNames(self, ruta, files): 
         """ 
         @param: ruta, files
@@ -114,10 +111,13 @@ class AutomatizacionData:
         - Valida con isorderCorrect si los archivos estan en orden, en caso negativo ban = true
          """
 
+<<<<<<< HEAD
         #print(files)
         nombres_indice = self.separa_cadena(files)
         #print(nombres_indice)
 
+=======
+>>>>>>> parent of b07d37e... update readme
         nombres = []
         extensiones = []
         for x in files:
@@ -153,7 +153,6 @@ class AutomatizacionData:
             if nombres[x] == "":
                 nombres[x] = ("DocumentoElectronico")
             nombres[x] = str(f"{x+1:03}")+nombres[x]
-            
         nombresExtensiones=[]
         for x in range(len(nombres)):
             if extensiones[x] != 'Carpeta':
@@ -162,9 +161,9 @@ class AutomatizacionData:
                 nombresExtensiones.append(str(nombres[x]))
         numeraciones = list(range(len(nombres)+1))
         numeraciones.pop(0)
-
         if self.isOrderCorrect(files, nombresExtensiones):
             ban = True
+<<<<<<< HEAD
         
         #print(nombres)
 
@@ -183,6 +182,9 @@ class AutomatizacionData:
             resultado = resultado.title() # Aplicar capitalización en cada palabra
             files[i] = resultado # Modificar la cadena de la lista
         return files
+=======
+        return nombresExtensiones, nombres, extensiones, numeraciones, ban
+>>>>>>> parent of b07d37e... update readme
 
     def isOrderCorrect(self, files, nombresExtensiones):
         """ 
