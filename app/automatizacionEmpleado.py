@@ -91,13 +91,8 @@ class AutomatizacionEmpleado:
         current_dir = os.getcwd()
 
         # Unir dos partes de una ruta de archivo
-<<<<<<< HEAD
         ruta = os.path.join(current_dir, 'app/assets', '000IndiceElectronicoC0.xlsm')
         #print(ruta + "\n" + rutaFinal)
-=======
-        ruta = os.path.join(current_dir, 'assets', '000IndiceElectronicoC0.xlsm')
-        print(ruta + "\n" + rutaFinal)
->>>>>>> parent of b07d37e... update readme
         # Copiar el archivo xlsm
         shutil.copy(ruta, rutaFinal) 
         self.indice = os.path.join(rutaFinal, '000IndiceElectronicoC0.xlsm')
@@ -118,12 +113,7 @@ class AutomatizacionEmpleado:
 
         #*********************************************
         #Separar instrucciones en funcion a parte
-<<<<<<< HEAD
-        nombresExtensiones, nombres, extensiones, numeraciones, ban, nombres_indice = self.obj1.formatNames(ruta, files)
-
-=======
         nombresExtensiones, nombres, extensiones, numeraciones, ban = self.obj1.formatNames(ruta, files)
->>>>>>> parent of b07d37e... update readme
         if ban: 
             self.renameFiles(files, nombresExtensiones, ruta)
         fullFilePaths = self.fullFilePath(nombresExtensiones, ruta)
@@ -140,7 +130,7 @@ class AutomatizacionEmpleado:
         df['Origen'] = None
         df['Observaciones'] = None
         for y in range(len(nombres)):  
-            nueva_fila = pd.Series([str(nombres_indice[y]), str(fechamod[y]), str(numeraciones[y]), str(cantidadpag[y]), str(extensiones[y].replace('.',"")), str(tama[y]), 'Electrónico', str(observaciones[y])], index=df.columns)
+            nueva_fila = pd.Series([str(nombres[y]), str(fechamod[y]), str(numeraciones[y]), str(cantidadpag[y]), str(extensiones[y].replace('.',"")), str(tama[y]), 'Electrónico', str(observaciones[y])], index=df.columns)
             df = df.append(nueva_fila, ignore_index=True)
         return df
 

@@ -111,13 +111,6 @@ class AutomatizacionData:
         - Valida con isorderCorrect si los archivos estan en orden, en caso negativo ban = true
          """
 
-<<<<<<< HEAD
-        #print(files)
-        nombres_indice = self.separa_cadena(files)
-        #print(nombres_indice)
-
-=======
->>>>>>> parent of b07d37e... update readme
         nombres = []
         extensiones = []
         for x in files:
@@ -163,28 +156,7 @@ class AutomatizacionData:
         numeraciones.pop(0)
         if self.isOrderCorrect(files, nombresExtensiones):
             ban = True
-<<<<<<< HEAD
-        
-        #print(nombres)
-
-        return nombresExtensiones, nombres, extensiones, numeraciones, ban, nombres_indice
-
-    def separa_cadena(self, files):
-        for i in range(len(files)):
-            cadena = files[i]
-            if ' ' in cadena:    
-                cadena = os.path.splitext(cadena)[0] # Separa el nombre de la extensión
-                palabras = re.findall(r'[A-Za-z]+', cadena)                # Aplicar expresión regular para extraer las palabras
-                resultado = ' '.join(palabras)# Unir las palabras en una sola cadena con espacios entre ellas
-            else:
-                palabras = re.findall('[A-Z][a-z]*', cadena)  # Encuentra las palabras en la cadena que comienzan con una letra mayúscula seguida de letras minúsculas
-                resultado = ' '.join(palabras)  # Une las palabras con espacios para formar la cadena resultante
-            resultado = resultado.title() # Aplicar capitalización en cada palabra
-            files[i] = resultado # Modificar la cadena de la lista
-        return files
-=======
         return nombresExtensiones, nombres, extensiones, numeraciones, ban
->>>>>>> parent of b07d37e... update readme
 
     def isOrderCorrect(self, files, nombresExtensiones):
         """ 
