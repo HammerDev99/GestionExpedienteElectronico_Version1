@@ -117,8 +117,13 @@ class AutomatizacionEmpleado:
         #Separar instrucciones en funcion a parte
         nombresExtensiones, nombres, extensiones, numeraciones, ban, nombres_indice = self.obj1.formatNames(ruta, files)
 
-        print(files)
         print(nombresExtensiones)
+        print(nombres)
+        print(extensiones)
+        print(numeraciones)
+        print(ban)
+        print(nombres_indice)
+        print(files)
         print(ruta)
 
         if ban: 
