@@ -166,7 +166,7 @@ class AutomatizacionData:
         if self.isOrderCorrect(files, nombresExtensiones):
             ban = True
         
-        print(nombres)
+        #print(nombres)
 
         return nombresExtensiones, nombres, extensiones, numeraciones, ban, nombres_indice
 

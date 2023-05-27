@@ -92,7 +92,7 @@ class AutomatizacionEmpleado:
 
         # Unir dos partes de una ruta de archivo
         ruta = os.path.join(current_dir, 'app/assets', '000IndiceElectronicoC0.xlsm')
-        print(ruta + "\n" + rutaFinal)
+        #print(ruta + "\n" + rutaFinal)
         # Copiar el archivo xlsm
         shutil.copy(ruta, rutaFinal) 
         self.indice = os.path.join(rutaFinal, '000IndiceElectronicoC0.xlsm')
@@ -113,12 +113,7 @@ class AutomatizacionEmpleado:
 
         #*********************************************
         #Separar instrucciones en funcion a parte
-        nombresExtensiones, nombres, extensiones, numeraciones, ban, 
-        nombres_indice = self.obj1.formatNames(ruta, files)
-
-        """ print(files)
-        print(nombresExtensiones)
-        print(ruta) """
+        nombresExtensiones, nombres, extensiones, numeraciones, ban, nombres_indice = self.obj1.formatNames(ruta, files)
 
         if ban: 
             self.renameFiles(files, nombresExtensiones, ruta)
