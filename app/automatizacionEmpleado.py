@@ -1,3 +1,5 @@
+# coding=utf-8
+
 import os
 import pandas as pd
 import shutil 
@@ -113,12 +115,11 @@ class AutomatizacionEmpleado:
 
         #*********************************************
         #Separar instrucciones en funcion a parte
-        nombresExtensiones, nombres, extensiones, numeraciones, ban, 
-        nombres_indice = self.obj1.formatNames(ruta, files)
+        nombresExtensiones, nombres, extensiones, numeraciones, ban, nombres_indice = self.obj1.formatNames(ruta, files)
 
-        """ print(files)
+        print(files)
         print(nombresExtensiones)
-        print(ruta) """
+        print(ruta)
 
         if ban: 
             self.renameFiles(files, nombresExtensiones, ruta)

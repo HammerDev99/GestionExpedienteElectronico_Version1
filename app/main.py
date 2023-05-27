@@ -1,3 +1,5 @@
+# coding=utf-8
+
 import automatizacionGUI
 
 # Punto de entrada
