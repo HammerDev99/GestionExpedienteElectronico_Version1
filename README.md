@@ -1,8 +1,8 @@
-# GestionExpedienteElectronico_Version1
+# GestionExpedienteElectronico
 
 ## Tabla de contenidos
 
-- [GestionExpedienteElectronico\_Version1](#gestionexpedienteelectronico_version1)
+- [GestionExpedienteElectronico](#gestionexpedienteelectronico)
   - [Tabla de contenidos](#tabla-de-contenidos)
   - [Descripción](#descripción)
   - [Demo](#demo)
@@ -120,12 +120,9 @@ python app_package/main.py
 
 ## Registro de cambios
 
-<<<<<<< HEAD
-- 2023-05-29 Modifies index name format and enables cross-platform function.
-=======
->>>>>>> master
-- 2022-12-02 Update folder schema
-- 2022-10-26 First release
+- 2023-05-29 Modifies index name format and enables cross-platform function. (v.1.0.1)
+- 2022-12-02 Update folder schema.
+- 2022-10-26 First release. (v.1.0.0)
 
 ## Construido con
 
@@ -133,11 +130,6 @@ python app_package/main.py
 
 ## Descargar
 
-<<<<<<< HEAD
-=======
-**[Descargar APP](https://github.com/HammerDev99/GestionExpedienteElectronico_Version1/releases/tag/published).**
-
->>>>>>> master
 Para recibir actualizaciones de las novedades y cambios que se realicen al programa puedes seguirme en la cuenta de twitter [@hammerdev99](https://www.twitter.com/hammerdev99) dónde se comparte su creación en público.
 
 ---
