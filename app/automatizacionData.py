@@ -1,5 +1,8 @@
+<<<<<<< HEAD
 # coding=utf-8
 
+=======
+>>>>>>> master
 import datetime
 import re
 import os
@@ -94,8 +97,12 @@ class AutomatizacionData:
                     print("Excepcion presentada: \n")
     """ ************ """                    
 
+<<<<<<< HEAD
     # Separar función en funciones más pequeñas
     """ La solucion más efectiva es crear una funcion principal que cuente con un ciclo y envie cada nombre de archivo llamando a otra funcion que luego controle cada palabra del nombre del archivo y así gestionar hasta el detalle más mínimo  """
+=======
+    # VALIDAR ERROR CUANDO LOS NOMBRES SEAN DE SOLO NUMEROS
+>>>>>>> master
     def formatNames(self, ruta, files): 
         """ 
         @param: ruta, files
@@ -149,7 +156,10 @@ class AutomatizacionData:
             if nombres[x] == "":
                 nombres[x] = ("DocumentoElectronico")
             nombres[x] = str(f"{x+1:03}")+nombres[x]
+<<<<<<< HEAD
             
+=======
+>>>>>>> master
         nombresExtensiones=[]
         for x in range(len(nombres)):
             if extensiones[x] != 'Carpeta':
@@ -158,6 +168,7 @@ class AutomatizacionData:
                 nombresExtensiones.append(str(nombres[x]))
         numeraciones = list(range(len(nombres)+1))
         numeraciones.pop(0)
+<<<<<<< HEAD
 
         if self.isOrderCorrect(files, nombresExtensiones):
             ban = True
@@ -203,6 +214,11 @@ class AutomatizacionData:
             
             lista_cadena[i] = resultado # Modificar la cadena de la lista
         return lista_cadena
+=======
+        if self.isOrderCorrect(files, nombresExtensiones):
+            ban = True
+        return nombresExtensiones, nombres, extensiones, numeraciones, ban
+>>>>>>> master
 
     def isOrderCorrect(self, files, nombresExtensiones):
         """ 

@@ -1,5 +1,8 @@
+<<<<<<< HEAD
 # coding=utf-8
 
+=======
+>>>>>>> master
 import automatizacionGUI
 
 # Punto de entrada
