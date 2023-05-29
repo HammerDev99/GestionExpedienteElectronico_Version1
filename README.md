@@ -120,6 +120,7 @@ python app_package/main.py
 
 ## Registro de cambios
 
+- 2023-05-29 Modifies index name format and enables cross-platform function.
 - 2022-12-02 Update folder schema
 - 2022-10-26 First release
 

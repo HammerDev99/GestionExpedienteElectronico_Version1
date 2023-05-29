@@ -24,7 +24,10 @@ class AutomatizacionEmpleado:
 
         ### Inicializa variables globales con lista de archivos ordenados por nombre
         self.ruta = input
+
+        # LISTAR SOLO LOS ARCHIVOS QUE NO ESTAN OCULTOS (.ds_store)
         self.files = os.listdir(self.ruta)
+
         if indice == '':
             self.copyXlsm(self.ruta)
         else:
@@ -117,14 +120,14 @@ class AutomatizacionEmpleado:
         #Separar instrucciones en funcion a parte
         nombresExtensiones, nombres, extensiones, numeraciones, ban, nombres_indice = self.obj1.formatNames(ruta, files)
 
-        print(nombresExtensiones)
+        """ print(nombresExtensiones)
         print(nombres)
         print(extensiones)
         print(numeraciones)
         print(ban)
         print(nombres_indice)
         print(files)
-        print(ruta)
+        print(ruta) """
 
         if ban: 
             self.renameFiles(files, nombresExtensiones, ruta)

@@ -4,6 +4,7 @@ import tkinter as tk
 from tkinter import ttk
 from tkinter import filedialog
 import os.path
+import sys
 import webbrowser
 from automatizacionEmpleado import AutomatizacionEmpleado
 
@@ -17,6 +18,7 @@ class Application(ttk.Frame):
         root.title('GestionExpedienteElectronico')
         root.resizable(False, False)
         root.geometry('350x165')
+        root.protocol("WM_DELETE_WINDOW", self.on_closing)
         self.create_oneProcessWidgets()
 
     def create_oneProcessWidgets(self):
@@ -50,7 +52,7 @@ class Application(ttk.Frame):
         self.aceptar = tk.Button(self, text = 'Aceptar', command = self.procesaCarpeta, height = 1, width = 7)
         self.aceptar.pack(side=tk.RIGHT, padx=3)
 
-        self.cancelar = tk.Button(self, text = 'Cancelar', fg = 'red', command = self.master.destroy, height = 1, width = 7)
+        self.cancelar = tk.Button(self, text = 'Cancelar', fg = 'red', command = self.on_closing, height = 1, width = 7)
         self.cancelar.pack(side=tk.RIGHT, before=self.aceptar)
 
         self.pack()
@@ -59,8 +61,11 @@ class Application(ttk.Frame):
         """
         @modules: webbrowser 
         """
-
         webbrowser.open_new(url)
+
+    def on_closing(self):
+        print('closing')
+        root.destroy()
 
     def obtenerExpediente(self):
         """ 

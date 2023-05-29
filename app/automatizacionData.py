@@ -94,8 +94,6 @@ class AutomatizacionData:
                     print("Excepcion presentada: \n")
     """ ************ """                    
 
-    # VALIDAR ERROR CUANDO LOS NOMBRES SEAN DE SOLO NUMEROS
-    # Modificar la estructura del nombre, devolver variable con nombres separados y sin el consecutivo para el índice
     # Separar función en funciones más pequeñas
     """ La solucion más efectiva es crear una funcion principal que cuente con un ciclo y envie cada nombre de archivo llamando a otra funcion que luego controle cada palabra del nombre del archivo y así gestionar hasta el detalle más mínimo  """
     def formatNames(self, ruta, files): 
@@ -115,10 +113,6 @@ class AutomatizacionData:
         - Agrega consecutivo al comienzo del nombre en el mismo orden de la carpeta
         - Valida con isorderCorrect si los archivos estan en orden, en caso negativo ban = true
          """
-
-        #print(files)
-        nombres_indice = self.separa_cadena(files)
-        #print(nombres_indice)
 
         nombres = []
         extensiones = []
@@ -168,13 +162,22 @@ class AutomatizacionData:
         if self.isOrderCorrect(files, nombresExtensiones):
             ban = True
         
+        print(nombresExtensiones)
         print(nombres)
+        print(extensiones)
+        print(numeraciones)
+        print(ban)
+        
+        nombres_indice = []
+        nombres_indice = self.procesa_cadena_indice(files)
+        print(nombres_indice)
 
         return nombresExtensiones, nombres, extensiones, numeraciones, ban, nombres_indice
 
-    def separa_cadena(self, files):
-        for i in range(len(files)):
-            cadena = files[i]
+    def procesa_cadena_indice(self, files):
+        lista_cadena = list(files)
+        for i in range(len(lista_cadena)):
+            cadena = lista_cadena[i]
             if ' ' in cadena:    
                 cadena = os.path.splitext(cadena)[0] # Separa el nombre de la extensión
                 palabras = re.findall(r'[A-Za-z]+', cadena)                # Aplicar expresión regular para extraer las palabras
@@ -182,9 +185,24 @@ class AutomatizacionData:
             else:
                 palabras = re.findall('[A-Z][a-z]*', cadena)  # Encuentra las palabras en la cadena que comienzan con una letra mayúscula seguida de letras minúsculas
                 resultado = ' '.join(palabras)  # Une las palabras con espacios para formar la cadena resultante
-            resultado = resultado.title() # Aplicar capitalización en cada palabra
-            files[i] = resultado # Modificar la cadena de la lista
-        return files
+
+            palabras = resultado.split()  # Dividir la cadena en palabras
+            if palabras:
+                # Capitalizar la primera palabra
+                palabras[0] = palabras[0].capitalize()
+                # Convertir las demás palabras a minúscula
+                palabras[1:] = [palabra.lower() for palabra in palabras[1:]]
+            resultado = ' '.join(palabras)  # Unir las palabras en una cadena nuevamente
+
+            if resultado.isdigit():
+                caracter_aleatorio = random.choice(string.ascii_letters)
+                resultado = caracter_aleatorio + resultado
+            
+            if resultado == '':
+                resultado = 'Documento electronico'
+            
+            lista_cadena[i] = resultado # Modificar la cadena de la lista
+        return lista_cadena
 
     def isOrderCorrect(self, files, nombresExtensiones):
         """ 
