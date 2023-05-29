@@ -1,8 +1,5 @@
-<<<<<<< HEAD
 # coding=utf-8
 
-=======
->>>>>>> master
 import os
 import pandas as pd
 import shutil 
@@ -27,14 +24,10 @@ class AutomatizacionEmpleado:
 
         ### Inicializa variables globales con lista de archivos ordenados por nombre
         self.ruta = input
-<<<<<<< HEAD
 
         # LISTAR SOLO LOS ARCHIVOS QUE NO ESTAN OCULTOS (.ds_store)
         self.files = os.listdir(self.ruta)
 
-=======
-        self.files = os.listdir(self.ruta)
->>>>>>> master
         if indice == '':
             self.copyXlsm(self.ruta)
         else:
@@ -104,11 +97,7 @@ class AutomatizacionEmpleado:
 
         # Unir dos partes de una ruta de archivo
         ruta = os.path.join(current_dir, 'app/assets', '000IndiceElectronicoC0.xlsm')
-<<<<<<< HEAD
         print(ruta + "\n" + rutaFinal)
-=======
-        #print(ruta + "\n" + rutaFinal)
->>>>>>> master
         # Copiar el archivo xlsm
         shutil.copy(ruta, rutaFinal) 
         self.indice = os.path.join(rutaFinal, '000IndiceElectronicoC0.xlsm')
@@ -129,7 +118,6 @@ class AutomatizacionEmpleado:
 
         #*********************************************
         #Separar instrucciones en funcion a parte
-<<<<<<< HEAD
         nombresExtensiones, nombres, extensiones, numeraciones, ban, nombres_indice = self.obj1.formatNames(ruta, files)
 
         """ print(nombresExtensiones)
@@ -141,9 +129,6 @@ class AutomatizacionEmpleado:
         print(files)
         print(ruta) """
 
-=======
-        nombresExtensiones, nombres, extensiones, numeraciones, ban = self.obj1.formatNames(ruta, files)
->>>>>>> master
         if ban: 
             self.renameFiles(files, nombresExtensiones, ruta)
         fullFilePaths = self.fullFilePath(nombresExtensiones, ruta)
@@ -160,11 +145,7 @@ class AutomatizacionEmpleado:
         df['Origen'] = None
         df['Observaciones'] = None
         for y in range(len(nombres)):  
-<<<<<<< HEAD
             nueva_fila = pd.Series([str(nombres_indice[y]), str(fechamod[y]), str(numeraciones[y]), str(cantidadpag[y]), str(extensiones[y].replace('.',"")), str(tama[y]), 'Electrónico', str(observaciones[y])], index=df.columns)
-=======
-            nueva_fila = pd.Series([str(nombres[y]), str(fechamod[y]), str(numeraciones[y]), str(cantidadpag[y]), str(extensiones[y].replace('.',"")), str(tama[y]), 'Electrónico', str(observaciones[y])], index=df.columns)
->>>>>>> master
             df = df.append(nueva_fila, ignore_index=True)
         return df
 
