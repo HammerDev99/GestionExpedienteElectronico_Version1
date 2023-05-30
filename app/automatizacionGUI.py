@@ -64,8 +64,9 @@ class Application(ttk.Frame):
         webbrowser.open_new(url)
 
     def on_closing(self):
-        print('closing')
+        print('Cerrando aplicación')
         root.destroy()
+        #root.quit()
 
     def obtenerExpediente(self):
         """ 
@@ -108,6 +109,8 @@ class Application(ttk.Frame):
              }
         if result != None:
             tk.messagebox.showinfo(message=switcher.get(result), title=os.path.basename(self.expediente))
+            lista_vacia = list()
+            self.agregaNombreBase(lista_vacia, False)
 
     def agregaNombreBase(self, items, bandera):
         """ 

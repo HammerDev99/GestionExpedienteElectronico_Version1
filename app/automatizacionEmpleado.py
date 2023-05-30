@@ -47,6 +47,7 @@ class AutomatizacionEmpleado:
             extensiones.append(os.path.splitext(x)[1])
         return nombres, extensiones
 
+    # Renombrar el archivo que quedó como Documento electrónico (por formateo de nombres en indice) también en el sistema de archivos
     def renameFiles(self, files, nombresExtensiones, ruta):
         """ 
         @param: files, nombresExtensiones (List), ruta (string)
@@ -65,26 +66,6 @@ class AutomatizacionEmpleado:
                 except:
                     print("Excepcion presentada: \n")
 
-    def renameFiles2(self, files, nombresExtensiones, ruta):
-        """
-        Renombra los archivos en la ruta especificada.
-        @param: files, nombresExtensiones (List), ruta (string)
-        """
-        for i in range(len(files)):
-            fulldirct = os.path.join(ruta, files[i])
-            if os.path.exists(fulldirct):
-                new_file_path = os.path.join(ruta, nombresExtensiones[i])
-                os.rename(fulldirct, new_file_path)
-            else:
-                try:
-                    length_of_string = 3
-                    file_name, file_ext = os.path.splitext(nombresExtensiones[i])
-                    new_file_name = file_name + ''.join(random.choice(string.ascii_letters + string.digits) for _ in range(length_of_string)) + file_ext
-                    new_file_path = os.path.join(ruta, new_file_name)
-                    os.rename(os.path.join(ruta, files[i]), new_file_path)
-                except Exception as e:
-                    print("Excepcion presentada:", e)
-
     # Validar sistema de archivos segun SO
     def copyXlsm(self, rutaFinal):
         """ 
@@ -97,7 +78,7 @@ class AutomatizacionEmpleado:
 
         # Unir dos partes de una ruta de archivo
         ruta = os.path.join(current_dir, 'app/assets', '000IndiceElectronicoC0.xlsm')
-        print(ruta + "\n" + rutaFinal)
+        #print(ruta + "\n" + rutaFinal)
         # Copiar el archivo xlsm
         shutil.copy(ruta, rutaFinal) 
         self.indice = os.path.join(rutaFinal, '000IndiceElectronicoC0.xlsm')

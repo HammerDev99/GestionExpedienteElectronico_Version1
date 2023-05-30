@@ -113,6 +113,10 @@ class AutomatizacionData:
         - Agrega consecutivo al comienzo del nombre en el mismo orden de la carpeta
         - Valida con isorderCorrect si los archivos estan en orden, en caso negativo ban = true
          """
+        
+        # Función para procesar nombres del índice
+        nombres_indice = []
+        nombres_indice = self.procesa_cadena_indice(files)
 
         nombres = []
         extensiones = []
@@ -146,8 +150,10 @@ class AutomatizacionData:
                         cont = cont +1
                         continue
             nombres[x] = nombres[x][0:36]
-            if nombres[x] == "":
+            # Compara valores de nombre_indice y nombres para aplicar nombre a archivo 
+            if (nombres_indice[x] == "Documento electronico") or (nombres[x] == ""):
                 nombres[x] = ("DocumentoElectronico")
+
             nombres[x] = str(f"{x+1:03}")+nombres[x]
             
         nombresExtensiones=[]
@@ -161,16 +167,6 @@ class AutomatizacionData:
 
         if self.isOrderCorrect(files, nombresExtensiones):
             ban = True
-        
-        print(nombresExtensiones)
-        print(nombres)
-        print(extensiones)
-        print(numeraciones)
-        print(ban)
-        
-        nombres_indice = []
-        nombres_indice = self.procesa_cadena_indice(files)
-        print(nombres_indice)
 
         return nombresExtensiones, nombres, extensiones, numeraciones, ban, nombres_indice
 

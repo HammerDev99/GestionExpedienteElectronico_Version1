@@ -8,11 +8,12 @@ app/__pycache__
 venv/
 
 # Files
-app/test/test.py
+app/test.py
 app/assets/Pasos manejo de archivos.md
 app/assets/004-2022-00023 (Pame-SALIÓ) impugnada.txt
 app/assets/chain_text_test00.ipynb
 app/assets/chain_text_test01.ipynb
+app/assets/textchain.py
 
 #########
 
