@@ -10,6 +10,8 @@ venv/
 # Files
 src/test/
 src/resources/Pasos manejo de archivos.md
+src/resources/chain_text_test00.ipynb
+src/resources/chain_text_test01.ipynb
 src/resources/example.py
 src/views/prueba.py
 
@@ -65,6 +67,8 @@ __pycache__/
 build/
 develop-eggs/
 dist/
+bin/
+app/
 downloads/
 eggs/
 .eggs/
