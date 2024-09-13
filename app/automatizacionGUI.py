@@ -27,7 +27,7 @@ class Application(ttk.Frame):
         ### GUI GestionExpedienteElectronico_Version1
         """
 
-        self.label = tk.Label(self, text=r"Daniel Arbelaez Alvarez - HammerDev99", fg="blue", cursor="hand2")
+        self.label = tk.Label(self, text=r"Daniel Arbelaez - HammerDev99", fg="blue", cursor="hand2")
         self.label.pack(side=tk.BOTTOM, padx=10, pady=10)
         self.label.bind(
             "<Button-1>",
@@ -157,8 +157,7 @@ class Application(ttk.Frame):
                 title=os.path.basename(self.expediente),
             ):
                 obj = AutomatizacionEmpleado(self.expediente, "")
-                result = obj.process()
-                #self.mensaje(result)
+                self.mensaje(obj.process())
             else:
                 self.mensaje(6)
         else:
