@@ -11,6 +11,7 @@ from automatizacionEmpleado import AutomatizacionEmpleado
 class Application(ttk.Frame):
 
     expediente = ""
+    carpetas = []
 
     def __init__(self, root):
 
@@ -27,7 +28,7 @@ class Application(ttk.Frame):
         ### GUI GestionExpedienteElectronico_Version1
         """
 
-        self.label = tk.Label(self, text=r"Daniel Arbelaez Alvarez - HammerDev99", fg="blue", cursor="hand2")
+        self.label = tk.Label(self, text=r"HammerDev99", fg="blue", cursor="hand2")
         self.label.pack(side=tk.BOTTOM, padx=10, pady=10)
         self.label.bind(
             "<Button-1>",
@@ -55,7 +56,7 @@ class Application(ttk.Frame):
         self.entry02.insert(0, "Expedientes de Procesos Judiciales Ejecutivos")
 
         self.label1 = tk.Label(
-            self, text="Seleccione la ubicación de la subserie a procesar \n(Debe contener expedientes)"
+            self, text="Seleccione la ubicación de la subserie a procesar \n(Debe contener carpetas con el nombre del radicado)"
         )
         self.label1.pack(pady=15)
 
@@ -73,7 +74,7 @@ class Application(ttk.Frame):
             self,
             text="Agregar carpeta",
             #command=self.obtenerExpediente,
-            command=self.obtenerExpedientes,
+            command=self.obtenerExpediente,
             height=1,
             width=17,
         )
@@ -83,8 +84,7 @@ class Application(ttk.Frame):
         self.label5.pack(side=tk.LEFT)
 
         self.aceptar = tk.Button(
-            #self, text="Aceptar", command=self.procesaCarpeta, height=1, width=7
-            self, text="Aceptar", command=self.procesaCarpetas, height=1, width=7
+            self, text="Aceptar", command=self.procesaCarpetas(self.carpetas), height=1, width=7
         )
         self.aceptar.pack(side=tk.RIGHT, padx=3)
 
@@ -124,26 +124,19 @@ class Application(ttk.Frame):
         - Llama a procesaCarpetas con la lista de carpetas
         """
         folder_selected = os.path.normpath(filedialog.askdirectory())
-        if folder_selected:
-            carpetas = [os.path.join(folder_selected, d) for d in os.listdir(folder_selected) if os.path.isdir(os.path.join(folder_selected, d))]
-            self.procesaCarpetas(carpetas)
+        if self.expediente:
+            carpetas = [os.path.join(self.expediente, d) for d in os.listdir(self.expediente) if os.path.isdir(os.path.join(self.expediente, d))]
+            self.carpetas = carpetas
+            print(carpetas)
 
     def procesaCarpetas(self, carpetas):
         """
         - Crea objeto y llama metodo process() para cada carpeta en la lista
         """
         for carpeta in carpetas:
-                despacho = self.entry01.get()
-                subserie = self.entry02.get()
                 rdo = os.path.basename(carpeta)
-
-                print("Despacho: ", despacho)
-                print("Subserie: ", subserie)
-                print("RDO: ", rdo)
-
-                obj = AutomatizacionEmpleado(carpeta, "", despacho, subserie, rdo)
-                result = obj.process()
-                #self.mensaje(result)
+                obj = AutomatizacionEmpleado(carpeta, "", self.entry01.get(), self.entry02.get(), rdo)
+                self.mensaje(obj.process())
 
     def procesaCarpeta(self):
         """
@@ -157,8 +150,7 @@ class Application(ttk.Frame):
                 title=os.path.basename(self.expediente),
             ):
                 obj = AutomatizacionEmpleado(self.expediente, "")
-                result = obj.process()
-                #self.mensaje(result)
+                self.mensaje(obj.process())
             else:
                 self.mensaje(6)
         else:
@@ -180,9 +172,10 @@ class Application(ttk.Frame):
             6: "Procedimiento detenido",
         }
         if result != None:
-            tk.messagebox.showinfo(
+            print(switcher.get(result))
+            """ tk.messagebox.showinfo(
                 message=switcher.get(result), title=os.path.basename(self.expediente)
-            )
+            ) """
             lista_vacia = list()
             self.agregaNombreBase(lista_vacia, False)
 

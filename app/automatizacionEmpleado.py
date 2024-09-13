@@ -9,18 +9,22 @@ import random
 import traceback
 from automatizacionData import AutomatizacionData
 
-
 class AutomatizacionEmpleado:
 
     ruta = ""
     indice = ""
     files = []
+
+    despacho = ""
+    subserie = ""
+    rdo = ""
+
     obj1 = AutomatizacionData()
 
     """ def __init__(self) -> None: # Only for test
         pass """
 
-    def __init__(self, input: str, indice):
+    def __init__(self, input: str, indice, despacho, subserie, rdo):
         # @param: input tipo str; Obtiene ruta de la carpeta a procesar
 
         ### Inicializa variables globales con lista de archivos ordenados por nombre
@@ -33,6 +37,10 @@ class AutomatizacionEmpleado:
             self.copyXlsm(self.ruta)
         else:
             self.indice = indice
+
+        self.despacho = despacho
+        self.subserie = subserie
+        self.rdo = rdo
 
     def separatePath(self, files):
         """
@@ -200,7 +208,8 @@ class AutomatizacionEmpleado:
         df = self.createDataFrame(self.files, self.ruta)
         self.createXlsm(df, macro_vba, sheet)
         wb.save()
-        # wb.close()
+        wb.close()
+        wb.app.quit()
         return 1
 
     def createXlsm(self, df, macro_vba, sheet):
@@ -224,6 +233,20 @@ class AutomatizacionEmpleado:
         contFila = filaInicial
         for x in range(df.shape[0]):
             macro_vba()
+
+        # Agregar valores de entry01_value y entry02_value en celdas específicas
+        try:
+            # Verificar si las variables globales existen y tienen valores válidos
+            if 'entry01_value' in globals() and 'entry02_value' in globals():
+                sheet.range("B3").value = self.despacho  # Despacho
+                sheet.range("B4").value = self.subserie  # Subserie
+                sheet.range("B5").value = self.rdo  # Radicado
+            else:
+                raise ValueError("Las variables despacho, subserie y/o rdo no están definidas o no tienen valores válidos.")
+        except Exception as e:
+            print(f"Error al escribir en las celdas del archivo Excel: {e}")
+
+
         for i in range(df.shape[0]):
             for j in range(len(columnas)):
                 sheet.range(columnas[j] + str(contFila)).value = df.iloc[i, j]
