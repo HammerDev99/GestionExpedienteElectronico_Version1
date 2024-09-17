@@ -9,6 +9,8 @@ import warnings
 import PyPDF2
 import random  # importado por función duplicada
 from collections import Counter
+from docx import Document
+import win32com.client as win32
 
 
 class AutomatizacionData:
@@ -287,14 +289,19 @@ class AutomatizacionData:
         extension = extension.lower()
         if os.path.isfile(file):
             if extension == ".pdf":
-                with open(file, "rb") as f:
-                    try:
-                        pdf = PyPDF2.PdfFileReader(f)
-                        if not sys.warnoptions:
-                            warnings.simplefilter("ignore")
-                        return pdf.getNumPages()
-                    except:
-                        return 0
+                try:
+                    pdf_path = file
+                    total_pages = count_pages_in_pdf(pdf_path)
+                    return total_pages
+                except:
+                    return 0
+            elif extension == ".docx" or extension == ".doc":
+                try:
+                    docx_path = file
+                    total_pages = count_pages_in_docx(docx_path)
+                    return total_pages
+                except:
+                    return 0
             elif (
                 extension == ".xls"
                 or extension == ".xlsx"
@@ -317,3 +324,59 @@ class AutomatizacionData:
                 return 0
         else:
             return 1
+
+def count_pages_in_pdf(pdf_path):
+    """
+    Cuenta el número de páginas en un archivo PDF utilizando dos métodos diferentes.
+    
+    :param pdf_path: Ruta del archivo PDF
+    :return: Número de páginas en el documento
+    """
+    # Primer método: PyPDF2.PdfFileReader
+    try:
+        with open(pdf_path, "rb") as f:
+            pdf = PyPDF2.PdfFileReader(f)
+            if not sys.warnoptions:
+                warnings.simplefilter("ignore")
+            return pdf.getNumPages()
+    except Exception as e:
+        print(f"Error al contar páginas con PyPDF2.PdfFileReader: {e}")
+
+    # Segundo método: PyPDF2.PdfReader
+    try:
+        with open(pdf_path, "rb") as file:
+            reader = PdfReader(file)
+            return len(reader.pages)
+    except Exception as e:
+        print(f"Error al contar páginas con PyPDF2.PdfReader: {e}")
+        return 0
+
+def count_pages_in_docx(doc_path):
+    """
+    Cuenta el número de páginas en un archivo .doc o .docx utilizando Microsoft Word.
+    
+    :param doc_path: Ruta del archivo .doc o .docx
+    :return: Número de páginas en el documento
+    """
+    try:
+        # Inicia Microsoft Word
+        word = win32.Dispatch("Word.Application")
+        word.Visible = False  # No mostrar la ventana de Word
+        
+        # Abre el documento .doc o .docx
+        doc = word.Documents.Open(doc_path)
+        
+        # Recalcula las páginas
+        doc.Repaginate()  # Asegura que las páginas se recalculen si es necesario
+        
+        # Obtiene el número de páginas
+        pages = doc.ComputeStatistics(2)  # 2 es el código para contar páginas (wdStatisticPages)
+        
+        # Cierra el documento y Word
+        doc.Close(False)  # False para no guardar cambios
+        word.Quit()
+        
+        return pages
+    except Exception as e:
+        print(f"Error al contar páginas en el archivo {doc_path}: {e}")
+        return 0

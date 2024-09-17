@@ -194,6 +194,7 @@ class AutomatizacionEmpleado:
         try:
             wb = xw.Book(indexPath)
             app = wb.app
+            app.visible = False  # Hacer que la aplicación de Excel no sea visible
             macro_vba = app.macro(
                 "'" + str(os.path.basename(self.indice)) + "'" + "!Macro1InsertarFila"
             )

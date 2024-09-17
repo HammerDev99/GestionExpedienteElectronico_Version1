@@ -9,12 +9,17 @@ venv/
 
 # Files
 app/assets/test.py
+app/assets/test_document.docx
+app/assets/test_page_counter.py
+app/assets/test_page_counter_in_pdf.py
+app/assets/archivo_firmado_o_protegido.pdf
 app/assets/test_xlwings.py
 app/assets/Pasos manejo de archivos.md
 app/assets/004-2022-00023 (Pame-SALIÓ) impugnada.txt
 app/assets/chain_text_test00.ipynb
 app/assets/chain_text_test01.ipynb
 app/assets/textchain.py
+app/assets/000IndiceElectronicoC0 copy.xlsm
 
 #########
 
