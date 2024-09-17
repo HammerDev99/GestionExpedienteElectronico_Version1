@@ -128,6 +128,8 @@ class AutomatizacionEmpleado:
         print(files)
         print(ruta) """
 
+        nombresExtensiones = self.capitalize_first_letter(nombresExtensiones)
+
         if ban:
             self.renameFiles(files, nombresExtensiones, ruta)
         fullFilePaths = self.fullFilePath(nombresExtensiones, ruta)
@@ -161,6 +163,16 @@ class AutomatizacionEmpleado:
             )
             df = df.append(nueva_fila, ignore_index=True)
         return df
+    
+    def capitalize_first_letter(self, file_names):
+        capitalized_names = []
+        for name in file_names:
+            for i, char in enumerate(name):
+                if char.isalpha():
+                    capitalized_name = name[:i] + char.upper() + name[i+1:]
+                    capitalized_names.append(capitalized_name)
+                    break
+        return capitalized_names
 
     def fullFilePath(self, files, ruta):
         """

@@ -84,7 +84,6 @@ class Application(ttk.Frame):
         self.pathExpediente = tk.Button(
             self,
             text="Procesar carpeta",
-            #command=self.obtenerExpediente,
             command=self.obtenerExpedientes,
             height=1,
             width=17,
@@ -95,7 +94,6 @@ class Application(ttk.Frame):
         self.label5.pack(side=tk.LEFT)
 
         self.aceptar = tk.Button(
-            #self, text="Aceptar", command=self.procesaCarpeta, height=1, width=7
             self, text="Aceptar", command=self.procesaCarpetas, height=1, width=7
         )
         #self.aceptar.pack(side=tk.RIGHT, padx=3)
@@ -140,6 +138,7 @@ class Application(ttk.Frame):
         - Llama a procesaCarpetas con la lista de carpetas
         """
         folder_selected = os.path.normpath(filedialog.askdirectory())
+        self.text_widget.insert(tk.END, "CARPETAS PROCESADAS:\n")
         if folder_selected:
             carpetas = [os.path.join(folder_selected, d) for d in os.listdir(folder_selected) if os.path.isdir(os.path.join(folder_selected, d))]
             self.procesaCarpetas(carpetas)
@@ -149,7 +148,6 @@ class Application(ttk.Frame):
         """
         - Crea objeto y llama metodo process() para cada carpeta en la lista
         """
-        self.text_widget.insert(tk.END, f"CARPETAS PROCESADAS:\n")
         total_carpetas = len(carpetas)
         self.progress["maximum"] = total_carpetas
 
@@ -158,14 +156,12 @@ class Application(ttk.Frame):
             subserie = self.entry02.get()
             rdo = os.path.basename(carpeta)
 
-            print("Despacho: ", despacho)
-            print("Subserie: ", subserie)
             print("RDO: ", rdo)
-            self.text_widget.insert(tk.END, f"{rdo}\n")
+            self.text_widget.insert(tk.END, subserie+"/"+rdo+"\n")
             self.text_widget.see(tk.END)
 
             obj = AutomatizacionEmpleado(carpeta, "", despacho, subserie, rdo)
-            result = obj.process()
+            obj.process()
 
             # Actualizar la barra de progreso
             self.progress["value"] = i + 1
@@ -226,7 +222,6 @@ class Application(ttk.Frame):
                 nombres.append(os.path.basename(x))
             self.listbox1.delete(0, tk.END)
             self.listbox1.insert(0, *nombres)
-            # self.listaNombres = nombres
         else:
             """ self.entry1.config(state=tk.NORMAL)
             self.entry1.delete(0, tk.END)
@@ -239,9 +234,3 @@ class Application(ttk.Frame):
 root = tk.Tk()
 app = Application(root)
 app.mainloop()
-
-# Punto de entrada sin __main__.py
-""" if __name__ == '__main__':
-    root = tk.Tk()
-    obj = Application(root)
-    root.mainloop() """
