@@ -27,7 +27,7 @@ class Application(ttk.Frame):
         ### GUI GestionExpedienteElectronico_Version1
         """
 
-        self.label = tk.Label(self, text=r"Daniel Arbelaez - HammerDev99", fg="blue", cursor="hand2")
+        self.label = tk.Label(self, text=r"Daniel Arbelaez Alvarez - HammerDev99", fg="blue", cursor="hand2")
         self.label.pack(side=tk.BOTTOM, padx=10, pady=10)
         self.label.bind(
             "<Button-1>",
@@ -46,7 +46,7 @@ class Application(ttk.Frame):
         self.entry01.insert(0, "JUZGADO TERCERO CIVIL MUNICIPAL DE BELLO")
 
         self.label02 = tk.Label(
-            self, text="Subserie"
+            self, text="Serie o Subserie"
         )
         self.label02.pack(pady=5)
 
@@ -71,7 +71,7 @@ class Application(ttk.Frame):
 
         self.pathExpediente = tk.Button(
             self,
-            text="Agregar carpeta",
+            text="Procesar carpeta",
             #command=self.obtenerExpediente,
             command=self.obtenerExpedientes,
             height=1,
@@ -86,12 +86,13 @@ class Application(ttk.Frame):
             #self, text="Aceptar", command=self.procesaCarpeta, height=1, width=7
             self, text="Aceptar", command=self.procesaCarpetas, height=1, width=7
         )
-        self.aceptar.pack(side=tk.RIGHT, padx=3)
+        #self.aceptar.pack(side=tk.RIGHT, padx=3)
 
         self.cancelar = tk.Button(
             self, text="Cancelar", fg="red", command=self.on_closing, height=1, width=7
         )
-        self.cancelar.pack(side=tk.RIGHT, before=self.aceptar)
+        #self.cancelar.pack(side=tk.RIGHT, before=self.aceptar)
+        self.cancelar.pack(side=tk.RIGHT, before=self.pathExpediente)
 
         self.pack()
 
@@ -127,23 +128,23 @@ class Application(ttk.Frame):
         if folder_selected:
             carpetas = [os.path.join(folder_selected, d) for d in os.listdir(folder_selected) if os.path.isdir(os.path.join(folder_selected, d))]
             self.procesaCarpetas(carpetas)
+            self.mensaje(1)
 
     def procesaCarpetas(self, carpetas):
         """
         - Crea objeto y llama metodo process() para cada carpeta en la lista
         """
         for carpeta in carpetas:
-                despacho = self.entry01.get()
-                subserie = self.entry02.get()
-                rdo = os.path.basename(carpeta)
+            despacho = self.entry01.get()
+            subserie = self.entry02.get()
+            rdo = os.path.basename(carpeta)
 
-                print("Despacho: ", despacho)
-                print("Subserie: ", subserie)
-                print("RDO: ", rdo)
+            print("Despacho: ", despacho)
+            print("Subserie: ", subserie)
+            print("RDO: ", rdo)
 
-                obj = AutomatizacionEmpleado(carpeta, "", despacho, subserie, rdo)
-                result = obj.process()
-                #self.mensaje(result)
+            obj = AutomatizacionEmpleado(carpeta, "", despacho, subserie, rdo)
+            result = obj.process()
 
     def procesaCarpeta(self):
         """
