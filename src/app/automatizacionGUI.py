@@ -106,6 +106,9 @@ class Application(ttk.Frame):
         #self.cancelar.pack(side=tk.RIGHT, before=self.aceptar)
         self.cancelar.pack(side=tk.RIGHT, before=self.pathExpediente)
 
+        # Otros widgets...
+        self.progress = ttk.Progressbar(self, orient="horizontal", length=300, mode="determinate")
+        self.progress.pack(pady=10)
         self.pack()
 
     def callback(self, url):
@@ -147,7 +150,10 @@ class Application(ttk.Frame):
         - Crea objeto y llama metodo process() para cada carpeta en la lista
         """
         self.text_widget.insert(tk.END, f"CARPETAS PROCESADAS:\n")
-        for carpeta in carpetas:
+        total_carpetas = len(carpetas)
+        self.progress["maximum"] = total_carpetas
+
+        for i, carpeta in enumerate(carpetas):
             despacho = self.entry01.get()
             subserie = self.entry02.get()
             rdo = os.path.basename(carpeta)
@@ -160,6 +166,10 @@ class Application(ttk.Frame):
 
             obj = AutomatizacionEmpleado(carpeta, "", despacho, subserie, rdo)
             result = obj.process()
+
+            # Actualizar la barra de progreso
+            self.progress["value"] = i + 1
+            self.update_idletasks()
 
     def procesaCarpeta(self):
         """
