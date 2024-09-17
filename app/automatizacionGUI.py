@@ -59,15 +59,24 @@ class Application(ttk.Frame):
         )
         self.label1.pack(pady=15)
 
-        self.scrollbar = tk.Scrollbar(self, orient=tk.HORIZONTAL)
-        self.scrollbar.pack(fill="x", padx=5)
+        """ self.scrollbar = tk.Scrollbar(self, orient=tk.VERTICAL)
+        self.scrollbar.pack(fill="x", padx=5) """
+        #self.scrollbar.config(command=self.entry1.xview)
+        # Crear una barra de desplazamiento vertical
+        self.scrollbar = tk.Scrollbar(self, orient=tk.VERTICAL)
+        self.scrollbar.pack(side=tk.RIGHT, fill=tk.Y, padx=5)
 
-        self.entry1 = tk.Entry(self, width=50, xscrollcommand=self.scrollbar.set)
+        """ self.entry1 = tk.Entry(self, width=50, xscrollcommand=self.scrollbar.set)
         self.entry1.config(state=tk.DISABLED)
         self.entry1.insert("end", str(dir(tk.Scrollbar)))
-        self.entry1.pack(fill="x", before=self.scrollbar)
+        self.entry1.pack(fill="x", before=self.scrollbar) """
+        # Crear un Text widget para mostrar los RDOs procesados
+        self.text_widget = tk.Text(self, width=50, height=10, yscrollcommand=self.scrollbar.set)
+        self.text_widget.pack(fill="both", expand=True, padx=5, pady=5)
 
-        self.scrollbar.config(command=self.entry1.xview)
+        # Configurar la barra de desplazamiento para el Text widget
+        self.scrollbar.config(command=self.text_widget.yview)
+
 
         self.pathExpediente = tk.Button(
             self,
@@ -134,6 +143,7 @@ class Application(ttk.Frame):
         """
         - Crea objeto y llama metodo process() para cada carpeta en la lista
         """
+        self.text_widget.insert(tk.END, f"CARPETAS PROCESADAS:\n")
         for carpeta in carpetas:
             despacho = self.entry01.get()
             subserie = self.entry02.get()
@@ -142,6 +152,8 @@ class Application(ttk.Frame):
             print("Despacho: ", despacho)
             print("Subserie: ", subserie)
             print("RDO: ", rdo)
+            self.text_widget.insert(tk.END, f"{rdo}\n")
+            self.text_widget.see(tk.END)
 
             obj = AutomatizacionEmpleado(carpeta, "", despacho, subserie, rdo)
             result = obj.process()
@@ -183,6 +195,7 @@ class Application(ttk.Frame):
             tk.messagebox.showinfo(
                 message=switcher.get(result), title=os.path.basename(self.expediente)
             )
+            #self.text_widget.insert(tk.END, switcher.get(result))
             lista_vacia = list()
             self.agregaNombreBase(lista_vacia, False)
 
@@ -202,10 +215,10 @@ class Application(ttk.Frame):
             self.listbox1.insert(0, *nombres)
             # self.listaNombres = nombres
         else:
-            self.entry1.config(state=tk.NORMAL)
+            """ self.entry1.config(state=tk.NORMAL)
             self.entry1.delete(0, tk.END)
             self.entry1.insert(0, items)
-            self.entry1.config(state=tk.DISABLED)
+            self.entry1.config(state=tk.DISABLED) """
 
 
 # Quitar comentario si se ejecuta desde el __main__.py
