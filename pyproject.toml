@@ -1,0 +1,9 @@
+[tool.briefcase]
+project_name = "GestionExpedienteElectronico"
+bundle = "com.example"
+version = "1.3.0"
+description = "Este proyecto fue desarrollado para automatizar una función administrativa, asistiendo las operaciones manuales que haría un empleado en la conformación del expediente electrónico, alineado con el Plan Estrategico de Transformación Digital de la Rama Judicial."
+author = "Daniel Arbelaez Alvarez"
+author_email = "darbelaal@cendoj.ramajudicial.gov.co"
+url = "https://github.com/HammerDev99/GestionExpedienteElectronico_Version1/"
+license = "MIT"

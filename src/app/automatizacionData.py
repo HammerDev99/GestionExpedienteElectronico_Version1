@@ -323,10 +323,11 @@ class AutomatizacionData:
         else:
             return 1
 
+
 def count_pages_in_pdf(pdf_path):
     """
     Cuenta el número de páginas en un archivo PDF utilizando dos métodos diferentes.
-    
+
     :param pdf_path: Ruta del archivo PDF
     :return: Número de páginas en el documento
     """
@@ -349,10 +350,11 @@ def count_pages_in_pdf(pdf_path):
         print(f"Error al contar páginas con PyPDF2.PdfReader: {e}")
         return 0
 
+
 def count_pages_in_docx(doc_path):
     """
     Cuenta el número de páginas en un archivo .doc o .docx utilizando Microsoft Word.
-    
+
     :param doc_path: Ruta del archivo .doc o .docx
     :return: Número de páginas en el documento
     """
@@ -360,20 +362,22 @@ def count_pages_in_docx(doc_path):
         # Inicia Microsoft Word
         word = win32.Dispatch("Word.Application")
         word.Visible = False  # No mostrar la ventana de Word
-        
+
         # Abre el documento .doc o .docx
         doc = word.Documents.Open(doc_path)
-        
+
         # Recalcula las páginas
         doc.Repaginate()  # Asegura que las páginas se recalculen si es necesario
-        
+
         # Obtiene el número de páginas
-        pages = doc.ComputeStatistics(2)  # 2 es el código para contar páginas (wdStatisticPages)
-        
+        pages = doc.ComputeStatistics(
+            2
+        )  # 2 es el código para contar páginas (wdStatisticPages)
+
         # Cierra el documento y Word
         doc.Close(False)  # False para no guardar cambios
         word.Quit()
-        
+
         return pages
     except Exception as e:
         print(f"Error al contar páginas en el archivo {doc_path}: {e}")

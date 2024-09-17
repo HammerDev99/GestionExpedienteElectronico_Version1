@@ -3,11 +3,14 @@
 import automatizacionGUI
 import sys
 
-# Punto de entrada
-if __name__ == '__main__':
+def main():
+    # Punto de entrada
     try:
         obj = automatizacionGUI()
         obj.__init__()
     except Exception as e:
         #print(e)
         sys.exit(0)
+
+if __name__ == '__main__':
+    main()
