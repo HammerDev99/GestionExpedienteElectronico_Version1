@@ -8,18 +8,20 @@ app/__pycache__
 venv/
 
 # Files
-app/assets/test.py
-app/assets/test_document.docx
-app/assets/test_page_counter.py
-app/assets/test_page_counter_in_pdf.py
-app/assets/archivo_firmado_o_protegido.pdf
-app/assets/test_xlwings.py
-app/assets/Pasos manejo de archivos.md
-app/assets/004-2022-00023 (Pame-SALIÓ) impugnada.txt
-app/assets/chain_text_test00.ipynb
-app/assets/chain_text_test01.ipynb
-app/assets/textchain.py
-app/assets/000IndiceElectronicoC0 copy.xlsm
+setup.py
+pyproject.toml
+src/app/assets/test.py
+src/app/assets/test_document.docx
+src/app/assets/test_page_counter.py
+src/app/assets/test_page_counter_in_pdf.py
+src/app/assets/archivo_firmado_o_protegido.pdf
+src/app/assets/test_xlwings.py
+src/app/assets/Pasos manejo de archivos.md
+src/app/assets/004-2022-00023 (Pame-SALIÓ) impugnada.txt
+src/app/assets/chain_text_test00.ipynb
+src/app/assets/chain_text_test01.ipynb
+src/app/assets/textchain.py
+src/app/assets/000IndiceElectronicoC0 copy.xlsm
 
 #########
 
