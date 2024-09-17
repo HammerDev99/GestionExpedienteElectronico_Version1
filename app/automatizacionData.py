@@ -8,8 +8,6 @@ import sys
 import warnings
 import PyPDF2
 import random  # importado por función duplicada
-from collections import Counter
-from docx import Document
 import win32com.client as win32
 
 

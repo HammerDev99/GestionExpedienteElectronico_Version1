@@ -37,7 +37,8 @@ class Application(ttk.Frame):
         )
 
         self.label01 = tk.Label(
-            self, text="Juzgado"
+            self, text="Juzgado", 
+            font=("Helvetica", 12)
         )
         self.label01.pack(pady=5)
 
@@ -46,7 +47,8 @@ class Application(ttk.Frame):
         self.entry01.insert(0, "JUZGADO TERCERO CIVIL MUNICIPAL DE BELLO")
 
         self.label02 = tk.Label(
-            self, text="Serie o Subserie"
+            self, text="Serie o Subserie", 
+            font=("Helvetica", 12)
         )
         self.label02.pack(pady=5)
 
@@ -55,7 +57,8 @@ class Application(ttk.Frame):
         self.entry02.insert(0, "Expedientes de Procesos Judiciales Ejecutivos")
 
         self.label1 = tk.Label(
-            self, text="Seleccione la ubicación de la subserie a procesar \n(Debe contener expedientes)"
+            self, text="Seleccione la ubicación de la subserie a procesar \n(Debe contener expedientes)", 
+            font=("Helvetica", 11)
         )
         self.label1.pack(pady=15)
 
