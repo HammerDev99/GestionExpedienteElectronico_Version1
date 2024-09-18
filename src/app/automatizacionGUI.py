@@ -54,7 +54,7 @@ class Application(ttk.Frame):
 
         self.entry02 = tk.Entry(self, width=50)
         self.entry02.pack(pady=5)
-        self.entry02.insert(0, "Expedientes de Procesos Judiciales Ejecutivos")
+        self.entry02.insert(0, "Expedientes de Procesos Judiciales")
 
         self.label1 = tk.Label(
             self, text="Seleccione la ubicación de la subserie a procesar \n(Debe contener expedientes)", 
@@ -138,7 +138,6 @@ class Application(ttk.Frame):
         - Llama a procesaCarpetas con la lista de carpetas
         """
         folder_selected = os.path.normpath(filedialog.askdirectory())
-        self.text_widget.insert(tk.END, "CARPETAS PROCESADAS:\n")
         if folder_selected:
             carpetas = [os.path.join(folder_selected, d) for d in os.listdir(folder_selected) if os.path.isdir(os.path.join(folder_selected, d))]
             self.procesaCarpetas(carpetas)
@@ -149,7 +148,13 @@ class Application(ttk.Frame):
         - Crea objeto y llama metodo process() para cada carpeta en la lista
         """
         total_carpetas = len(carpetas)
-        self.progress["maximum"] = total_carpetas
+        self.progress["maximum"] = 1.0  # La barra de progreso va de 0 a 1
+
+        # Indicar al usuario que el proceso ha comenzado
+        self.progress["value"] = 0.1
+        self.text_widget.insert(tk.END, "Proceso iniciado...\n")
+        self.text_widget.insert(tk.END, "CARPETAS PROCESADAS:\n")
+        self.update_idletasks()
 
         for i, carpeta in enumerate(carpetas):
             despacho = self.entry01.get()
@@ -164,8 +169,13 @@ class Application(ttk.Frame):
             obj.process()
 
             # Actualizar la barra de progreso
-            self.progress["value"] = i + 1
+            self.progress["value"] = 0.1 + ((i + 1) / total_carpetas) * 0.9
             self.update_idletasks()
+
+        # Indicar al usuario que el proceso ha terminado
+        self.text_widget.insert(tk.END, "Proceso completado.\n")
+        self.progress["value"] = 1.0  # Asegurarse de que la barra de progreso llegue al 100%
+        self.update_idletasks()
 
     def procesaCarpeta(self):
         """
