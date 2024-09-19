@@ -1,5 +1,3 @@
-# coding=utf-8
-
 import datetime
 import re
 import os
@@ -50,7 +48,11 @@ class AutomatizacionData:
         return fechamod, tama, cantidadpag, observaciones
 
     def set_comments_folder(self, extensiones):
-
+        """
+        @param: extensiones (List)
+        @return: resultado (Dict)
+        @modules: None
+        """
         resultado = dict(
             zip(extensiones, map(lambda x: extensiones.count(x), extensiones))
         )
@@ -198,6 +200,14 @@ class AutomatizacionData:
         )
 
     def procesa_cadena_indice(self, files):
+        """
+        @param: files (List)
+        @return: lista_cadena (List)
+        @modules: os, re, random, string
+
+        - La función toma una lista de nombres de archivos, los procesa para extraer y formatear las palabras, y devuelve una lista de cadenas formateadas
+        """
+
         lista_cadena = list(files)
         for i in range(len(lista_cadena)):
             cadena = lista_cadena[i]
@@ -237,8 +247,10 @@ class AutomatizacionData:
 
     def isOrderCorrect(self, files, nombresExtensiones):
         """
-        @param: files, nombresExtensiones
+        @param: files (List), nombresExtensiones (List)
         @return: Bool
+        @modules: None
+
         - Verifica el orden de los consecutivos de los archivos
         """
 
@@ -254,8 +266,9 @@ class AutomatizacionData:
 
     def sizeUnitsConverter(self, size):
         """
-        @param: size of a file
-        @return: string; contiene cantidad mas unidad de medicion
+        @param: size (int); tamaño del archivo en bytes
+        @return: string; contiene cantidad más unidad de medición
+        @modules: None
         """
 
         kb = 1024
@@ -326,10 +339,10 @@ class AutomatizacionData:
 
 def count_pages_in_pdf(pdf_path):
     """
-    Cuenta el número de páginas en un archivo PDF utilizando dos métodos diferentes.
+    @param pdf_path: Ruta del archivo PDF
+    @return: Número de páginas en el documento
 
-    :param pdf_path: Ruta del archivo PDF
-    :return: Número de páginas en el documento
+    - Cuenta el número de páginas en un archivo PDF utilizando dos métodos diferentes.
     """
     # Primer método: PyPDF2.PdfFileReader
     try:
@@ -353,10 +366,10 @@ def count_pages_in_pdf(pdf_path):
 
 def count_pages_in_docx(doc_path):
     """
-    Cuenta el número de páginas en un archivo .doc o .docx utilizando Microsoft Word.
+    @param doc_path: Ruta del archivo .doc o .docx
+    @return: Número de páginas en el documento
 
-    :param doc_path: Ruta del archivo .doc o .docx
-    :return: Número de páginas en el documento
+    - Cuenta el número de páginas en un archivo .doc o .docx utilizando Microsoft Word.
     """
     try:
         # Inicia Microsoft Word

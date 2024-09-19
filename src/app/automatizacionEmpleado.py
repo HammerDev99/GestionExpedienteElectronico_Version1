@@ -1,6 +1,7 @@
 # coding=utf-8
 
 import os
+import sys
 import pandas as pd
 import shutil
 import xlwings as xw
@@ -8,7 +9,6 @@ import string
 import random
 import traceback
 from automatizacionData import AutomatizacionData
-
 
 class AutomatizacionEmpleado:
 
@@ -89,12 +89,17 @@ class AutomatizacionEmpleado:
         @modules: os, shutil
         """
 
-        # Obtener la ruta actual del archivo
-        current_dir = os.getcwd()
+        # Determinar la ruta del archivo xlsm
+        if getattr(sys, 'frozen', False):
+            # Si se está ejecutando el archivo empaquetado
+            bundle_dir = sys._MEIPASS
+        else:
+            # Si se está ejecutando desde el script original
+            bundle_dir = os.path.abspath(os.path.dirname(__file__))
 
-        # Unir dos partes de una ruta de archivo
-        ruta = os.path.join(current_dir, "src/app/assets", "000IndiceElectronicoC0.xlsm")
-        # print(ruta + "\n" + rutaFinal)
+        # La ruta del excel se deja en assets por condiciones actuales
+        ruta = os.path.join(bundle_dir, "assets/000IndiceElectronicoC0.xlsm")
+
         # Copiar el archivo xlsm
         shutil.copy(ruta, rutaFinal)
         self.indice = os.path.join(rutaFinal, "000IndiceElectronicoC0.xlsm")
@@ -176,7 +181,9 @@ class AutomatizacionEmpleado:
 
     def fullFilePath(self, files, ruta):
         """
-        @param: files (List); ruta (string)
+        @param: files tipo list; contiene la lista de archivos
+        @param: ruta tipo string; contiene la ruta base
+        @modules: os
         @return: pathArchivos tipo List
         """
 
@@ -192,6 +199,8 @@ class AutomatizacionEmpleado:
     # https://openpyxl.readthedocs.io/en/stable/editing_worksheets.html?highlight=insert%20row
     def process(self):
         """
+        @param: None
+        @modules: xlwings, os, traceback, pandas 
         @return: int
         @modules: xlwings
         """
@@ -239,9 +248,11 @@ class AutomatizacionEmpleado:
 
     def createXlsm(self, df, macro_vba, sheet):
         """
-        @param: df; contiene DataFrame con datos a registrar en excel
-        @return:
-        @modules: xlwings
+        @param: df tipo DataFrame; contiene los datos a escribir en el archivo Excel
+        @param: macro_vba tipo string; contiene el código VBA para la macro
+        @param: sheet tipo string; contiene el nombre de la hoja de Excel
+        @modules: pandas, xlwings
+        @return: None
 
         - Agrega nueva columna al df, ejecuta macro tantas veces como filas tenga el df, Ingresa
         registros en el xlsm, Guarda el archivo

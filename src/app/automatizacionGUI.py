@@ -13,6 +13,11 @@ class Application(ttk.Frame):
     expediente = ""
 
     def __init__(self, root):
+        """
+        @param: root tipo Tk; contiene la raíz de la aplicación Tkinter
+        @modules: tkinter
+        - Inicializa la aplicación, configura la ventana principal y crea los widgets.
+        """
 
         super().__init__(root)
         root.title("GestionExpedienteElectronico")
@@ -24,7 +29,8 @@ class Application(ttk.Frame):
 
     def create_oneProcessWidgets(self):
         """
-        ### GUI GestionExpedienteElectronico_Version1
+        @modules: tkinter
+        - Crea y configura los widgets de la interfaz gráfica.
         """
 
         self.label = tk.Label(self, text=r"Daniel Arbelaez Alvarez - HammerDev99", fg="blue", cursor="hand2")
@@ -44,7 +50,7 @@ class Application(ttk.Frame):
 
         self.entry01 = tk.Entry(self, width=50)
         self.entry01.pack(pady=5)
-        self.entry01.insert(0, "JUZGADO TERCERO CIVIL MUNICIPAL DE BELLO")
+        self.entry01.insert(0, "CENTRO DE SERVICIOS JUDICIALES DE BELLO")
 
         self.label02 = tk.Label(
             self, text="Serie o Subserie", 
@@ -74,8 +80,10 @@ class Application(ttk.Frame):
         self.entry1.insert("end", str(dir(tk.Scrollbar)))
         self.entry1.pack(fill="x", before=self.scrollbar) """
         # Crear un Text widget para mostrar los RDOs procesados
-        self.text_widget = tk.Text(self, width=50, height=10, yscrollcommand=self.scrollbar.set)
+        self.text_widget = tk.Text(self, width=50, height=20, yscrollcommand=self.scrollbar.set)
         self.text_widget.pack(fill="both", expand=True, padx=5, pady=5)
+
+        self.text_widget.insert(tk.END, "Instrucciones de Uso del Programa\n\n- Descargar la Carpeta: Descarga las carpetas que deben contener archivos, sin incluir ningún índice.\n\n- Nombrar la Carpeta: Asegúrate de que la carpeta del expediente tenga el radicado de 23 dígitos y los archivos estén ordenados dentro.\n\n- Verificar Metadatos: Las fechas de creación y modificación de los archivos reflejarán las del archivo descargado.\n\n- Cerrar Excel: Asegúrate de que todos los archivos de Excel estén cerrados antes de ejecutar el programa.\n\n- CARPETA: La carpeta seleccionada deberá tener la siguiente estructura carpeta_seleccionada/subcarpeta/archivos_para_indice.\n\n- Inicio Automático: El programa comenzará a procesar automáticamente UNA VEZ SELECCIONE la carpeta a procesar.\n\n")
 
         # Configurar la barra de desplazamiento para el Text widget
         self.scrollbar.config(command=self.text_widget.yview)
@@ -116,15 +124,19 @@ class Application(ttk.Frame):
         webbrowser.open_new(url)
 
     def on_closing(self):
+        """
+        @modules: tkinter
+        - Maneja el evento de cierre de la ventana principal.
+        """
         print("Cerrando aplicación")
         root.destroy()
         # root.quit()
 
     def obtenerExpediente(self):
         """
-        - Obtiene ruta seleccionada por usuario,
-        Actualiza variable global expediente
-        Ejecuta funcion agregaNombreBase enviando la ruta y parametro False
+        - Obtiene ruta seleccionada por usuario
+        - Actualiza variable global expediente
+        - Ejecuta funcion agregaNombreBase enviando la ruta y parametro False
         """
 
         folder_selected = os.path.normpath(filedialog.askdirectory())
@@ -153,7 +165,7 @@ class Application(ttk.Frame):
         # Indicar al usuario que el proceso ha comenzado
         self.progress["value"] = 0.1
         self.text_widget.insert(tk.END, "Proceso iniciado...\n")
-        self.text_widget.insert(tk.END, "CARPETAS PROCESADAS:\n")
+        #self.text_widget.insert(tk.END, "CARPETAS PROCESADAS:\n")
         self.update_idletasks()
 
         for i, carpeta in enumerate(carpetas):
@@ -214,6 +226,7 @@ class Application(ttk.Frame):
             tk.messagebox.showinfo(
                 message=switcher.get(result), title=os.path.basename(self.expediente)
             )
+            self.text_widget.insert(tk.END, "\n")
             #self.text_widget.insert(tk.END, switcher.get(result))
             lista_vacia = list()
             self.agregaNombreBase(lista_vacia, False)
@@ -237,9 +250,6 @@ class Application(ttk.Frame):
             self.entry1.delete(0, tk.END)
             self.entry1.insert(0, items)
             self.entry1.config(state=tk.DISABLED) """
-
-
-# Quitar comentario si se ejecuta desde el __main__.py
 
 root = tk.Tk()
 app = Application(root)
