@@ -2,6 +2,7 @@
 
 import os
 import sys
+import psutil
 import pandas as pd
 import shutil
 import xlwings as xw
@@ -205,6 +206,8 @@ class AutomatizacionEmpleado:
         @modules: xlwings
         """
 
+        self.close_excel_processes()
+
         auxFiles, extension = self.separatePath(self.files)  # datos en variales files
         listAux = [os.path.basename(self.indice)]  # datos en carpeta
         indexName, indexExtension = self.separatePath(listAux)
@@ -282,3 +285,14 @@ class AutomatizacionEmpleado:
             for j in range(len(columnas)):
                 sheet.range(columnas[j] + str(contFila)).value = df.iloc[i, j]
             contFila = contFila + 1
+
+    def close_excel_processes(self):
+        # Iterar sobre todos los procesos en ejecución
+        for proc in psutil.process_iter(['pid', 'name']):
+            if proc.info['name'] == 'EXCEL.EXE':
+                try:
+                    # Finalizar el proceso de Excel
+                    os.kill(proc.info['pid'], 9)  # 9 es la señal para "matar" el proceso
+                    print(f"Finalizado proceso de Excel con PID: {proc.info['pid']}")
+                except Exception as e:
+                    print(f"No se pudo finalizar el proceso de Excel con PID: {proc.info['pid']}. Error: {e}")
