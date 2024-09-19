@@ -8,12 +8,21 @@ app/__pycache__
 venv/
 
 # Files
-app/test.py
-app/assets/Pasos manejo de archivos.md
-app/assets/004-2022-00023 (Pame-SALIÓ) impugnada.txt
-app/assets/chain_text_test00.ipynb
-app/assets/chain_text_test01.ipynb
-app/assets/textchain.py
+setup.py
+pyproject.toml
+src/app/main_.py
+src/app/assets/test.py
+src/app/assets/test_document.docx
+src/app/assets/test_page_counter.py
+src/app/assets/test_page_counter_in_pdf.py
+src/app/assets/archivo_firmado_o_protegido.pdf
+src/app/assets/test_xlwings.py
+src/app/assets/Pasos manejo de archivos.md
+src/app/assets/004-2022-00023 (Pame-SALIÓ) impugnada.txt
+src/app/assets/chain_text_test00.ipynb
+src/app/assets/chain_text_test01.ipynb
+src/app/assets/textchain.py
+src/app/assets/000IndiceElectronicoC0 copy.xlsm
 
 #########
 
@@ -247,3 +256,55 @@ $RECYCLE.BIN/
 *.lnk
 
 # End of https://www.toptal.com/developers/gitignore/api/macos,windows,python
+output/main_.exe
+output/main/main.exe
+output/main.exe
+output/main/_internal/000IndiceElectronicoC0.xlsm
+output/main/_internal/api-ms-win-core-console-l1-1-0.dll
+output/main/_internal/api-ms-win-core-datetime-l1-1-0.dll
+output/main/_internal/api-ms-win-core-debug-l1-1-0.dll
+output/main/_internal/api-ms-win-core-errorhandling-l1-1-0.dll
+output/main/_internal/api-ms-win-core-file-l1-1-0.dll
+output/main/_internal/api-ms-win-core-file-l1-2-0.dll
+output/main/_internal/api-ms-win-core-file-l2-1-0.dll
+output/main/_internal/api-ms-win-core-handle-l1-1-0.dll
+output/main/_internal/api-ms-win-core-heap-l1-1-0.dll
+output/main/_internal/api-ms-win-core-interlocked-l1-1-0.dll
+output/main/_internal/api-ms-win-core-libraryloader-l1-1-0.dll
+output/main/_internal/api-ms-win-core-localization-l1-2-0.dll
+output/main/_internal/api-ms-win-core-memory-l1-1-0.dll
+output/main/_internal/api-ms-win-core-namedpipe-l1-1-0.dll
+output/main/_internal/api-ms-win-core-processenvironment-l1-1-0.dll
+output/main/_internal/api-ms-win-core-processthreads-l1-1-0.dll
+output/main/_internal/api-ms-win-core-processthreads-l1-1-1.dll
+output/main/_internal/api-ms-win-core-profile-l1-1-0.dll
+output/main/_internal/api-ms-win-core-rtlsupport-l1-1-0.dll
+output/main/_internal/api-ms-win-core-string-l1-1-0.dll
+output/main/_internal/api-ms-win-core-synch-l1-1-0.dll
+output/main/_internal/api-ms-win-core-synch-l1-2-0.dll
+output/main/_internal/api-ms-win-core-sysinfo-l1-1-0.dll
+output/main/_internal/api-ms-win-core-timezone-l1-1-0.dll
+output/main/_internal/api-ms-win-core-util-l1-1-0.dll
+output/main/_internal/api-ms-win-crt-conio-l1-1-0.dll
+output/main/_internal/api-ms-win-crt-convert-l1-1-0.dll
+output/main/_internal/api-ms-win-crt-environment-l1-1-0.dll
+output/main/_internal/api-ms-win-crt-filesystem-l1-1-0.dll
+output/main/_internal/api-ms-win-crt-heap-l1-1-0.dll
+output/main/_internal/api-ms-win-crt-locale-l1-1-0.dll
+output/main/_internal/api-ms-win-crt-math-l1-1-0.dll
+output/main/_internal/api-ms-win-crt-process-l1-1-0.dll
+output/main/_internal/api-ms-win-crt-runtime-l1-1-0.dll
+output/main/_internal/api-ms-win-crt-stdio-l1-1-0.dll
+output/main/_internal/api-ms-win-crt-string-l1-1-0.dll
+output/main/_internal/api-ms-win-crt-time-l1-1-0.dll
+output/main/_internal/api-ms-win-crt-utility-l1-1-0.dll
+output/main/_internal/base_library.zip
+output/main/_internal/libcrypto-1_1.dll
+output/main/_internal/python39.dll
+output/main/_internal/ucrtbase.dll
+output/main/_internal/VCRUNTIME140.dll
+src/app/assets/law_logo.ico
+src/app/assets/law_logo.png
+src/app/000IndiceElectronicoC0.xlsm
+src/app/assets/main_.py
+src/app/assets/comando.txt

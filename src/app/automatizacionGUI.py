@@ -1,0 +1,256 @@
+# coding=utf-8
+
+import tkinter as tk
+from tkinter import ttk
+from tkinter import filedialog
+import os.path
+import sys
+import webbrowser
+from automatizacionEmpleado import AutomatizacionEmpleado
+
+class Application(ttk.Frame):
+
+    expediente = ""
+
+    def __init__(self, root):
+        """
+        @param: root tipo Tk; contiene la raíz de la aplicación Tkinter
+        @modules: tkinter
+        - Inicializa la aplicación, configura la ventana principal y crea los widgets.
+        """
+
+        super().__init__(root)
+        root.title("GestionExpedienteElectronico")
+        root.resizable(False, False)
+        #root.geometry("350x300")
+        root.protocol("WM_DELETE_WINDOW", self.on_closing)
+        self.pack(padx=20, pady=20)  # Añadir padding aquí
+        self.create_oneProcessWidgets()
+
+    def create_oneProcessWidgets(self):
+        """
+        @modules: tkinter
+        - Crea y configura los widgets de la interfaz gráfica.
+        """
+
+        self.label = tk.Label(self, text=r"Daniel Arbelaez Alvarez - HammerDev99", fg="blue", cursor="hand2")
+        self.label.pack(side=tk.BOTTOM, padx=10, pady=10)
+        self.label.bind(
+            "<Button-1>",
+            lambda e: self.callback(
+                "https://github.com/HammerDev99/GestionExpedienteElectronico_Version1"
+            ),
+        )
+
+        self.label01 = tk.Label(
+            self, text="Juzgado", 
+            font=("Helvetica", 12)
+        )
+        self.label01.pack(pady=5)
+
+        self.entry01 = tk.Entry(self, width=50)
+        self.entry01.pack(pady=5)
+        self.entry01.insert(0, "CENTRO DE SERVICIOS JUDICIALES DE BELLO")
+
+        self.label02 = tk.Label(
+            self, text="Serie o Subserie", 
+            font=("Helvetica", 12)
+        )
+        self.label02.pack(pady=5)
+
+        self.entry02 = tk.Entry(self, width=50)
+        self.entry02.pack(pady=5)
+        self.entry02.insert(0, "Expedientes de Procesos Judiciales")
+
+        self.label1 = tk.Label(
+            self, text="Seleccione la ubicación de la subserie a procesar \n(Debe contener expedientes)", 
+            font=("Helvetica", 11)
+        )
+        self.label1.pack(pady=15)
+
+        """ self.scrollbar = tk.Scrollbar(self, orient=tk.VERTICAL)
+        self.scrollbar.pack(fill="x", padx=5) """
+        #self.scrollbar.config(command=self.entry1.xview)
+        # Crear una barra de desplazamiento vertical
+        self.scrollbar = tk.Scrollbar(self, orient=tk.VERTICAL)
+        self.scrollbar.pack(side=tk.RIGHT, fill=tk.Y, padx=5)
+
+        """ self.entry1 = tk.Entry(self, width=50, xscrollcommand=self.scrollbar.set)
+        self.entry1.config(state=tk.DISABLED)
+        self.entry1.insert("end", str(dir(tk.Scrollbar)))
+        self.entry1.pack(fill="x", before=self.scrollbar) """
+        # Crear un Text widget para mostrar los RDOs procesados
+        self.text_widget = tk.Text(self, width=50, height=20, yscrollcommand=self.scrollbar.set)
+        self.text_widget.pack(fill="both", expand=True, padx=5, pady=5)
+
+        self.text_widget.insert(tk.END, "Instrucciones de Uso del Programa\n\n- Descargar la Carpeta: Descarga las carpetas que deben contener archivos, sin incluir ningún índice.\n\n- Nombrar la Carpeta: Asegúrate de que la carpeta del expediente tenga el radicado de 23 dígitos y los archivos estén ordenados dentro.\n\n- Verificar Metadatos: Las fechas de creación y modificación de los archivos reflejarán las del archivo descargado.\n\n- Cerrar Excel: Asegúrate de que todos los archivos de Excel estén cerrados antes de ejecutar el programa.\n\n- CARPETA: La carpeta seleccionada deberá tener la siguiente estructura carpeta_seleccionada/subcarpeta/archivos_para_indice.\n\n- Inicio Automático: El programa comenzará a procesar automáticamente UNA VEZ SELECCIONE la carpeta a procesar.\n\n")
+
+        # Configurar la barra de desplazamiento para el Text widget
+        self.scrollbar.config(command=self.text_widget.yview)
+
+
+        self.pathExpediente = tk.Button(
+            self,
+            text="Procesar carpeta",
+            command=self.obtenerExpedientes,
+            height=1,
+            width=17,
+        )
+        self.pathExpediente.pack(side=tk.LEFT)
+
+        self.label5 = tk.Label(self, text="")
+        self.label5.pack(side=tk.LEFT)
+
+        self.aceptar = tk.Button(
+            self, text="Aceptar", command=self.procesaCarpetas, height=1, width=7
+        )
+        #self.aceptar.pack(side=tk.RIGHT, padx=3)
+
+        self.cancelar = tk.Button(
+            self, text="Cancelar", fg="red", command=self.on_closing, height=1, width=7
+        )
+        #self.cancelar.pack(side=tk.RIGHT, before=self.aceptar)
+        self.cancelar.pack(side=tk.RIGHT, before=self.pathExpediente)
+
+        # Otros widgets...
+        self.progress = ttk.Progressbar(self, orient="horizontal", length=300, mode="determinate")
+        self.progress.pack(pady=10)
+        self.pack()
+
+    def callback(self, url):
+        """
+        @modules: webbrowser
+        """
+        webbrowser.open_new(url)
+
+    def on_closing(self):
+        """
+        @modules: tkinter
+        - Maneja el evento de cierre de la ventana principal.
+        """
+        print("Cerrando aplicación")
+        root.destroy()
+        # root.quit()
+
+    def obtenerExpediente(self):
+        """
+        - Obtiene ruta seleccionada por usuario
+        - Actualiza variable global expediente
+        - Ejecuta funcion agregaNombreBase enviando la ruta y parametro False
+        """
+
+        folder_selected = os.path.normpath(filedialog.askdirectory())
+        self.expediente = folder_selected
+        self.agregaNombreBase(folder_selected, False)
+
+    def obtenerExpedientes(self):
+        """
+        - Obtiene la ruta seleccionada por el usuario,
+        - Recupera la lista de carpetas en esa ruta,
+        - Llama a procesaCarpetas con la lista de carpetas
+        """
+        folder_selected = os.path.normpath(filedialog.askdirectory())
+        if folder_selected:
+            carpetas = [os.path.join(folder_selected, d) for d in os.listdir(folder_selected) if os.path.isdir(os.path.join(folder_selected, d))]
+            self.procesaCarpetas(carpetas)
+            self.mensaje(1)
+
+    def procesaCarpetas(self, carpetas):
+        """
+        - Crea objeto y llama metodo process() para cada carpeta en la lista
+        """
+        total_carpetas = len(carpetas)
+        self.progress["maximum"] = 1.0  # La barra de progreso va de 0 a 1
+
+        # Indicar al usuario que el proceso ha comenzado
+        self.progress["value"] = 0.1
+        self.text_widget.insert(tk.END, "Proceso iniciado...\n")
+        #self.text_widget.insert(tk.END, "CARPETAS PROCESADAS:\n")
+        self.update_idletasks()
+
+        for i, carpeta in enumerate(carpetas):
+            despacho = self.entry01.get()
+            subserie = self.entry02.get()
+            rdo = os.path.basename(carpeta)
+
+            print("RDO: ", rdo)
+            self.text_widget.insert(tk.END, subserie+"/"+rdo+"\n")
+            self.text_widget.see(tk.END)
+
+            obj = AutomatizacionEmpleado(carpeta, "", despacho, subserie, rdo)
+            obj.process()
+
+            # Actualizar la barra de progreso
+            self.progress["value"] = 0.1 + ((i + 1) / total_carpetas) * 0.9
+            self.update_idletasks()
+
+        # Indicar al usuario que el proceso ha terminado
+        self.text_widget.insert(tk.END, "Proceso completado.\n")
+        self.progress["value"] = 1.0  # Asegurarse de que la barra de progreso llegue al 100%
+        self.update_idletasks()
+
+    def procesaCarpeta(self):
+        """
+        - Crea objeto y llama metodo process()
+        """
+        if self.expediente != "":
+            if tk.messagebox.askyesno(
+                message='Se procesarán los archivos que contiene la carpeta "'
+                + os.path.basename(self.expediente)
+                + '". \n¿Desea continuar?.',
+                title=os.path.basename(self.expediente),
+            ):
+                obj = AutomatizacionEmpleado(self.expediente, "")
+                self.mensaje(obj.process())
+            else:
+                self.mensaje(6)
+        else:
+            self.mensaje(3)
+
+    def mensaje(self, result):
+        """
+        @param: result tipo int
+        @modules: tkinter
+        - Utiliza la GUI para enviar mensaje
+        """
+        switcher = {
+            0: "Procedimiento detenido. No se encontraron los archivos indicados en el índice",
+            1: "Procedimiento finalizado",
+            2: "Archivos sin procesar",
+            3: "Seleccione una carpeta para procesar",
+            4: "Agregue archivos a la lista",
+            5: "La carpeta electrónica del expediente se encuentra actualizada",
+            6: "Procedimiento detenido",
+        }
+        if result != None:
+            tk.messagebox.showinfo(
+                message=switcher.get(result), title=os.path.basename(self.expediente)
+            )
+            self.text_widget.insert(tk.END, "\n")
+            #self.text_widget.insert(tk.END, switcher.get(result))
+            lista_vacia = list()
+            self.agregaNombreBase(lista_vacia, False)
+
+    def agregaNombreBase(self, items, bandera):
+        """
+        @param: items tipo List, bandera tipo bool;  items contiene nombre(s) de archivo(s)
+        @widgets: listbox1, entry1
+        - Crea lista auxiliar con nombres base de items
+        - Bandera controla Widget a modificar
+        """
+
+        nombres = []
+        if bandera:
+            for x in items:
+                nombres.append(os.path.basename(x))
+            self.listbox1.delete(0, tk.END)
+            self.listbox1.insert(0, *nombres)
+        else:
+            """ self.entry1.config(state=tk.NORMAL)
+            self.entry1.delete(0, tk.END)
+            self.entry1.insert(0, items)
+            self.entry1.config(state=tk.DISABLED) """
+
+root = tk.Tk()
+app = Application(root)
+app.mainloop()
