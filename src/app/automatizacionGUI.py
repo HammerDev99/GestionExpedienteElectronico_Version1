@@ -11,6 +11,7 @@ from automatizacionEmpleado import AutomatizacionEmpleado
 class Application(ttk.Frame):
 
     expediente = ""
+    carpetas = []
 
     def __init__(self, root):
         """
@@ -62,11 +63,22 @@ class Application(ttk.Frame):
         self.entry02.pack(pady=5)
         self.entry02.insert(0, "Expedientes de Procesos Judiciales")
 
+        # Label y entry para la variable rdo
+        self.label03 = tk.Label(
+            self, text="Radicado", 
+            font=("Helvetica", 12)
+        )
+        self.label03.pack(pady=5)
+
+        self.entry03 = tk.Entry(self, width=50)
+        self.entry03.pack(pady=5)
+        self.entry03.insert(0, "")
+
         self.label1 = tk.Label(
-            self, text="Seleccione la ubicación de la subserie a procesar \n(Debe contener expedientes)", 
+            self, text="(Dejar en blanco si el nombre de las subcarpetas corresponde al número de radicado)", 
             font=("Helvetica", 11)
         )
-        self.label1.pack(pady=15)
+        self.label1.pack(pady=1)
 
         """ self.scrollbar = tk.Scrollbar(self, orient=tk.VERTICAL)
         self.scrollbar.pack(fill="x", padx=5) """
@@ -88,7 +100,6 @@ class Application(ttk.Frame):
         # Configurar la barra de desplazamiento para el Text widget
         self.scrollbar.config(command=self.text_widget.yview)
 
-
         self.pathExpediente = tk.Button(
             self,
             text="Procesar carpeta",
@@ -96,25 +107,28 @@ class Application(ttk.Frame):
             height=1,
             width=17,
         )
-        self.pathExpediente.pack(side=tk.LEFT)
+        self.pathExpediente.pack(side=tk.LEFT, padx=5)
 
-        self.label5 = tk.Label(self, text="")
-        self.label5.pack(side=tk.LEFT)
+        # Barra de progreso
+        self.progress = ttk.Progressbar(self, orient="horizontal", length=300, mode="determinate")
+        self.progress.pack(side=tk.LEFT, padx=5)
 
+        # Botón Aceptar
         self.aceptar = tk.Button(
             self, text="Aceptar", command=self.procesaCarpetas, height=1, width=7
         )
-        #self.aceptar.pack(side=tk.RIGHT, padx=3)
+        self.aceptar.pack(side=tk.LEFT, padx=5)
 
+        # Botón Cancelar
         self.cancelar = tk.Button(
             self, text="Cancelar", fg="red", command=self.on_closing, height=1, width=7
         )
-        #self.cancelar.pack(side=tk.RIGHT, before=self.aceptar)
-        self.cancelar.pack(side=tk.RIGHT, before=self.pathExpediente)
+        self.cancelar.pack(side=tk.LEFT, padx=5)
 
         # Otros widgets...
-        self.progress = ttk.Progressbar(self, orient="horizontal", length=300, mode="determinate")
-        self.progress.pack(pady=10)
+        self.label5 = tk.Label(self, text="")
+        self.label5.pack(side=tk.LEFT)
+
         self.pack()
 
     def callback(self, url):
@@ -146,21 +160,22 @@ class Application(ttk.Frame):
     def obtenerExpedientes(self):
         """
         - Obtiene la ruta seleccionada por el usuario,
-        - Recupera la lista de carpetas en esa ruta,
-        - Llama a procesaCarpetas con la lista de carpetas
+        - Recupera la lista de carpetas en esa ruta
         """
         folder_selected = os.path.normpath(filedialog.askdirectory())
+        self.text_widget.insert(tk.END, "Carpeta seleccionada: " + folder_selected + "\n")
+        self.text_widget.see(tk.END)
+
         if folder_selected:
             carpetas = [os.path.join(folder_selected, d) for d in os.listdir(folder_selected) if os.path.isdir(os.path.join(folder_selected, d))]
-            self.procesaCarpetas(carpetas)
-            self.mensaje(1)
+            self.carpetas = carpetas
 
-    def procesaCarpetas(self, carpetas):
+    def procesaCarpetas(self):
         """
         - Crea objeto y llama metodo process() para cada carpeta en la lista
         """
-        total_carpetas = len(carpetas)
-        self.progress["maximum"] = 1.0  # La barra de progreso va de 0 a 1
+        total_carpetas = len(self.carpetas)
+        self.progress["maximum"] = 1  # La barra de progreso va de 0 a 1
 
         # Indicar al usuario que el proceso ha comenzado
         self.progress["value"] = 0.1
@@ -168,10 +183,16 @@ class Application(ttk.Frame):
         #self.text_widget.insert(tk.END, "CARPETAS PROCESADAS:\n")
         self.update_idletasks()
 
-        for i, carpeta in enumerate(carpetas):
+        for i, carpeta in enumerate(self.carpetas):
             despacho = self.entry01.get()
             subserie = self.entry02.get()
-            rdo = os.path.basename(carpeta)
+
+            # Obtener el valor de entry03
+            rdo = self.entry03.get().strip()
+            
+            # Si entry03 está vacío, usar el nombre de la carpeta como rdo
+            if rdo == "":
+                rdo = os.path.basename(carpeta)
 
             print("RDO: ", rdo)
             self.text_widget.insert(tk.END, subserie+"/"+rdo+"\n")
@@ -188,6 +209,8 @@ class Application(ttk.Frame):
         self.text_widget.insert(tk.END, "Proceso completado.\n")
         self.progress["value"] = 1.0  # Asegurarse de que la barra de progreso llegue al 100%
         self.update_idletasks()
+        self.carpetas = []
+        self.mensaje(1)
 
     def procesaCarpeta(self):
         """
