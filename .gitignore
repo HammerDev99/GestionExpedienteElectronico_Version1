@@ -308,3 +308,32 @@ src/app/assets/law_logo.png
 src/app/000IndiceElectronicoC0.xlsm
 src/app/assets/main_.py
 src/app/assets/comando.txt
+src/app/assets/Vista previa.jpg
+src/app/test/archivo_firmado_o_protegido.pdf
+src/app/test/chain_text_test00.ipynb
+src/app/test/chain_text_test01.ipynb
+src/app/test/comando.txt
+src/app/test/law_logo.ico
+src/app/test/law_logo.png
+src/app/test/main_.py
+src/app/test/Pasos manejo de archivos.md
+src/app/test/test_document.docx
+src/app/test/test_page_counter_in_pdf.py
+src/app/test/test_page_counter.py
+src/app/test/test_xlwings.py
+src/app/test/test.py
+src/app/test/textchain.py
+test/archivo_firmado_o_protegido.pdf
+test/chain_text_test00.ipynb
+test/chain_text_test01.ipynb
+test/comando.txt
+test/law_logo.ico
+test/law_logo.png
+test/main_.py
+test/Pasos manejo de archivos.md
+test/test_document.docx
+test/test_page_counter_in_pdf.py
+test/test_page_counter.py
+test/test_xlwings.py
+test/test.py
+test/textchain.py
