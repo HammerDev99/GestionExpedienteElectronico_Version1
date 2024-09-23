@@ -14,11 +14,21 @@ class AutomatizacionData:
     def __init__(self):
         pass
 
+
     def getMetadata(self, files):
         """
-        @param: files (List)
-        @return: fechamod, tama, cantidadpag, observaciones (List)
-        @modules: datetime, os
+        Extrae metadatos de una lista de archivos.
+        Args:
+            files (List[str]): Lista de rutas de archivos.
+        Returns:
+            Tuple[List[str], List[str], List[str], List[str]]: 
+            - fechamod: Lista de fechas de modificación como cadenas.
+            - tama: Lista de tamaños de archivos convertidos a unidades legibles.
+            - cantidadpag: Lista de conteos de páginas.
+            - observaciones: Lista de observaciones o comentarios.
+        Modules:
+            - datetime: Usado para manejar fechas.
+            - os: Usado para operaciones del sistema de archivos.
         """
 
         fechamod = []
@@ -49,9 +59,14 @@ class AutomatizacionData:
 
     def set_comments_folder(self, extensiones):
         """
-        @param: extensiones (List)
-        @return: resultado (Dict)
-        @modules: None
+        Establece la carpeta de comentarios contando las ocurrencias de cada extensión.
+        Args:
+            extensiones (List): Una lista de extensiones de archivos.
+        Returns:
+            Dict: Un diccionario con las extensiones como claves y sus conteos como valores.
+        Ejemplo:
+            >>> set_comments_folder(['.txt', '.pdf', '.txt'])
+            {'.txt': 2, '.pdf': 1}
         """
         resultado = dict(
             zip(extensiones, map(lambda x: extensiones.count(x), extensiones))
@@ -72,9 +87,14 @@ class AutomatizacionData:
     # Función duplicada
     def separatePath(self, files):
         """
-        @param: files (List)
-        @return: nombres, extensiones ambos de tipo List
-        @modules: os
+        Separa los nombres de archivo y sus extensiones de una lista de rutas de archivos.
+        Args:
+            files (List[str]): Una lista de rutas de archivos.
+        Returns:
+            Tuple[List[str], List[str]]: Dos listas, una que contiene los nombres de archivo sin extensiones,
+                                         y la otra que contiene las extensiones de archivo.
+        Modules:
+            os: Esta función utiliza el módulo os para dividir las rutas de archivo.
         """
 
         nombres = []
@@ -87,8 +107,16 @@ class AutomatizacionData:
     # Función duplicada
     def renameFiles(self, files, nombresExtensiones, ruta):
         """
-        @param: files, nombresExtensiones (List), ruta (string)
-        @modules: os
+        Renombra una lista de archivos a nuevos nombres proporcionados en `nombresExtensiones`. Si un archivo no existe,
+        agrega una cadena aleatoria al nuevo nombre.
+        Args:
+            files (list): Lista de nombres de archivos a renombrar.
+            nombresExtensiones (list): Lista de nuevos nombres de archivos con extensiones.
+            ruta (str): Ruta del directorio donde se encuentran los archivos.
+        Modules:
+            os
+        Raises:
+            Exception: Si ocurre un error durante el renombrado, se captura una excepción y se imprime un mensaje.
         """
 
         for i in range(len(files)):
@@ -120,20 +148,31 @@ class AutomatizacionData:
 
     def formatNames(self, ruta, files):
         """
-        @param: ruta, files
-        @return: nombresExtensiones, nombres, extensiones, numeraciones, ban, nombres_indice
-        @modules: re, os, string
-
-        - Separa el nombre y la extension, validando si es carpeta
-        - Asigna 'Carpeta' en extension del archivo
-        - Aplica mayuscula a la primera letra de cada palabra
-        - Elimina caracteres menos a-zA-Z0-9
-        - Elimina los numeros primeros existentes del nombre
-        - Limita la cantidad de caracteres a 36
-        - En caso de estar vacio asigna el nombre DocumentoElectronico
-        - Crea consecutivos
-        - Agrega consecutivo al comienzo del nombre en el mismo orden de la carpeta
-        - Valida con isorderCorrect si los archivos estan en orden, en caso negativo ban = true
+        Formatea los nombres de archivos y directorios en una ruta dada.
+        Args:
+            ruta (str): La ruta al directorio que contiene los archivos.
+            files (list): Una lista de nombres de archivos y directorios a procesar.
+        Returns:
+            tuple: Una tupla que contiene los siguientes elementos:
+                - nombresExtensiones (list): Lista de nombres formateados con extensiones.
+                - nombres (list): Lista de nombres formateados sin extensiones.
+                - extensiones (list): Lista de extensiones de archivos o 'Carpeta' para directorios.
+                - numeraciones (list): Lista de números consecutivos para cada archivo.
+                - ban (bool): Indicador que señala si los archivos no están en orden.
+                - nombres_indice (list): Lista de nombres procesados del índice.
+        Modules:
+            re, os, string
+        Functionality:
+            - Separa el nombre y la extension, validando si es carpeta
+            - Asigna 'Carpeta' en extension del archivo
+            - Aplica mayuscula a la primera letra de cada palabra
+            - Elimina caracteres menos a-zA-Z0-9
+            - Elimina los numeros primeros existentes del nombre
+            - Limita la cantidad de caracteres a 36
+            - En caso de estar vacio asigna el nombre DocumentoElectronico
+            - Crea consecutivos
+            - Agrega consecutivo al comienzo del nombre en el mismo orden de la carpeta
+            - Valida con isorderCorrect si los archivos estan en orden, en caso negativo ban = true
         """
 
         # Función para procesar nombres del índice
@@ -201,11 +240,23 @@ class AutomatizacionData:
 
     def procesa_cadena_indice(self, files):
         """
-        @param: files (List)
-        @return: lista_cadena (List)
-        @modules: os, re, random, string
+        Procesa una lista de nombres de archivos para extraer y formatear las palabras.
 
-        - La función toma una lista de nombres de archivos, los procesa para extraer y formatear las palabras, y devuelve una lista de cadenas formateadas
+        Args:
+            files (List[str]): Lista de nombres de archivos.
+
+        Returns:
+            List[str]: Lista de cadenas formateadas.
+
+        Modules:
+            os, re, random, string
+
+        Functionality:
+            - Separa el nombre de la extensión.
+            - Extrae las palabras utilizando expresiones regulares.
+            - Capitaliza la primera palabra y convierte las demás a minúscula.
+            - Si la cadena resultante es un número, agrega un carácter aleatorio al inicio.
+            - Si la cadena está vacía, asigna "Documento electronico".
         """
 
         lista_cadena = list(files)
@@ -247,11 +298,12 @@ class AutomatizacionData:
 
     def isOrderCorrect(self, files, nombresExtensiones):
         """
-        @param: files (List), nombresExtensiones (List)
-        @return: Bool
-        @modules: None
-
-        - Verifica el orden de los consecutivos de los archivos
+        Verifica el orden de los archivos consecutivos.
+        Args:
+            files (List): Lista de nombres de archivos.
+            nombresExtensiones (List): Lista de nombres de archivos esperados con extensiones.
+        Returns:
+            bool: True si el orden es incorrecto, False en caso contrario.
         """
 
         cont = 0
@@ -266,9 +318,14 @@ class AutomatizacionData:
 
     def sizeUnitsConverter(self, size):
         """
-        @param: size (int); tamaño del archivo en bytes
-        @return: string; contiene cantidad más unidad de medición
-        @modules: None
+        Convierte el tamaño del archivo de bytes a una cadena legible con las unidades apropiadas.
+        Args:
+            size (int): El tamaño del archivo en bytes.
+        Returns:
+            str: Una cadena que representa el tamaño en las unidades apropiadas (BYTES, KB, MB, GB, TB).
+        Notes:
+            - La función convierte el tamaño a la unidad más grande posible sin exceder el tamaño dado.
+            - Si el tamaño es 0, devuelve "0 BYTES".
         """
 
         kb = 1024
@@ -291,9 +348,22 @@ class AutomatizacionData:
 
     def pageCounter(self, file):
         """
-        @param: file (string)
-        @return: int; cantidad de paginas
-        @modules: PyPDF2, warnings, os, sys
+        Cuenta el número de páginas en un archivo dado.
+        Parámetros:
+            file (str): La ruta al archivo cuyas páginas se van a contar.
+        Returns:
+            int: El número de páginas en el archivo. Devuelve 0 si el tipo de archivo no es compatible o si ocurre un error.
+        Módulos:
+            PyPDF2, warnings, os, sys
+        Tipos de archivos compatibles:
+            - PDF (.pdf)
+            - Documentos de Word (.docx, .doc)
+            - Hojas de cálculo de Excel (.xls, .xlsx, .xlsm)
+            - Archivos de imagen (.bmp, .jpeg, .jpg, .png, .tif, .gif)
+            - Archivos de video (.mp4, .wmv)
+            - Archivos de texto (.txt, .textclipping)
+            - Archivos de correo electrónico (.eml)
+            - Archivos HTML (.html)
         """
 
         path, extension = os.path.splitext(file)
@@ -339,11 +409,18 @@ class AutomatizacionData:
 
 def count_pages_in_pdf(pdf_path):
     """
-    @param pdf_path: Ruta del archivo PDF
-    @return: Número de páginas en el documento
-
-    - Cuenta el número de páginas en un archivo PDF utilizando dos métodos diferentes.
+    Cuenta el número de páginas en un archivo PDF utilizando dos métodos diferentes.
+    Args:
+        pdf_path (str): Ruta al archivo PDF.
+    Returns:
+        int: Número de páginas en el documento. Devuelve 0 si ocurre un error.
+    Métodos:
+        - PyPDF2.PdfFileReader: Intenta contar las páginas utilizando PdfFileReader de PyPDF2.
+        - PyPDF2.PdfReader: Intenta contar las páginas utilizando PdfReader de PyPDF2.
+    Excepciones:
+        - Imprime un mensaje de error si falla el conteo de páginas en cualquiera de los métodos.
     """
+
     # Primer método: PyPDF2.PdfFileReader
     try:
         with open(pdf_path, "rb") as f:
@@ -366,10 +443,13 @@ def count_pages_in_pdf(pdf_path):
 
 def count_pages_in_docx(doc_path):
     """
-    @param doc_path: Ruta del archivo .doc o .docx
-    @return: Número de páginas en el documento
-
-    - Cuenta el número de páginas en un archivo .doc o .docx utilizando Microsoft Word.
+    Cuenta el número de páginas en un archivo .doc o .docx utilizando Microsoft Word.
+    Args:
+        doc_path (str): Ruta al archivo .doc o .docx.
+    Returns:
+        int: Número de páginas en el documento.
+    Raises:
+        Exception: Si hay un error al abrir o procesar el documento.
     """
     try:
         # Inicia Microsoft Word

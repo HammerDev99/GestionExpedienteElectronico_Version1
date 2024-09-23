@@ -16,6 +16,7 @@ class AutomatizacionEmpleado:
     ruta = ""
     indice = ""
     files = []
+    pids_creados = []
 
     obj1 = AutomatizacionData()
 
@@ -206,7 +207,7 @@ class AutomatizacionEmpleado:
         @modules: xlwings
         """
 
-        self.close_excel_processes()
+        #self.close_excel_processes()
 
         auxFiles, extension = self.separatePath(self.files)  # datos en variales files
         listAux = [os.path.basename(self.indice)]  # datos en carpeta
@@ -223,7 +224,11 @@ class AutomatizacionEmpleado:
 
         try:
             wb = xw.Book(indexPath) # Abrir el libro
-            app = wb.app # Obtener la aplicación de Excel
+            app = wb.app # Obtener la aplicación de Excel AQUI SE CREA EL PID
+
+            pid_excel = app.pid # Obtener el PID de la aplicación de Excel
+            self.pids_creados.append(pid_excel) # Agregar el PID a la lista de PIDs creados
+
             app.visible = False  # Hacer que la aplicación de Excel no sea visible
             macro_vba = app.macro(
                 "'" + str(os.path.basename(self.indice)) + "'" + "!Macro1InsertarFila"
@@ -246,6 +251,8 @@ class AutomatizacionEmpleado:
             if app:  # Si la aplicación de Excel fue creada correctamente
                 app.quit()  # Cerrar la aplicación de Excel
                 del app  # Eliminar la referencia para liberar memoria
+
+                self.cerrar_procesos_por_pid(self.pids_creados)  # Cerrar los procesos de Excel
 
         return 1  # Retornar 1 si todo salió bien
 
@@ -296,3 +303,17 @@ class AutomatizacionEmpleado:
                     print(f"Finalizado proceso de Excel con PID: {proc.info['pid']}")
                 except Exception as e:
                     print(f"No se pudo finalizar el proceso de Excel con PID: {proc.info['pid']}. Error: {e}")
+
+    def cerrar_procesos_por_pid(self, pids):
+        """
+        Cierra los procesos especificados en la lista de PID.
+        @param: pids tipo list; lista de PID de los procesos a cerrar
+        """
+        for pid in pids:
+            try:
+                proc = psutil.Process(pid)
+                proc.kill()  # forzar el cierre
+                print(f"Proceso {proc.name()} con PID {pid} cerrado.")
+                self.pids_creados.remove(pid)
+            except (psutil.NoSuchProcess, psutil.AccessDenied, psutil.ZombieProcess) as e:
+                print(f"No se pudo cerrar el proceso con PID {pid}: {e}")

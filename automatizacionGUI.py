@@ -102,7 +102,7 @@ class Application(ttk.Frame):
 
         self.pathExpediente = tk.Button(
             self,
-            text="Procesar carpeta",
+            text="Agregar carpeta",
             command=self.obtenerExpedientes,
             height=1,
             width=17,
@@ -146,6 +146,7 @@ class Application(ttk.Frame):
         root.destroy()
         # root.quit()
 
+    # Funcion para el caso de una carpeta (2 niveles: carpeta/archivos)
     def obtenerExpediente(self):
         """
         - Obtiene ruta seleccionada por usuario
@@ -157,16 +158,24 @@ class Application(ttk.Frame):
         self.expediente = folder_selected
         self.agregaNombreBase(folder_selected, False)
 
+    # Funcion para el caso de varias carpetas (3 niveles: carpeta/subcarpetas/archivos)
     def obtenerExpedientes(self):
         """
         - Obtiene la ruta seleccionada por el usuario,
         - Recupera la lista de carpetas en esa ruta
         """
-        folder_selected = os.path.normpath(filedialog.askdirectory())
-        self.text_widget.insert(tk.END, "Carpeta seleccionada: " + folder_selected + "\n")
-        self.text_widget.see(tk.END)
 
-        if folder_selected:
+        folder_selected = os.path.normpath(filedialog.askdirectory())
+        # Valida si no selecciona carpeta y muestra la carpeta seleccionada en el widget de texto
+        if folder_selected == "." or folder_selected == "":  # Si no se selecciona ninguna carpeta
+            tk.messagebox.showwarning("Advertencia", "No se ha seleccionado ninguna carpeta.")
+        else:
+            #print("Carpeta seleccionada: ", folder_selected)
+            self.expediente = folder_selected
+            self.text_widget.insert(tk.END, "Carpeta seleccionada: " + folder_selected + "\n")
+            self.text_widget.see(tk.END)
+
+            # Obtener la lista de carpetas en la carpeta seleccionada
             carpetas = [os.path.join(folder_selected, d) for d in os.listdir(folder_selected) if os.path.isdir(os.path.join(folder_selected, d))]
             self.carpetas = carpetas
 
@@ -177,40 +186,54 @@ class Application(ttk.Frame):
         total_carpetas = len(self.carpetas)
         self.progress["maximum"] = 1  # La barra de progreso va de 0 a 1
 
-        # Indicar al usuario que el proceso ha comenzado
-        self.progress["value"] = 0.1
-        self.text_widget.insert(tk.END, "Proceso iniciado...\n")
-        #self.text_widget.insert(tk.END, "CARPETAS PROCESADAS:\n")
-        self.update_idletasks()
+        if self.carpetas != []:	
+                num_carpetas = len(self.carpetas)
+                if tk.messagebox.askyesno(
+                    message=f'Se procesarán {num_carpetas} carpetas que contiene la carpeta "{os.path.basename(self.expediente)}". \n¿Desea continuar?.',
+                    title=os.path.basename(self.expediente),
+                ):
+                    # Indicar al usuario que el proceso ha comenzado
+                    self.progress["value"] = 0.1
+                    self.text_widget.insert(tk.END, "Proceso iniciado...\n")
+                    #self.text_widget.insert(tk.END, "CARPETAS PROCESADAS:\n")
+                    self.update_idletasks()
 
-        for i, carpeta in enumerate(self.carpetas):
-            despacho = self.entry01.get()
-            subserie = self.entry02.get()
+                    for i, carpeta in enumerate(self.carpetas):
+                        despacho = self.entry01.get()
+                        subserie = self.entry02.get()
 
-            # Obtener el valor de entry03
-            rdo = self.entry03.get().strip()
-            
-            # Si entry03 está vacío, usar el nombre de la carpeta como rdo
-            if rdo == "":
-                rdo = os.path.basename(carpeta)
+                        # Obtener el valor de entry03
+                        rdo = self.entry03.get().strip()
+                        
+                        # Si entry03 está vacío, usar el nombre de la carpeta como rdo
+                        if rdo == "":
+                            rdo = os.path.basename(carpeta)
 
-            print("RDO: ", rdo)
-            self.text_widget.insert(tk.END, subserie+"/"+rdo+"\n")
-            self.text_widget.see(tk.END)
+                        print("RDO: ", rdo)
+                        self.text_widget.insert(tk.END, subserie+"/"+rdo+"\n")
+                        self.text_widget.see(tk.END)
 
-            obj = AutomatizacionEmpleado(carpeta, "", despacho, subserie, rdo)
-            obj.process()
+                        obj = AutomatizacionEmpleado(carpeta, "", despacho, subserie, rdo)
+                        obj.process()
 
-            # Actualizar la barra de progreso
-            self.progress["value"] = 0.1 + ((i + 1) / total_carpetas) * 0.9
-            self.update_idletasks()
-
-        # Indicar al usuario que el proceso ha terminado
-        self.text_widget.insert(tk.END, "Proceso completado.\n")
-        self.progress["value"] = 1.0  # Asegurarse de que la barra de progreso llegue al 100%
-        self.update_idletasks()
-        self.carpetas = []
-        self.mensaje(1)
+                        # Actualizar la barra de progreso
+                        self.progress["value"] = 0.1 + ((i + 1) / total_carpetas) * 0.9
+                        self.update_idletasks()
+                        
+                    # Indicar al usuario que el proceso ha terminado
+                    self.progress["value"] = 1.0  # Asegurarse de que la barra de progreso llegue al 100%
+                    self.update_idletasks()
+                    self.expediente = ""
+                    self.carpetas = []
+                    self.text_widget.insert(tk.END, "Proceso completado.\n")
+                    self.update_idletasks()
+                    self.mensaje(1)
+                else:
+                    self.expediente = ""
+                    self.carpetas = []
+                    self.mensaje(6)
+        else:
+            self.mensaje(3)
 
     def procesaCarpeta(self):
         """
@@ -226,6 +249,8 @@ class Application(ttk.Frame):
                 obj = AutomatizacionEmpleado(self.expediente, "")
                 self.mensaje(obj.process())
             else:
+                self.expediente = ""
+                self.carpetas = []
                 self.mensaje(6)
         else:
             self.mensaje(3)
