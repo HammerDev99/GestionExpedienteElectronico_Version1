@@ -14,8 +14,9 @@ class Application(ttk.Frame):
 
     expediente = ""
     carpetas = []
+    is_updated = True
 
-    def __init__(self, root):
+    def __init__(self, root, is_updated=True):
         """
         @param: root tipo Tk; contiene la raíz de la aplicación Tkinter
         @modules: tkinter
@@ -25,7 +26,7 @@ class Application(ttk.Frame):
         super().__init__(root)
         root.title("GestionExpedienteElectronico")
         root.resizable(False, False)
-        #root.geometry("350x300")
+        # root.geometry("350x300")
         root.protocol("WM_DELETE_WINDOW", self.on_closing)
         self.pack(padx=20, pady=20)  # Añadir padding aquí
         self.create_oneProcessWidgets()
@@ -35,6 +36,7 @@ class Application(ttk.Frame):
         @modules: tkinter
         - Crea y configura los widgets de la interfaz gráfica.
         """
+        self.is_updated = self.comprobar_actualizaciones() # Comprobar actualizaciones al iniciar la aplicación
 
         self.label = tk.Label(self, text=r"Daniel Arbelaez Alvarez - HammerDev99", fg="blue", cursor="hand2")
         self.label.pack(side=tk.BOTTOM, padx=10, pady=10)
@@ -44,6 +46,22 @@ class Application(ttk.Frame):
                 "https://github.com/HammerDev99/GestionExpedienteElectronico_Version1"
             ),
         )
+
+        if not self.is_updated:
+            # Crear un contenedor para el label de actualización
+            self.update_frame = tk.Frame(self)
+            self.update_frame.pack(side=tk.TOP, fill=tk.X)
+
+            self.update_label = tk.Label(
+                self.update_frame, text="🚀 Nueva versión disponible", fg="green", cursor="hand2"
+            )
+            self.update_label.pack(side=tk.RIGHT, padx=0, pady=0)
+            self.update_label.bind(
+                "<Button-1>",
+                lambda e: self.callback(
+                    "https://github.com/HammerDev99/GestionExpedienteElectronico_Version1/releases/tag/latest"
+                ),
+            )
 
         self.label01 = tk.Label(
             self, text="Juzgado", 
@@ -84,7 +102,7 @@ class Application(ttk.Frame):
 
         """ self.scrollbar = tk.Scrollbar(self, orient=tk.VERTICAL)
         self.scrollbar.pack(fill="x", padx=5) """
-        #self.scrollbar.config(command=self.entry1.xview)
+        # self.scrollbar.config(command=self.entry1.xview)
         # Crear una barra de desplazamiento vertical
         self.scrollbar = tk.Scrollbar(self, orient=tk.VERTICAL)
         self.scrollbar.pack(side=tk.RIGHT, fill=tk.Y, padx=5)
@@ -172,7 +190,7 @@ class Application(ttk.Frame):
         if folder_selected == "." or folder_selected == "":  # Si no se selecciona ninguna carpeta
             tk.messagebox.showwarning("Advertencia", "No se ha seleccionado ninguna carpeta.")
         else:
-            #print("Carpeta seleccionada: ", folder_selected)
+            # print("Carpeta seleccionada: ", folder_selected)
             self.expediente = folder_selected
             self.text_widget.insert(tk.END, "Carpeta seleccionada: " + folder_selected + "\n")
             self.text_widget.see(tk.END)
@@ -189,51 +207,51 @@ class Application(ttk.Frame):
         self.progress["maximum"] = 1  # La barra de progreso va de 0 a 1
 
         if self.carpetas != []:	
-                num_carpetas = len(self.carpetas)
-                if tk.messagebox.askyesno(
+            num_carpetas = len(self.carpetas)
+            if tk.messagebox.askyesno(
                     message=f'Se procesarán {num_carpetas} carpetas que contiene la carpeta "{os.path.basename(self.expediente)}". \n¿Desea continuar?.',
                     title=os.path.basename(self.expediente),
                 ):
-                    # Indicar al usuario que el proceso ha comenzado
-                    self.progress["value"] = 0.1
-                    self.text_widget.insert(tk.END, "Proceso iniciado...\n")
-                    #self.text_widget.insert(tk.END, "CARPETAS PROCESADAS:\n")
+                # Indicar al usuario que el proceso ha comenzado
+                self.progress["value"] = 0.1
+                self.text_widget.insert(tk.END, "Proceso iniciado...\n")
+                # self.text_widget.insert(tk.END, "CARPETAS PROCESADAS:\n")
+                self.update_idletasks()
+
+                for i, carpeta in enumerate(self.carpetas):
+                    despacho = self.entry01.get()
+                    subserie = self.entry02.get()
+
+                    # Obtener el valor de entry03
+                    rdo = self.entry03.get().strip()
+
+                    # Si entry03 está vacío, usar el nombre de la carpeta como rdo
+                    if rdo == "":
+                        rdo = os.path.basename(carpeta)
+
+                    print("RDO: ", rdo)
+                    self.text_widget.insert(tk.END, subserie+"/"+rdo+"\n")
+                    self.text_widget.see(tk.END)
+
+                    obj = AutomatizacionEmpleado(carpeta, "", despacho, subserie, rdo)
+                    obj.process()
+
+                    # Actualizar la barra de progreso
+                    self.progress["value"] = 0.1 + ((i + 1) / total_carpetas) * 0.9
                     self.update_idletasks()
 
-                    for i, carpeta in enumerate(self.carpetas):
-                        despacho = self.entry01.get()
-                        subserie = self.entry02.get()
-
-                        # Obtener el valor de entry03
-                        rdo = self.entry03.get().strip()
-                        
-                        # Si entry03 está vacío, usar el nombre de la carpeta como rdo
-                        if rdo == "":
-                            rdo = os.path.basename(carpeta)
-
-                        print("RDO: ", rdo)
-                        self.text_widget.insert(tk.END, subserie+"/"+rdo+"\n")
-                        self.text_widget.see(tk.END)
-
-                        obj = AutomatizacionEmpleado(carpeta, "", despacho, subserie, rdo)
-                        obj.process()
-
-                        # Actualizar la barra de progreso
-                        self.progress["value"] = 0.1 + ((i + 1) / total_carpetas) * 0.9
-                        self.update_idletasks()
-                        
-                    # Indicar al usuario que el proceso ha terminado
-                    self.progress["value"] = 1.0  # Asegurarse de que la barra de progreso llegue al 100%
-                    self.update_idletasks()
-                    self.expediente = ""
-                    self.carpetas = []
-                    self.text_widget.insert(tk.END, "Proceso completado.\n")
-                    self.update_idletasks()
-                    self.mensaje(1)
-                else:
-                    self.expediente = ""
-                    self.carpetas = []
-                    self.mensaje(6)
+                # Indicar al usuario que el proceso ha terminado
+                self.progress["value"] = 1.0  # Asegurarse de que la barra de progreso llegue al 100%
+                self.update_idletasks()
+                self.expediente = ""
+                self.carpetas = []
+                self.text_widget.insert(tk.END, "Proceso completado.\n")
+                self.update_idletasks()
+                self.mensaje(1)
+            else:
+                self.expediente = ""
+                self.carpetas = []
+                self.mensaje(6)
         else:
             self.mensaje(3)
 
@@ -277,7 +295,7 @@ class Application(ttk.Frame):
                 message=switcher.get(result), title=os.path.basename(self.expediente)
             )
             self.text_widget.insert(tk.END, "\n")
-            #self.text_widget.insert(tk.END, switcher.get(result))
+            # self.text_widget.insert(tk.END, switcher.get(result))
             lista_vacia = list()
             self.agregaNombreBase(lista_vacia, False)
 
@@ -307,19 +325,22 @@ class Application(ttk.Frame):
             data = json.load(file)
             version = data.get('version')
         return version
-    
+
     def comprobar_actualizaciones(self):
-        url = "https://tu-usuario.github.io/actualizaciones-app/ultima_version.json"  # O usa la URL de raw.githubusercontent.com
+        url = "https://raw.githubusercontent.com/HammerDev99/GestionExpedienteElectronico_Version1/refs/heads/master/assets/last_version.json"  # O usa la URL de raw.githubusercontent.com
         try:
             response = requests.get(url)
             response.raise_for_status()
             datos = response.json()
-            
-            version_actual = self.obtener_version_actual()
-            ultima_version = datos["version"]
-            
+
+            version_actual = list(map(int, self.obtener_version_actual().split(".")))
+            ultima_version = list(map(int, datos.get('version').split(".")))
+
             if version_actual < ultima_version:
-                mostrar_notificacion_actualizacion(datos)
+                # Actualizar variable para mostrar notificación en un label de la GUI
+                return False # la variable is_updated se actualiza a False
+            else:
+                return True # la variable is_updated se mantiene en True
         except requests.RequestException as e:
             print(f"Error al comprobar actualizaciones: {e}")
 
