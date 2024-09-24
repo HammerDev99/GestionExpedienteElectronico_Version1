@@ -12,3 +12,8 @@ six==1.16.0
 tk==0.1.0
 typing-extensions==4.12.2
 xlwings==0.28.5
+certifi-2024.8.30 
+charset-normalizer-3.3.2 
+idna-3.10 
+requests-2.32.3 
+urllib3-2.2.3

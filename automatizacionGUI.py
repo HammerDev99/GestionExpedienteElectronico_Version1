@@ -6,6 +6,8 @@ from tkinter import filedialog
 import os.path
 import sys
 import webbrowser
+import requests
+import json
 from automatizacionEmpleado import AutomatizacionEmpleado
 
 class Application(ttk.Frame):
@@ -298,6 +300,28 @@ class Application(ttk.Frame):
             self.entry1.delete(0, tk.END)
             self.entry1.insert(0, items)
             self.entry1.config(state=tk.DISABLED) """
+
+    def obtener_version_actual(self):
+        ruta_json = os.path.join('assets', 'last_version.json')
+        with open(ruta_json, 'r', encoding='utf-8') as file:
+            data = json.load(file)
+            version = data.get('version')
+        return version
+    
+    def comprobar_actualizaciones(self):
+        url = "https://tu-usuario.github.io/actualizaciones-app/ultima_version.json"  # O usa la URL de raw.githubusercontent.com
+        try:
+            response = requests.get(url)
+            response.raise_for_status()
+            datos = response.json()
+            
+            version_actual = self.obtener_version_actual()
+            ultima_version = datos["version"]
+            
+            if version_actual < ultima_version:
+                mostrar_notificacion_actualizacion(datos)
+        except requests.RequestException as e:
+            print(f"Error al comprobar actualizaciones: {e}")
 
 root = tk.Tk()
 app = Application(root)

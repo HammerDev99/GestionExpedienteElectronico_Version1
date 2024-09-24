@@ -337,3 +337,4 @@ test/test_page_counter.py
 test/test_xlwings.py
 test/test.py
 test/textchain.py
+test/empaquetado.md
