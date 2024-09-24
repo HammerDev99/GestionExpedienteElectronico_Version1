@@ -320,7 +320,15 @@ class Application(ttk.Frame):
             self.entry1.config(state=tk.DISABLED) """
 
     def obtener_version_actual(self):
-        ruta_json = os.path.join('assets', 'last_version.json')
+        # Determinar la ruta del archivo xlsm
+        if getattr(sys, 'frozen', False):
+            # Si se está ejecutando el archivo empaquetado
+            bundle_dir = sys._MEIPASS
+        else:
+            # Si se está ejecutando desde el script original
+            bundle_dir = os.path.abspath(os.path.dirname(__file__))
+
+        ruta_json = os.path.join(bundle_dir, 'assets/last_version.json')
         with open(ruta_json, 'r', encoding='utf-8') as file:
             data = json.load(file)
             version = data.get('version')

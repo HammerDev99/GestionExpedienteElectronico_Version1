@@ -20,9 +20,6 @@ class AutomatizacionEmpleado:
 
     obj1 = AutomatizacionData()
 
-    """ def __init__(self) -> None: # Only for test
-        pass """
-
     def __init__(self, input: str, indice, despacho, subserie, rdo):
         # @param: input tipo str; Obtiene ruta de la carpeta a procesar
 
