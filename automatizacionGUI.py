@@ -10,11 +10,17 @@ import requests
 import json
 from automatizacionEmpleado import AutomatizacionEmpleado
 
+from PIL import Image, ImageTk
+import csv
+
 class Application(ttk.Frame):
 
     expediente = ""
     carpetas = []
     is_updated = True
+    selected_value = "2"
+    lista_cui = []
+    lista_subcarpetas = []
 
     def __init__(self, root, is_updated=True):
         """
@@ -69,7 +75,7 @@ class Application(ttk.Frame):
         )
         self.label01.pack(pady=5)
 
-        self.entry01 = tk.Entry(self, width=50)
+        self.entry01 = tk.Entry(self, width=90, justify="center")
         self.entry01.pack(pady=5)
         self.entry01.insert(0, "CENTRO DE SERVICIOS JUDICIALES DE BELLO")
 
@@ -79,11 +85,15 @@ class Application(ttk.Frame):
         )
         self.label02.pack(pady=5)
 
-        self.entry02 = tk.Entry(self, width=50)
+        # Crear el Combobox para entry02
+        self.entry02 = ttk.Combobox(self, width=90, state="normal", justify="center")
         self.entry02.pack(pady=5)
-        self.entry02.insert(0, "Expedientes de Procesos Judiciales")
 
-        # Label y entry para la variable rdo
+        # Leer el archivo CSV y obtener los valores para el Combobox
+        self.load_csv_values()
+
+        # El radicado se obtendrá mediante la selección del usuario sobre la estructura de carpetas que tenga
+        """ # Label y entry para la variable rdo
         self.label03 = tk.Label(
             self, text="Radicado", 
             font=("Helvetica", 12)
@@ -98,7 +108,26 @@ class Application(ttk.Frame):
             self, text="(Dejar en blanco si el nombre de las subcarpetas corresponde al número de radicado)", 
             font=("Helvetica", 11)
         )
-        self.label1.pack(pady=1)
+        self.label1.pack(pady=1) """
+
+        # Crear un Frame para los Radiobuttons
+        self.radio_frame = tk.Frame(self)
+        self.radio_frame.pack(pady=5)
+
+        # Variable para los Radiobuttons
+        self.radio_var = tk.StringVar(value="2")
+        self.radio_var.trace("w", self.on_radio_change)
+
+        # Crear los Radiobuttons
+        """ self.radio1 = ttk.Radiobutton(self.radio_frame, text="Opción 1: Índice de una \nsola carpeta específica", variable=self.radio_var, value="1")
+        self.radio1.pack(side=tk.LEFT, padx=10) """
+        self.radio2 = ttk.Radiobutton(self.radio_frame, text="Opción 1: Índice de todas \nlas carpetas internas de un \nexpediente", variable=self.radio_var, value="2")
+        self.radio2.pack(side=tk.LEFT, padx=10)
+        self.radio3 = ttk.Radiobutton(self.radio_frame, text="Opción 2: Índice de múltiples \nexpedientes de una serie o \nsubserie documental", variable=self.radio_var, value="3")
+        self.radio3.pack(side=tk.LEFT, padx=10)
+
+        # Crear tooltips con imágenes para los Radiobuttons
+        self.create_tooltips()
 
         """ self.scrollbar = tk.Scrollbar(self, orient=tk.VERTICAL)
         self.scrollbar.pack(fill="x", padx=5) """
@@ -115,7 +144,7 @@ class Application(ttk.Frame):
         self.text_widget = tk.Text(self, width=50, height=20, yscrollcommand=self.scrollbar.set)
         self.text_widget.pack(fill="both", expand=True, padx=5, pady=5)
 
-        self.text_widget.insert(tk.END, "Instrucciones de Uso del Programa\n\n- Descargar la Carpeta: Descarga las carpetas que deben contener archivos, sin incluir ningún índice.\n\n- Nombrar la Carpeta: Asegúrate de que la carpeta del expediente tenga el radicado de 23 dígitos y los archivos estén ordenados dentro.\n\n- Verificar Metadatos: Las fechas de creación y modificación de los archivos reflejarán las del archivo descargado.\n\n- Cerrar Excel: Asegúrate de que todos los archivos de Excel estén cerrados antes de ejecutar el programa.\n\n- CARPETA: La carpeta seleccionada deberá tener la siguiente estructura carpeta_seleccionada/subcarpeta/archivos_para_indice.\n\n- Inicio Automático: El programa comenzará a procesar automáticamente UNA VEZ SELECCIONE la carpeta a procesar.\n\n")
+        self.text_widget.insert(tk.END, "Instrucciones de Uso del Programa\n\n1. Descargar la(s) carpeta(s): NO DEBEN TENER ÍNDICE.\n\n2. Validar esquema de carpetas: Asegúrate de que la estructura interna de carpetas cumple con el protocolo. Ejemplo:\n\n  -Opción 1: 05088/01PrimeraInstancia/C01Principal/Archivos\n  -Opción 2: 2024/05088/01PrimeraInstancia/C01Principal/Archivos\n\n3. El radicado debe tener 23 dígitos y los nombres de los archivos deben tener un orden mínimo.\n\n4. Datos del SGDE: Ingresar exactamente los mismos datos de 'Juzgado' y 'serie o subserie' que registra en el SGDE.\n\n")
 
         # Configurar la barra de desplazamiento para el Text widget
         self.scrollbar.config(command=self.text_widget.yview)
@@ -123,7 +152,7 @@ class Application(ttk.Frame):
         self.pathExpediente = tk.Button(
             self,
             text="Agregar carpeta",
-            command=self.obtenerExpedientes,
+            command=self.obtener_rutas, # PENDIENTE
             height=1,
             width=17,
         )
@@ -135,7 +164,7 @@ class Application(ttk.Frame):
 
         # Botón Aceptar
         self.aceptar = tk.Button(
-            self, text="Aceptar", command=self.procesaCarpetas, height=1, width=7
+            self, text="Aceptar", command=self.procesaCarpetas, height=1, width=7 # procesa_expedientes
         )
         self.aceptar.pack(side=tk.LEFT, padx=5)
 
@@ -151,6 +180,33 @@ class Application(ttk.Frame):
 
         self.pack()
 
+    def on_radio_change(self, *args):
+        self.selected_value = self.radio_var.get()
+        #print(f"El valor del Radiobutton ha cambiado a: {selected_value}")
+
+    def get_radio_value(self):
+        selected_value = self.radio_var.get()
+        print(f"Valor seleccionado: {selected_value}")
+
+    def create_tooltips(self):
+        # Determinar la ruta del archivo xlsm
+        if getattr(sys, 'frozen', False):
+            # Si se está ejecutando el archivo empaquetado
+            bundle_dir = sys._MEIPASS
+        else:
+            # Si se está ejecutando desde el script original
+            bundle_dir = os.path.abspath(os.path.dirname(__file__))
+
+        image_paths = [
+            os.path.join(bundle_dir, 'assets/tooltip1.png'),
+            os.path.join(bundle_dir, 'assets/tooltip2.png'), 
+            os.path.join(bundle_dir, 'assets/tooltip3.png')
+        ]
+        #print(image_paths)
+        """ Tooltip(self.radio1, image_paths[0]) """
+        Tooltip(self.radio2, image_paths[1])
+        Tooltip(self.radio3, image_paths[2])
+
     def callback(self, url):
         """
         @modules: webbrowser
@@ -165,6 +221,25 @@ class Application(ttk.Frame):
         print("Cerrando aplicación")
         root.destroy()
         # root.quit()
+
+    def load_csv_values(self):
+        # Determinar la ruta del archivo xlsm
+        if getattr(sys, 'frozen', False):
+            # Si se está ejecutando el archivo empaquetado
+            bundle_dir = sys._MEIPASS
+        else:
+            # Si se está ejecutando desde el script original
+            bundle_dir = os.path.abspath(os.path.dirname(__file__))
+
+        csv_file_path = os.path.join(bundle_dir, 'assets/TRD.csv')
+        values = []
+        with open(csv_file_path, newline='', encoding='utf-8') as csvfile:
+            reader = csv.DictReader(csvfile)
+            for row in reader:
+                values.append(row['nombre'].upper())
+        self.entry02['values'] = values
+        if values:
+            self.entry02.set(values[0])
 
     # Funcion para el caso de una carpeta (2 niveles: carpeta/archivos)
     def obtenerExpediente(self):
@@ -199,6 +274,132 @@ class Application(ttk.Frame):
             carpetas = [os.path.join(folder_selected, d) for d in os.listdir(folder_selected) if os.path.isdir(os.path.join(folder_selected, d))]
             self.carpetas = carpetas
 
+    # Función recursiva para construir el diccionario de estructura de directorios
+    def construir_estructura(self, ruta):
+        estructura = {}
+        for item in os.listdir(ruta):
+            item_path = os.path.join(ruta, item)
+            if os.path.isdir(item_path):
+                estructura[item] = self.construir_estructura(item_path)
+            else:
+                estructura[item] = None
+        return estructura
+    
+    def obtener_profundidad_maxima(self, directorio, nivel_actual=1):
+        if not isinstance(directorio, dict) or not directorio:
+            # Si no es un diccionario o está vacío, la profundidad es el nivel actual
+            return nivel_actual
+        else:
+            # Calcula la profundidad recursivamente en cada subdirectorio
+            return max(self.obtener_profundidad_maxima(subdirectorio, nivel_actual + 1) for subdirectorio in directorio.values())
+
+    # Funcion para el caso de varias carpetas (4 y 5 niveles: carpeta/subcarpetas/archivos)
+    def obtener_rutas(self):
+        """
+        - Obtiene la ruta seleccionada por el usuario,
+        - Recupera la lista de carpetas en esa ruta
+        - Hace uso de la variable global directorio (estructura_directorios) para:
+            - Validar que coincida con la opcion seleccionada por el usuario
+            - Obtener la lista de rutas de CUI a procesar
+            - Obtener la lista de rutas de subcarpetas a procesar
+        """
+
+        folder_selected = os.path.normpath(filedialog.askdirectory())
+        # Valida si no selecciona carpeta y muestra la carpeta seleccionada en el widget de texto
+        if folder_selected == "." or folder_selected == "":  # Si no se selecciona ninguna carpeta
+            tk.messagebox.showwarning("Advertencia", "No se ha seleccionado ninguna carpeta.")
+        else:
+            print("Carpeta seleccionada: ", folder_selected)
+            self.expediente = folder_selected
+            self.text_widget.insert(tk.END, "Carpeta seleccionada: " + folder_selected + "\n")
+            self.text_widget.see(tk.END)
+
+            # Inicializar el diccionario de estructura de directorios
+            estructura_directorios = {}
+            # Construir la estructura de directorios
+            estructura_directorios = self.construir_estructura(folder_selected)
+            print("Estructura de Directorios:", estructura_directorios)
+            estructura_directorios = estructura_directorios
+
+            #**************
+
+            profundidad_maxima = self.obtener_profundidad_maxima(estructura_directorios)
+            print(f"La profundidad máxima es: {profundidad_maxima}")
+
+            if self.selected_value == "2" and profundidad_maxima == 4:
+                self.profundidad = 4
+                lista_cui, lista_subcarpetas = self.obtener_lista_rutas_subcarpetas(estructura_directorios, 4)
+            elif self.selected_value == "3" and profundidad_maxima == 5:
+                self.profundidad = 5
+                lista_cui, lista_subcarpetas = self.obtener_lista_rutas_subcarpetas(estructura_directorios, 5)
+            else:
+                tk.messagebox.showwarning("Advertencia", "La estructura de directorios no coincide con la opción seleccionada. Por favor, verifique la estructura interna de los directorios seleccionados.")
+
+            #************
+
+            # Guardar las listas en atributos de la clase
+            self.lista_cui = lista_cui
+            self.lista_subcarpetas = lista_subcarpetas
+            self.estructura_directorios = estructura_directorios
+
+# PENDIENTE MOVER A procesa_expedientes
+            # Imprimir las listas para verificación
+            print("Estructura de Directorios:", self.estructura_directorios)
+            print("Lista de C.U.I.:", self.lista_cui)
+            print("Lista de Subcarpetas Internas:", self.lista_subcarpetas)
+            
+
+    def obtener_rutas_nivel(self, directorio, nivel_deseado, nivel_actual=1, ruta_actual=""):
+        rutas = []
+        if nivel_actual == nivel_deseado:
+            rutas.append(ruta_actual)
+        elif isinstance(directorio, dict):
+            for nombre, subdirectorio in directorio.items():
+                rutas.extend(self.obtener_rutas_nivel(subdirectorio, nivel_deseado, nivel_actual + 1, f"{ruta_actual}/{nombre}"))
+        return rutas
+
+    def obtener_lista_rutas_subcarpetas(self, directorio, profundidad_maxima):
+        lista_rutas_subcarpetas = []
+        lista_cui = []
+
+        if profundidad_maxima == 4:
+            for nombre, subdirectorio in directorio.items():
+                # Obtener rutas de nivel 2 y nivel 4
+                rutas_nivel_dos = self.obtener_rutas_nivel(subdirectorio, 2, 1, nombre)
+                rutas_nivel_cuatro = self.obtener_rutas_nivel(subdirectorio, 4, 1, nombre)
+
+                # Añadir rutas de nivel 2 a lista de subcarpetas y nivel 4 a lista de CUIs
+                lista_rutas_subcarpetas.append(rutas_nivel_dos)
+                lista_cui.extend(rutas_nivel_cuatro)
+                
+        elif profundidad_maxima == 5:
+            for nombre, subdirectorio in directorio.items():
+                for subnombre, subsubdirectorio in subdirectorio.items():
+                    # Obtener rutas de nivel 2 y nivel 4
+                    rutas_nivel_dos = self.obtener_rutas_nivel(subsubdirectorio, 2, 1, f"{nombre}/{subnombre}")
+                    rutas_nivel_cuatro = self.obtener_rutas_nivel(subsubdirectorio, 4, 1, f"{nombre}/{subnombre}")
+
+                    # Añadir rutas de nivel 2 a lista de subcarpetas y nivel 4 a lista de CUIs
+                    lista_rutas_subcarpetas.append(rutas_nivel_dos)
+                    lista_cui.extend(rutas_nivel_cuatro)
+
+        return lista_cui, lista_rutas_subcarpetas
+
+    def procesa_expedientes(self):
+        """
+        - Obtiene la seleccion del radio button
+        - Obtiene la ruta seleccionada por el usuario
+        - Valida y crea la lista de expedientes a procesar obtenerRutasExpedientes()
+            - Obtiene lista de rutas de carpetas en la carpeta seleccionada
+            - Valida radicados unicamente obteniendo los primeros 23 digitos
+        - Confirma procedimiento con el usuario
+        - Crea objeto y llama metodo procesaCarpetas() u otro en su defecto para cada expediente en la lista
+        - Genera lista de rutas no procesadas
+        """
+        radio = self.get_radio_value()
+        pass
+
+# PENDIENTE *******************************
     def procesaCarpetas(self):
         """
         - Crea objeto y llama metodo process() para cada carpeta en la lista
@@ -351,6 +552,37 @@ class Application(ttk.Frame):
                 return True # la variable is_updated se mantiene en True
         except requests.RequestException as e:
             print(f"Error al comprobar actualizaciones: {e}")
+
+class Tooltip:
+    def __init__(self, widget, image_path, y_offset=25):
+        self.widget = widget
+        self.image_path = image_path
+        self.y_offset = y_offset
+        self.tooltip_window = None
+        self.widget.bind("<Enter>", self.show_tooltip)
+        self.widget.bind("<Leave>", self.hide_tooltip)
+
+    def show_tooltip(self, event):
+        if self.tooltip_window or not self.image_path:
+            return
+        x, y, _, _ = self.widget.bbox("insert")
+        x += self.widget.winfo_rootx() + 25
+        y += self.widget.winfo_rooty() + 25 + self.y_offset
+
+        self.tooltip_window = tw = tk.Toplevel(self.widget)
+        tw.wm_overrideredirect(True)
+        tw.wm_geometry(f"+{x}+{y}")
+
+        image = Image.open(self.image_path)
+        photo = ImageTk.PhotoImage(image)
+        label = tk.Label(tw, image=photo)
+        label.image = photo  # Mantener una referencia para evitar que la imagen sea recolectada por el garbage collector
+        label.pack()
+
+    def hide_tooltip(self, event):
+        if self.tooltip_window:
+            self.tooltip_window.destroy()
+            self.tooltip_window = None
 
 root = tk.Tk()
 app = Application(root)

@@ -293,6 +293,9 @@ class AutomatizacionData:
             if resultado == "":
                 resultado = "Documento electronico"
 
+            if len(resultado) > 36:
+                resultado = resultado[:36]
+
             lista_cadena[i] = resultado  # Modificar la cadena de la lista
         return lista_cadena
 

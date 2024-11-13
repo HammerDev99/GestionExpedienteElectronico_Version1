@@ -1,7 +1,7 @@
 VSVersionInfo(
   ffi=FixedFileInfo(
-    filevers=(1, 3, 1, 0),
-    prodvers=(1, 3, 1, 0),
+    filevers=(1, 4, 0, 0),
+    prodvers=(1, 4, 0, 0),
     mask=0x3f,
     flags=0x0,
     OS=0x40004,
@@ -14,13 +14,14 @@ VSVersionInfo(
       StringTable(
         u'040904B0', [
           StringStruct(u'CompanyName', u'Daniel Arbelaez Alvarez - HammerDev99'),
-          StringStruct(u'FileDescription', u'Este proyecto fue desarrollado para automatizar una función administrativa, asistiendo las operaciones manuales que haría un empleado en la conformación del expediente electrónico'),
-          StringStruct(u'FileVersion', u'1.3.1.0'),
+          StringStruct(u'FileDescription', u'GestionExpedienteElectronico_Version1'),
+          StringStruct(u'FileVersion', u'1.4.0.0'),
           StringStruct(u'InternalName', u'GestionExpedienteElectronico_Version1'),
           StringStruct(u'LegalCopyright', u'Copyright © 2024 Daniel Arbelaez. Licensed under the MIT License.'),
-          StringStruct(u'OriginalFilename', u'GestionExpedienteElectronico_v1.3.1.exe'),
+          StringStruct(u'OriginalFilename', u'GestionExpedienteElectronico_v1.4.0.exe'),
           StringStruct(u'ProductName', u'GestionExpedienteElectronico_Version1'),
-          StringStruct(u'ProductVersion', u'1.3.1.0')
+          StringStruct(u'ProductVersion', u'1.4.0.0'),
+          StringStruct(u'Comments', u'Este proyecto fue desarrollado para automatizar una función administrativa, asistiendo las operaciones manuales que haría un empleado en la conformación del expediente electrónico.')
         ]
       )
     ]),

@@ -15,6 +15,7 @@
   - [Registro de cambios](#registro-de-cambios)
   - [Construido con](#construido-con)
   - [Descargar](#descargar)
+  - [Descargo de responsabilidades](#descargo-de-responsabilidades)
 
 ---
 
@@ -99,7 +100,11 @@ python3 -m venv venv
   Para activar el ambiente virtual usa:
 
 ```BASH
+#MAC
 source venv/bin/activate
+
+#WINDOWS
+.venv\Scripts\Activate.ps1
 ```
 
 2. Luego instala las dependencias necesarias:
@@ -120,7 +125,7 @@ python app_package/main.py
 
 ## Registro de cambios
 
-- 2204-09-17 Nuevo Release 🚀 GestionExpedienteElectronico v1.3.0
+- 2024-09-17 Nuevo Release 🚀 GestionExpedienteElectronico v1.3.0
 - 2024-09-17 Optimización en el manejo de archivos excel y mejora en el conteo del progressBar
 - 2024-09-17 eliminación de comentarios y agrega upperCase a primera letra
 - 2024-09-17 Agrega progressBar
@@ -161,7 +166,27 @@ python app_package/main.py
 
 ## Descargar
 
+[Descargar última versión](https://github.com/HammerDev99/GestionExpedienteElectronico_Version1/releases/tag/latest)
+
 Para recibir actualizaciones de las novedades y cambios que se realicen al programa puedes seguirme en la cuenta de twitter [@hammerdev99](https://www.twitter.com/hammerdev99) dónde se comparte su creación en público.
+
+## Descargo de responsabilidades
+
+Este documento tiene por objeto informar a los usuarios del software GestionExpedienteElectronico_Version1 sobre las condiciones y limitaciones en el uso de la aplicación. El uso de este software implica la aceptación de los términos y condiciones establecidos a continuación:
+
+1. El software GestionExpedienteElectronico_Version1 fue desarrollado para solucionar una necesidad personal del creador y puede ser utilizado por otras personas bajo su propia responsabilidad.
+
+2. El uso del software GestionExpedienteElectronico_Version1 es responsabilidad exclusiva del usuario. El creador no se hace responsable de cualquier daño, pérdida o perjuicio que pudiera derivarse del uso de la aplicación.
+
+3. El software GestionExpedienteElectronico_Version1 se proporciona "tal cual" y sin garantías de ningún tipo, ya sean explícitas o implícitas. El creador no garantiza la precisión, fiabilidad, integridad o calidad de la aplicación ni de cualquier información o contenido relacionado.
+
+4. El usuario es el único responsable de la selección, instalación, uso y resultados obtenidos del software GestionExpedienteElectronico_Version1. El creador no será responsable de ningún error, virus, interrupción del servicio, pérdida de datos, pérdida de ingresos o cualquier otro daño que pudiera resultar del uso del software.
+
+5. El usuario acepta indemnizar y eximir de responsabilidad al creador por cualquier reclamo, demanda o daño, incluyendo honorarios razonables de abogados, que pudiera surgir de la utilización del software GestionExpedienteElectronico_Version1.
+
+6. El creador se reserva el derecho de modificar, suspender o descontinuar el software GestionExpedienteElectronico_Version1 en cualquier momento y sin previo aviso.
+
+7. Al descargar, instalar o utilizar el software GestionExpedienteElectronico_Version1, el usuario acepta y reconoce haber leído y entendido este documento y acepta los términos y condiciones establecidos.
 
 ---
 
