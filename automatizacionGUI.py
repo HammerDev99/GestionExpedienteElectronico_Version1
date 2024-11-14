@@ -9,8 +9,9 @@ import webbrowser
 import requests
 import json
 from automatizacionEmpleado import AutomatizacionEmpleado
+from carpetas_analyzer import CarpetasAnalyzer
+from tooltip import Tooltip
 
-from PIL import Image, ImageTk
 import csv
 
 class Application(ttk.Frame):
@@ -19,8 +20,6 @@ class Application(ttk.Frame):
     carpetas = []
     is_updated = True
     selected_value = "2"
-    lista_cui = []
-    lista_subcarpetas = []
 
     def __init__(self, root, is_updated=True):
         """
@@ -241,154 +240,97 @@ class Application(ttk.Frame):
         if values:
             self.entry02.set(values[0])
 
-    # Funcion para el caso de una carpeta (2 niveles: carpeta/archivos)
-    def obtenerExpediente(self):
-        """
-        - Obtiene ruta seleccionada por usuario
-        - Actualiza variable global expediente
-        - Ejecuta funcion agregaNombreBase enviando la ruta y parametro False
-        """
-
-        folder_selected = os.path.normpath(filedialog.askdirectory())
-        self.expediente = folder_selected
-        self.agregaNombreBase(folder_selected, False)
-
-    # Funcion para el caso de varias carpetas (3 niveles: carpeta/subcarpetas/archivos)
-    def obtenerExpedientes(self):
-        """
-        - Obtiene la ruta seleccionada por el usuario,
-        - Recupera la lista de carpetas en esa ruta
-        """
-
-        folder_selected = os.path.normpath(filedialog.askdirectory())
-        # Valida si no selecciona carpeta y muestra la carpeta seleccionada en el widget de texto
-        if folder_selected == "." or folder_selected == "":  # Si no se selecciona ninguna carpeta
-            tk.messagebox.showwarning("Advertencia", "No se ha seleccionado ninguna carpeta.")
-        else:
-            # print("Carpeta seleccionada: ", folder_selected)
-            self.expediente = folder_selected
-            self.text_widget.insert(tk.END, "Carpeta seleccionada: " + folder_selected + "\n")
-            self.text_widget.see(tk.END)
-
-            # Obtener la lista de carpetas en la carpeta seleccionada
-            carpetas = [os.path.join(folder_selected, d) for d in os.listdir(folder_selected) if os.path.isdir(os.path.join(folder_selected, d))]
-            self.carpetas = carpetas
-
-    # Función recursiva para construir el diccionario de estructura de directorios
-    def construir_estructura(self, ruta):
-        estructura = {}
-        for item in os.listdir(ruta):
-            item_path = os.path.join(ruta, item)
-            if os.path.isdir(item_path):
-                estructura[item] = self.construir_estructura(item_path)
-            else:
-                estructura[item] = None
-        return estructura
-    
-    def obtener_profundidad_maxima(self, directorio, nivel_actual=1):
-        if not isinstance(directorio, dict) or not directorio:
-            # Si no es un diccionario o está vacío, la profundidad es el nivel actual
-            return nivel_actual
-        else:
-            # Calcula la profundidad recursivamente en cada subdirectorio
-            return max(self.obtener_profundidad_maxima(subdirectorio, nivel_actual + 1) for subdirectorio in directorio.values())
-
     # Funcion para el caso de varias carpetas (4 y 5 niveles: carpeta/subcarpetas/archivos)
     def obtener_rutas(self):
         """
-        - Obtiene la ruta seleccionada por el usuario,
+        - Obtiene la ruta seleccionada por el usuario
         - Recupera la lista de carpetas en esa ruta
-        - Hace uso de la variable global directorio (estructura_directorios) para:
-            - Validar que coincida con la opcion seleccionada por el usuario
-            - Obtener la lista de rutas de CUI a procesar
-            - Obtener la lista de rutas de subcarpetas a procesar
+        - Valida la estructura de las carpetas
+        - Obtiene los CUIs y subcarpetas internas
         """
+        self.lista_cui = []
+        self.lista_subcarpetas = []
+        self.carpetas_omitidas = set()
+        self.estructura_directorios = {}
 
         folder_selected = os.path.normpath(filedialog.askdirectory())
-        # Valida si no selecciona carpeta y muestra la carpeta seleccionada en el widget de texto
-        if folder_selected == "." or folder_selected == "":  # Si no se selecciona ninguna carpeta
+        if folder_selected in [".", ""]:
             tk.messagebox.showwarning("Advertencia", "No se ha seleccionado ninguna carpeta.")
+            return
+
+        self.expediente = folder_selected
+
+        analyzer = CarpetasAnalyzer({}, None)
+        estructura_directorios = analyzer.construir_estructura(folder_selected)
+        if not estructura_directorios:
+            tk.messagebox.showwarning("Advertencia", "La carpeta seleccionada está vacía o no es accesible.")
+            return
+
+        print("Estructura de Directorios:", estructura_directorios)
+        profundidad_maxima = analyzer.obtener_profundidad_maxima(estructura_directorios)
+        analyzer = CarpetasAnalyzer(estructura_directorios, profundidad_maxima)
+
+        if self.selected_value == "2" and profundidad_maxima == 4:
+            self.profundidad = 4
+            lista_cui, lista_subcarpetas = analyzer.obtener_lista_rutas_subcarpetas(
+                estructura_directorios, 4, folder_selected)
+            self.handle_directory_analysis(folder_selected, estructura_directorios, lista_cui, lista_subcarpetas, self.carpetas_omitidas, analyzer)
+# PENDIENTE SEGUIR CON procesa_expedientes ****************************************************
+        elif self.selected_value == "3" and profundidad_maxima == 5:
+            self.profundidad = 5
+            lista_cui, lista_subcarpetas = analyzer.obtener_lista_rutas_subcarpetas(
+                estructura_directorios, 5, None)
+            self.handle_directory_analysis(folder_selected, estructura_directorios, lista_cui, 
+            lista_subcarpetas, self.carpetas_omitidas, analyzer)
+# PENDIENTE SEGUIR CON procesa_expedientes ****************************************************
         else:
-            print("Carpeta seleccionada: ", folder_selected)
-            self.expediente = folder_selected
-            self.text_widget.insert(tk.END, "Carpeta seleccionada: " + folder_selected + "\n")
-            self.text_widget.see(tk.END)
+            tk.messagebox.showwarning(
+                "Advertencia", 
+                "La estructura de directorios no coincide con la opción seleccionada.\n\n"
+                "Por favor, verifique la estructura interna de los directorios seleccionados."
+            )
 
-            # Inicializar el diccionario de estructura de directorios
-            estructura_directorios = {}
-            # Construir la estructura de directorios
-            estructura_directorios = self.construir_estructura(folder_selected)
-            print("Estructura de Directorios:", estructura_directorios)
-            estructura_directorios = estructura_directorios
+        # Imprimir las listas para verificación
+        print("Estructura de Directorios:", self.estructura_directorios)
+        print("Lista de C.U.I.:", self.lista_cui)
+        print("Lista de Subcarpetas Internas:", self.lista_subcarpetas)
+        print("Carpetas Omitidas:", self.carpetas_omitidas)
 
-            #**************
+    def handle_directory_analysis(self, folder_selected, estructura_directorios, lista_cui, lista_subcarpetas, carpetas_omitidas, analyzer):
+        """
+        @param: folder_selected tipo str, estructura_directorios tipo dict, lista_cui tipo list, lista_subcarpetas tipo list, carpetas_omitidas tipo set
 
-            profundidad_maxima = self.obtener_profundidad_maxima(estructura_directorios)
-            print(f"La profundidad máxima es: {profundidad_maxima}")
+        - Muestra mensaje de carpeta seleccionada
+        - Guarda las listas en atributos de la clase
+        - Muestra mensaje de carpetas omitidas
+        """
+        self.text_widget.insert(tk.END, f"Carpeta seleccionada: {folder_selected}\n")
+        self.text_widget.see(tk.END)
 
-            if self.selected_value == "2" and profundidad_maxima == 4:
-                self.profundidad = 4
-                lista_cui, lista_subcarpetas = self.obtener_lista_rutas_subcarpetas(estructura_directorios, 4)
-            elif self.selected_value == "3" and profundidad_maxima == 5:
-                self.profundidad = 5
-                lista_cui, lista_subcarpetas = self.obtener_lista_rutas_subcarpetas(estructura_directorios, 5)
-            else:
-                tk.messagebox.showwarning("Advertencia", "La estructura de directorios no coincide con la opción seleccionada. Por favor, verifique la estructura interna de los directorios seleccionados.")
-
-            #************
-
-            # Guardar las listas en atributos de la clase
+        try:
             self.lista_cui = lista_cui
             self.lista_subcarpetas = lista_subcarpetas
             self.estructura_directorios = estructura_directorios
-
-# PENDIENTE MOVER A procesa_expedientes
-            # Imprimir las listas para verificación
-            print("Estructura de Directorios:", self.estructura_directorios)
-            print("Lista de C.U.I.:", self.lista_cui)
-            print("Lista de Subcarpetas Internas:", self.lista_subcarpetas)
-            
-
-    def obtener_rutas_nivel(self, directorio, nivel_deseado, nivel_actual=1, ruta_actual=""):
-        rutas = []
-        if nivel_actual == nivel_deseado:
-            rutas.append(ruta_actual)
-        elif isinstance(directorio, dict):
-            for nombre, subdirectorio in directorio.items():
-                rutas.extend(self.obtener_rutas_nivel(subdirectorio, nivel_deseado, nivel_actual + 1, f"{ruta_actual}/{nombre}"))
-        return rutas
-
-    def obtener_lista_rutas_subcarpetas(self, directorio, profundidad_maxima):
-        lista_rutas_subcarpetas = []
-        lista_cui = []
-
-        if profundidad_maxima == 4:
-            for nombre, subdirectorio in directorio.items():
-                # Obtener rutas de nivel 2 y nivel 4
-                rutas_nivel_dos = self.obtener_rutas_nivel(subdirectorio, 2, 1, nombre)
-                rutas_nivel_cuatro = self.obtener_rutas_nivel(subdirectorio, 4, 1, nombre)
-
-                # Añadir rutas de nivel 2 a lista de subcarpetas y nivel 4 a lista de CUIs
-                lista_rutas_subcarpetas.append(rutas_nivel_dos)
-                lista_cui.extend(rutas_nivel_cuatro)
-                
-        elif profundidad_maxima == 5:
-            for nombre, subdirectorio in directorio.items():
-                for subnombre, subsubdirectorio in subdirectorio.items():
-                    # Obtener rutas de nivel 2 y nivel 4
-                    rutas_nivel_dos = self.obtener_rutas_nivel(subsubdirectorio, 2, 1, f"{nombre}/{subnombre}")
-                    rutas_nivel_cuatro = self.obtener_rutas_nivel(subsubdirectorio, 4, 1, f"{nombre}/{subnombre}")
-
-                    # Añadir rutas de nivel 2 a lista de subcarpetas y nivel 4 a lista de CUIs
-                    lista_rutas_subcarpetas.append(rutas_nivel_dos)
-                    lista_cui.extend(rutas_nivel_cuatro)
-
-        return lista_cui, lista_rutas_subcarpetas
+            if self.selected_value == "3":
+                self.carpetas_omitidas = analyzer.encontrar_cuis_faltantes(lista_cui, lista_subcarpetas)
+        except Exception as e:
+            print(f"Error al guardar las listas en atributos de la clase: {str(e)}")
+        
+        try:
+            if self.carpetas_omitidas:
+                mensaje = f"Se encontraron {len(self.carpetas_omitidas)} carpetas que no cumplen con la estructura de directorios"
+                self.mensaje(None, mensaje)
+                mensaje = "Las siguientes carpetas no serán incluidas en el procesamiento:\n"
+                for carpeta in sorted(self.carpetas_omitidas):
+                    mensaje += f"- {carpeta}\n"
+                self.text_widget.insert(tk.END, mensaje + "\n")
+                self.text_widget.see(tk.END)
+        except Exception as e:
+            print(f"Error al mostrar las carpetas omitidas: {str(e)}. No se eligio una estructura de carpetas adecuada")
 
     def procesa_expedientes(self):
         """
-        - Obtiene la seleccion del radio button
-        - Obtiene la ruta seleccionada por el usuario
+        - Elimina valores de lista_cui todas las carpetas_omitidas
         - Valida y crea la lista de expedientes a procesar obtenerRutasExpedientes()
             - Obtiene lista de rutas de carpetas en la carpeta seleccionada
             - Valida radicados unicamente obteniendo los primeros 23 digitos
@@ -396,7 +338,6 @@ class Application(ttk.Frame):
         - Crea objeto y llama metodo procesaCarpetas() u otro en su defecto para cada expediente en la lista
         - Genera lista de rutas no procesadas
         """
-        radio = self.get_radio_value()
         pass
 
 # PENDIENTE *******************************
@@ -476,7 +417,7 @@ class Application(ttk.Frame):
         else:
             self.mensaje(3)
 
-    def mensaje(self, result):
+    def mensaje(self, result = None, mensaje = None):
         """
         @param: result tipo int
         @modules: tkinter
@@ -489,7 +430,7 @@ class Application(ttk.Frame):
             3: "Seleccione una carpeta para procesar",
             4: "Agregue archivos a la lista",
             5: "La carpeta electrónica del expediente se encuentra actualizada",
-            6: "Procedimiento detenido",
+            6: "Procedimiento detenido"
         }
         if result != None:
             tk.messagebox.showinfo(
@@ -499,6 +440,11 @@ class Application(ttk.Frame):
             # self.text_widget.insert(tk.END, switcher.get(result))
             lista_vacia = list()
             self.agregaNombreBase(lista_vacia, False)
+        
+        if mensaje != None:
+            tk.messagebox.showinfo(
+                message=mensaje, title=os.path.basename(self.expediente)
+            )
 
     def agregaNombreBase(self, items, bandera):
         """
@@ -552,37 +498,6 @@ class Application(ttk.Frame):
                 return True # la variable is_updated se mantiene en True
         except requests.RequestException as e:
             print(f"Error al comprobar actualizaciones: {e}")
-
-class Tooltip:
-    def __init__(self, widget, image_path, y_offset=25):
-        self.widget = widget
-        self.image_path = image_path
-        self.y_offset = y_offset
-        self.tooltip_window = None
-        self.widget.bind("<Enter>", self.show_tooltip)
-        self.widget.bind("<Leave>", self.hide_tooltip)
-
-    def show_tooltip(self, event):
-        if self.tooltip_window or not self.image_path:
-            return
-        x, y, _, _ = self.widget.bbox("insert")
-        x += self.widget.winfo_rootx() + 25
-        y += self.widget.winfo_rooty() + 25 + self.y_offset
-
-        self.tooltip_window = tw = tk.Toplevel(self.widget)
-        tw.wm_overrideredirect(True)
-        tw.wm_geometry(f"+{x}+{y}")
-
-        image = Image.open(self.image_path)
-        photo = ImageTk.PhotoImage(image)
-        label = tk.Label(tw, image=photo)
-        label.image = photo  # Mantener una referencia para evitar que la imagen sea recolectada por el garbage collector
-        label.pack()
-
-    def hide_tooltip(self, event):
-        if self.tooltip_window:
-            self.tooltip_window.destroy()
-            self.tooltip_window = None
 
 root = tk.Tk()
 app = Application(root)
