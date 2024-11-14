@@ -190,21 +190,16 @@ class Application(ttk.Frame):
         print(f"Valor seleccionado: {selected_value}")
 
     def create_tooltips(self):
-        # Determinar la ruta del archivo xlsm
-        if getattr(sys, 'frozen', False):
-            # Si se está ejecutando el archivo empaquetado
-            bundle_dir = sys._MEIPASS
-        else:
-            # Si se está ejecutando desde el script original
-            bundle_dir = os.path.abspath(os.path.dirname(__file__))
-
+        """
+        Crea tooltips para los radiobuttons usando imágenes.
+        """
         image_paths = [
-            os.path.join(bundle_dir, 'assets/tooltip1.png'),
-            os.path.join(bundle_dir, 'assets/tooltip2.png'), 
-            os.path.join(bundle_dir, 'assets/tooltip3.png')
+            self.get_bundled_path('assets/tooltip1.png'),
+            self.get_bundled_path('assets/tooltip2.png'),
+            self.get_bundled_path('assets/tooltip3.png')
         ]
-        #print(image_paths)
-        """ Tooltip(self.radio1, image_paths[0]) """
+
+        # Tooltip(self.radio1, image_paths[0])  # Comentado
         Tooltip(self.radio2, image_paths[1])
         Tooltip(self.radio3, image_paths[2])
 
@@ -224,20 +219,17 @@ class Application(ttk.Frame):
         # root.quit()
 
     def load_csv_values(self):
-        # Determinar la ruta del archivo xlsm
-        if getattr(sys, 'frozen', False):
-            # Si se está ejecutando el archivo empaquetado
-            bundle_dir = sys._MEIPASS
-        else:
-            # Si se está ejecutando desde el script original
-            bundle_dir = os.path.abspath(os.path.dirname(__file__))
-
-        csv_file_path = os.path.join(bundle_dir, 'assets/TRD.csv')
+        """
+        Carga los valores del archivo CSV en el combobox.
+        """
+        csv_file_path = self.get_bundled_path('assets/TRD.csv')
         values = []
+        
         with open(csv_file_path, newline='', encoding='utf-8') as csvfile:
             reader = csv.DictReader(csvfile)
             for row in reader:
                 values.append(row['nombre'].upper())
+                
         self.entry02['values'] = values
         if values:
             self.entry02.set(values[0])
@@ -424,7 +416,6 @@ class Application(ttk.Frame):
                     # Obtiene la serie o subserie documental del combobox
                     subserie = self.entry02.get()
                     for ruta in sublista:
-                        i = i + 1
                         
                         # Validacion de datos en consola
                         #print("Despacho: ", despacho)
@@ -451,10 +442,15 @@ class Application(ttk.Frame):
                         self.text_widget.see(tk.END)
 
                         # Concatena la ruta con la carpeta a procesar y normaliza la ruta
-                        carpeta = os.path.normpath(self.expediente+"/"+ruta)
+                        carpeta = os.path.normpath(os.path.join(self.expediente, ruta))
 
                         # Crea una instancia de AutomatizacionEmpleado con los parámetros necesarios
-                        obj = AutomatizacionEmpleado(carpeta, "", despacho, subserie, rdo)
+                        # identificar valores en consola de variables para crear objeto
+                        print("Carpeta: ", carpeta)
+                        print("Despacho: ", despacho)
+                        print("Subserie: ", subserie)
+                        print("Radicado: ", rdo)
+                        obj = AutomatizacionEmpleado(self.get_bundled_path(carpeta), "", despacho, subserie, rdo)
                         # Ejecuta el procesamiento de la carpeta
                         obj.process()
 
@@ -462,13 +458,18 @@ class Application(ttk.Frame):
                         self.progress["value"] = 0.1 + ((i + 1) / total_carpetas) * 0.9
                         # Actualiza la interfaz gráfica para mostrar el progreso
                         self.update_idletasks()
-
+                    i = i + 1
                 # Indicar al usuario que el proceso ha terminado
                 self.progress["value"] = 1.0  # Asegurarse de que la barra de progreso llegue al 100%
                 self.update_idletasks()
                 self.expediente = ""
                 self.carpetas = []
+                self.lista_cui = []
+                self.lista_subcarpetas = []
+                self.estructura_directorios = {}
+                self.analyzer = None
                 self.text_widget.insert(tk.END, "Proceso completado.\n*******************\n")
+                self.progress["value"] = 0
                 self.update_idletasks()
                 self.mensaje(1)
             else:
@@ -527,16 +528,22 @@ class Application(ttk.Frame):
             self.entry1.insert(0, items)
             self.entry1.config(state=tk.DISABLED) """
 
+    def get_bundled_path(self, ruta):
+        """
+        Obtiene la ruta correcta según el entorno de ejecución.
+        
+        Args:
+            ruta (str): Ruta relativa al directorio base
+            
+        Returns:
+            str: Ruta absoluta normalizada
+        """
+        bundle_dir = sys._MEIPASS if getattr(sys, 'frozen', False) else os.path.abspath(os.path.dirname(__file__))
+        return os.path.normpath(os.path.join(bundle_dir, ruta))
+
     def obtener_version_actual(self):
         # Determinar la ruta del archivo xlsm
-        if getattr(sys, 'frozen', False):
-            # Si se está ejecutando el archivo empaquetado
-            bundle_dir = sys._MEIPASS
-        else:
-            # Si se está ejecutando desde el script original
-            bundle_dir = os.path.abspath(os.path.dirname(__file__))
-
-        ruta_json = os.path.join(bundle_dir, 'assets/last_version.json')
+        ruta_json = self.get_bundled_path('assets/last_version.json')
         with open(ruta_json, 'r', encoding='utf-8') as file:
             data = json.load(file)
             version = data.get('version')
