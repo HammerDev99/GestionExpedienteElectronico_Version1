@@ -427,13 +427,23 @@ class Application(ttk.Frame):
                         i = i + 1
                         
                         # Validacion de datos en consola
-                        """ print("Despacho: ", despacho)
-                        print("Subserie: ", subserie)   
-                        print("sublista: ", sublista)
-                        print("Ruta: ", ruta) """
+                        #print("Despacho: ", despacho)
+                        #print("Subserie: ", subserie)   
+                        #print("sublista: ", sublista)
+                        #print("Ruta: ", ruta)
 
                         # Obtiene el valor del radicado
-                        rdo = analyzer._formater_cui(self.expediente)
+                        if self.selected_value == "2":
+                            rdo = os.path.normpath(os.path.basename(self.expediente))
+                            print("Radicado antes: ", rdo)
+                            rdo = analyzer._formater_cui(rdo)
+                            print("Radicado después: ", rdo)
+                        elif self.selected_value == "3":
+                            rdo = os.path.normpath(ruta)
+                            print("Radicado antes: ", rdo)
+                            rdo = analyzer._formater_cui(rdo)
+                            print("Radicado después: ", rdo)
+                        print("Radicado: ", rdo)
 
                         # Muestra en el widget de texto la ruta subserie/radicado
                         self.text_widget.insert(tk.END, "- "+os.path.normpath(os.path.basename(self.expediente)+"/"+ruta)+"\n")
