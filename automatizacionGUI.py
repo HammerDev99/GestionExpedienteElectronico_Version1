@@ -20,6 +20,8 @@ class Application(ttk.Frame):
     carpetas = []
     is_updated = True
     selected_value = "2"
+    lista_subcarpetas = []
+    analyzer = None
 
     def __init__(self, root, is_updated=True):
         """
@@ -151,7 +153,7 @@ class Application(ttk.Frame):
         self.pathExpediente = tk.Button(
             self,
             text="Agregar carpeta",
-            command=self.obtener_rutas, # PENDIENTE
+            command=self.obtener_rutas,
             height=1,
             width=17,
         )
@@ -163,7 +165,7 @@ class Application(ttk.Frame):
 
         # Botón Aceptar
         self.aceptar = tk.Button(
-            self, text="Aceptar", command=self.procesaCarpetas, height=1, width=7 # procesa_expedientes
+            self, text="Aceptar", command=self.procesa_expedientes, height=1, width=7
         )
         self.aceptar.pack(side=tk.LEFT, padx=5)
 
@@ -266,7 +268,7 @@ class Application(ttk.Frame):
             tk.messagebox.showwarning("Advertencia", "La carpeta seleccionada está vacía o no es accesible.")
             return
 
-        print("Estructura de Directorios:", estructura_directorios)
+        #print("Estructura de Directorios:", estructura_directorios)
         profundidad_maxima = analyzer.obtener_profundidad_maxima(estructura_directorios)
         analyzer = CarpetasAnalyzer(estructura_directorios, profundidad_maxima)
 
@@ -274,15 +276,17 @@ class Application(ttk.Frame):
             self.profundidad = 4
             lista_cui, lista_subcarpetas = analyzer.obtener_lista_rutas_subcarpetas(
                 estructura_directorios, 4, folder_selected)
-            self.handle_directory_analysis(folder_selected, estructura_directorios, lista_cui, lista_subcarpetas, self.carpetas_omitidas, analyzer)
-# PENDIENTE SEGUIR CON procesa_expedientes ****************************************************
+            self.handle_directory_analysis(folder_selected, estructura_directorios, lista_cui, lista_subcarpetas, self.carpetas_omitidas, None)
+            self.lista_subcarpetas = lista_subcarpetas
+            self.analyzer = analyzer
         elif self.selected_value == "3" and profundidad_maxima == 5:
             self.profundidad = 5
             lista_cui, lista_subcarpetas = analyzer.obtener_lista_rutas_subcarpetas(
                 estructura_directorios, 5, None)
             self.handle_directory_analysis(folder_selected, estructura_directorios, lista_cui, 
             lista_subcarpetas, self.carpetas_omitidas, analyzer)
-# PENDIENTE SEGUIR CON procesa_expedientes ****************************************************
+            self.lista_subcarpetas = lista_subcarpetas
+            self.analyzer = analyzer
         else:
             tk.messagebox.showwarning(
                 "Advertencia", 
@@ -291,22 +295,60 @@ class Application(ttk.Frame):
             )
 
         # Imprimir las listas para verificación
-        print("Estructura de Directorios:", self.estructura_directorios)
+        """ print("Estructura de Directorios:", self.estructura_directorios)
         print("Lista de C.U.I.:", self.lista_cui)
         print("Lista de Subcarpetas Internas:", self.lista_subcarpetas)
-        print("Carpetas Omitidas:", self.carpetas_omitidas)
+        print("Carpetas Omitidas:", self.carpetas_omitidas) """
 
-    def handle_directory_analysis(self, folder_selected, estructura_directorios, lista_cui, lista_subcarpetas, carpetas_omitidas, analyzer):
+    def _validar_cui(self, cui):
+        """
+        Valida que el CUI tenga exactamente 23 dígitos sin caracteres especiales.
+        
+        Args:
+            cui (str): String a validar
+            
+        Returns:
+            tuple: (bool, str) - (Es válido, CUI limpio)
+        """
+        # Eliminar espacios y cualquier texto después de estos
+        cui = cui.split()[0]
+        
+        # Remover caracteres especiales y no numéricos
+        cui_limpio = ''.join(c for c in cui if c.isdigit())
+        
+        # Verificar que tenga exactamente 23 dígitos
+        return (len(cui_limpio) >= 23, cui_limpio[:23] if len(cui_limpio) >= 23 else cui)
+
+    def handle_directory_analysis(self, folder_selected, estructura_directorios, lista_cui, lista_subcarpetas, carpetas_omitidas = None, analyzer = None):
         """
         @param: folder_selected tipo str, estructura_directorios tipo dict, lista_cui tipo list, lista_subcarpetas tipo list, carpetas_omitidas tipo set
 
-        - Muestra mensaje de carpeta seleccionada
-        - Guarda las listas en atributos de la clase
-        - Muestra mensaje de carpetas omitidas
+        Muestra mensaje de carpeta seleccionada
+        Guarda las listas en atributos de la clase
+        Muestra mensaje de carpetas omitidas
         """
-        self.text_widget.insert(tk.END, f"Carpeta seleccionada: {folder_selected}\n")
+        self.text_widget.insert(tk.END, f"\n\nCarpeta seleccionada: {folder_selected}\n\n")
         self.text_widget.see(tk.END)
 
+        # Conjuntos para almacenar CUIs válidos e inválidos
+        cuis_validos = set()
+        cuis_invalidos = set()
+
+        # Procesar cada sublista en lista_subcarpetas
+        for sublista in lista_subcarpetas:
+            for ruta in sublista:
+                # Obtener la parte antes del primer backslash
+                cui = ruta.split('\\')[0]
+                
+                # Validar el CUI
+                es_valido, cui_procesado = self._validar_cui(cui)
+                
+                if es_valido:
+                    cuis_validos.add(cui_procesado)
+                else:
+                    cuis_invalidos.add(cui)
+
+        # Actualiza las listas en atributos de la clase
         try:
             self.lista_cui = lista_cui
             self.lista_subcarpetas = lista_subcarpetas
@@ -316,11 +358,12 @@ class Application(ttk.Frame):
         except Exception as e:
             print(f"Error al guardar las listas en atributos de la clase: {str(e)}")
         
+        # Mostrar carpetas omitidas
         try:
             if self.carpetas_omitidas:
                 mensaje = f"Se encontraron {len(self.carpetas_omitidas)} carpetas que no cumplen con la estructura de directorios"
                 self.mensaje(None, mensaje)
-                mensaje = "Las siguientes carpetas no serán incluidas en el procesamiento:\n"
+                mensaje = "Las siguientes carpetas no cumplen con la estructura de carpetas y no serán incluidas en el procesamiento:\n"
                 for carpeta in sorted(self.carpetas_omitidas):
                     mensaje += f"- {carpeta}\n"
                 self.text_widget.insert(tk.END, mensaje + "\n")
@@ -328,28 +371,35 @@ class Application(ttk.Frame):
         except Exception as e:
             print(f"Error al mostrar las carpetas omitidas: {str(e)}. No se eligio una estructura de carpetas adecuada")
 
+        # Muestra los CUIs inválidos
+        if cuis_invalidos:
+            mensaje = "Se encontraron carpetas que no cumplen con el formato de 23 dígitos:\n"
+            if self.selected_value == "3":
+                for cui in sorted(cuis_invalidos):
+                    mensaje += f"- {cui}\n"
+            else:
+                for cui in lista_cui:
+                    mensaje += f"- {cui}\n"
+            self.text_widget.insert(tk.END, mensaje)
+            self.text_widget.see(tk.END)
+            self.mensaje(None, "Algunas carpetas no cumplen con el formato requerido de 23 dígitos numéricos.")
+
     def procesa_expedientes(self):
         """
-        - Elimina valores de lista_cui todas las carpetas_omitidas
-        - Valida y crea la lista de expedientes a procesar obtenerRutasExpedientes()
-            - Obtiene lista de rutas de carpetas en la carpeta seleccionada
-            - Valida radicados unicamente obteniendo los primeros 23 digitos
+        - Obtiene Lista de Subcarpetas Internas para procesar
+        - Valida radicados unicamente obteniendo los primeros 23 digitos
         - Confirma procedimiento con el usuario
         - Crea objeto y llama metodo procesaCarpetas() u otro en su defecto para cada expediente en la lista
-        - Genera lista de rutas no procesadas
+        - Genera reporte de lista de rutas procesadas
         """
-        pass
+        lista_subcarpetas = self.lista_subcarpetas
+        analyzer = self.analyzer
 
-# PENDIENTE *******************************
-    def procesaCarpetas(self):
-        """
-        - Crea objeto y llama metodo process() para cada carpeta en la lista
-        """
-        total_carpetas = len(self.carpetas)
+        total_carpetas = sum(len(sublista) for sublista in lista_subcarpetas)
         self.progress["maximum"] = 1  # La barra de progreso va de 0 a 1
 
-        if self.carpetas != []:	
-            num_carpetas = len(self.carpetas)
+        if lista_subcarpetas != []:	
+            num_carpetas = total_carpetas
             if tk.messagebox.askyesno(
                     message=f'Se procesarán {num_carpetas} carpetas que contiene la carpeta "{os.path.basename(self.expediente)}". \n¿Desea continuar?.',
                     title=os.path.basename(self.expediente),
@@ -360,27 +410,33 @@ class Application(ttk.Frame):
                 # self.text_widget.insert(tk.END, "CARPETAS PROCESADAS:\n")
                 self.update_idletasks()
 
-                for i, carpeta in enumerate(self.carpetas):
+                for i, sublista in lista_subcarpetas:
+                    # Obtiene el nombre del despacho judicial del campo de entrada
                     despacho = self.entry01.get()
+                    # Obtiene la serie o subserie documental del combobox
                     subserie = self.entry02.get()
+                    for ruta in sublista:
+                        # Obtiene el valor del radicado
+                        rdo = analyzer._extraer_cui(ruta)
+                        # Imprime el radicado en la consola para debugging
+                        print("RDO: ", rdo)
+                        # Muestra en el widget de texto la ruta subserie/radicado
+                        self.text_widget.insert(tk.END, subserie+"/"+ruta+"\n")
+                        # Asegura que el último texto insertado sea visible
+                        self.text_widget.see(tk.END)
 
-                    # Obtener el valor de entry03
-                    rdo = self.entry03.get().strip()
+                        # Concatena la ruta con la carpeta a procesar y normaliza la ruta
+                        carpeta = os.path.normpath(self.expediente+ruta)
 
-                    # Si entry03 está vacío, usar el nombre de la carpeta como rdo
-                    if rdo == "":
-                        rdo = os.path.basename(carpeta)
+                        # Crea una instancia de AutomatizacionEmpleado con los parámetros necesarios
+                        obj = AutomatizacionEmpleado(carpeta, "", despacho, subserie, rdo)
+                        # Ejecuta el procesamiento de la carpeta
+                        obj.process()
 
-                    print("RDO: ", rdo)
-                    self.text_widget.insert(tk.END, subserie+"/"+rdo+"\n")
-                    self.text_widget.see(tk.END)
-
-                    obj = AutomatizacionEmpleado(carpeta, "", despacho, subserie, rdo)
-                    obj.process()
-
-                    # Actualizar la barra de progreso
-                    self.progress["value"] = 0.1 + ((i + 1) / total_carpetas) * 0.9
-                    self.update_idletasks()
+                        # Actualiza la barra de progreso basado en el progreso actual (10% inicial + progreso proporcional)
+                        self.progress["value"] = 0.1 + ((i + 1) / total_carpetas) * 0.9
+                        # Actualiza la interfaz gráfica para mostrar el progreso
+                        self.update_idletasks()
 
                 # Indicar al usuario que el proceso ha terminado
                 self.progress["value"] = 1.0  # Asegurarse de que la barra de progreso llegue al 100%
@@ -390,26 +446,6 @@ class Application(ttk.Frame):
                 self.text_widget.insert(tk.END, "Proceso completado.\n")
                 self.update_idletasks()
                 self.mensaje(1)
-            else:
-                self.expediente = ""
-                self.carpetas = []
-                self.mensaje(6)
-        else:
-            self.mensaje(3)
-
-    def procesaCarpeta(self):
-        """
-        - Crea objeto y llama metodo process()
-        """
-        if self.expediente != "":
-            if tk.messagebox.askyesno(
-                message='Se procesarán los archivos que contiene la carpeta "'
-                + os.path.basename(self.expediente)
-                + '". \n¿Desea continuar?.',
-                title=os.path.basename(self.expediente),
-            ):
-                obj = AutomatizacionEmpleado(self.expediente, "")
-                self.mensaje(obj.process())
             else:
                 self.expediente = ""
                 self.carpetas = []

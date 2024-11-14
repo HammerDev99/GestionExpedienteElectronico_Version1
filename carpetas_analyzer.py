@@ -261,7 +261,8 @@ class CarpetasAnalyzer:
                 
                 # Validar con opcion 1 con opcion 2 ya es funcional
                 if folder_selected:
-                    lista_cui.append(os.path.basename(folder_selected))
+                    if os.path.basename(folder_selected) not in lista_cui:
+                        lista_cui.append(os.path.basename(folder_selected))
                 else:
                     cui = self._extraer_cui(ruta_base)
                     if cui and cui not in lista_cui:  # Solo añadir CUIs únicos
