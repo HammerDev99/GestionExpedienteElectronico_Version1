@@ -454,9 +454,9 @@ class Application(ttk.Frame):
                         carpeta = os.path.normpath(self.expediente+"/"+ruta)
 
                         # Crea una instancia de AutomatizacionEmpleado con los parámetros necesarios
-                        #obj = AutomatizacionEmpleado(carpeta, "", despacho, subserie, rdo)
+                        obj = AutomatizacionEmpleado(carpeta, "", despacho, subserie, rdo)
                         # Ejecuta el procesamiento de la carpeta
-                        #obj.process()
+                        obj.process()
 
                         # Actualiza la barra de progreso basado en el progreso actual (10% inicial + progreso proporcional)
                         self.progress["value"] = 0.1 + ((i + 1) / total_carpetas) * 0.9
