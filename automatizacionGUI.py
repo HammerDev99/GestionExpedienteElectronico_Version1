@@ -319,7 +319,7 @@ class Application(ttk.Frame):
         Guarda las listas en atributos de la clase
         Muestra mensaje de carpetas omitidas
         """
-        self.text_widget.insert(tk.END, f"\n\nCarpeta seleccionada: {folder_selected}\n")
+        self.text_widget.insert(tk.END, f"\n*******************\nCarpeta seleccionada: {folder_selected}")
         self.text_widget.see(tk.END)
 
         # Conjuntos para almacenar CUIs válidos e inválidos
@@ -411,30 +411,17 @@ class Application(ttk.Frame):
 
                 i = 0
                 for sublista in lista_subcarpetas:
-                    # Obtiene el nombre del despacho judicial del campo de entrada
                     despacho = self.entry01.get()
-                    # Obtiene la serie o subserie documental del combobox
                     subserie = self.entry02.get()
                     for ruta in sublista:
-                        
-                        # Validacion de datos en consola
-                        #print("Despacho: ", despacho)
-                        #print("Subserie: ", subserie)   
-                        #print("sublista: ", sublista)
-                        #print("Ruta: ", ruta)
 
                         # Obtiene el valor del radicado
                         if self.selected_value == "2":
                             rdo = os.path.normpath(os.path.basename(self.expediente))
-                            print("Radicado antes: ", rdo)
                             rdo = analyzer._formater_cui(rdo)
-                            print("Radicado después: ", rdo)
                         elif self.selected_value == "3":
                             rdo = os.path.normpath(ruta)
-                            print("Radicado antes: ", rdo)
                             rdo = analyzer._formater_cui(rdo)
-                            print("Radicado después: ", rdo)
-                        print("Radicado: ", rdo)
 
                         # Muestra en el widget de texto la ruta subserie/radicado
                         self.text_widget.insert(tk.END, "- "+os.path.normpath(os.path.basename(self.expediente)+"/"+ruta)+"\n")
@@ -442,20 +429,14 @@ class Application(ttk.Frame):
                         self.text_widget.see(tk.END)
 
                         # Concatena la ruta con la carpeta a procesar y normaliza la ruta
-                        carpeta = os.path.normpath(os.path.join(self.expediente, ruta))
-
+                        carpeta = self.get_bundled_path(os.path.normpath(os.path.join(self.expediente, ruta)))
+                        print("Carpeta a procesar:", carpeta)
                         # Crea una instancia de AutomatizacionEmpleado con los parámetros necesarios
-                        # identificar valores en consola de variables para crear objeto
-                        print("Carpeta: ", carpeta)
-                        print("Despacho: ", despacho)
-                        print("Subserie: ", subserie)
-                        print("Radicado: ", rdo)
-                        obj = AutomatizacionEmpleado(self.get_bundled_path(carpeta), "", despacho, subserie, rdo)
-                        # Ejecuta el procesamiento de la carpeta
+                        obj = AutomatizacionEmpleado(carpeta, "", despacho, subserie, rdo)
                         obj.process()
 
                         # Actualiza la barra de progreso basado en el progreso actual (10% inicial + progreso proporcional)
-                        self.progress["value"] = 0.1 + ((i + 1) / total_carpetas) * 0.9
+                        self.progress["value"] = 0.1 + ((i + 1) / num_carpetas) * 0.9
                         # Actualiza la interfaz gráfica para mostrar el progreso
                         self.update_idletasks()
                     i = i + 1

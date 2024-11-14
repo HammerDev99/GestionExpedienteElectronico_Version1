@@ -5,7 +5,7 @@ import string
 import sys
 import warnings
 import PyPDF2
-import random  # importado por función duplicada
+import random 
 import win32com.client as win32
 
 
