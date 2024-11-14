@@ -290,7 +290,7 @@ class Application(ttk.Frame):
         else:
             tk.messagebox.showwarning(
                 "Advertencia", 
-                "La estructura de directorios no coincide con la opción seleccionada.\n\n"
+                "La estructura de directorios no coincide con la OPCIÓN seleccionada.\n\n"
                 "Por favor, verifique la estructura interna de los directorios seleccionados."
             )
 
@@ -312,10 +312,10 @@ class Application(ttk.Frame):
         """
         # Eliminar espacios y cualquier texto después de estos
         cui = cui.split()[0]
-        
+        #print(f"CUI: {cui}")
         # Remover caracteres especiales y no numéricos
         cui_limpio = ''.join(c for c in cui if c.isdigit())
-        
+        #print(f"CUI limpio: {cui_limpio}")
         # Verificar que tenga exactamente 23 dígitos
         return (len(cui_limpio) >= 23, cui_limpio[:23] if len(cui_limpio) >= 23 else cui)
 
@@ -327,7 +327,7 @@ class Application(ttk.Frame):
         Guarda las listas en atributos de la clase
         Muestra mensaje de carpetas omitidas
         """
-        self.text_widget.insert(tk.END, f"\n\nCarpeta seleccionada: {folder_selected}\n\n")
+        self.text_widget.insert(tk.END, f"\n\nCarpeta seleccionada: {folder_selected}\n")
         self.text_widget.see(tk.END)
 
         # Conjuntos para almacenar CUIs válidos e inválidos
@@ -335,14 +335,21 @@ class Application(ttk.Frame):
         cuis_invalidos = set()
 
         # Procesar cada sublista en lista_subcarpetas
-        for sublista in lista_subcarpetas:
-            for ruta in sublista:
-                # Obtener la parte antes del primer backslash
-                cui = ruta.split('\\')[0]
-                
-                # Validar el CUI
+        if self.selected_value == "3":
+            for sublista in lista_subcarpetas:
+                for ruta in sublista:
+                    # Obtener la parte antes del primer backslash
+                    cui = ruta.split('\\')[0]
+                    
+                    # Validar el CUI
+                    es_valido, cui_procesado = self._validar_cui(cui)
+                    if es_valido:
+                        cuis_validos.add(cui_procesado)
+                    else:
+                        cuis_invalidos.add(cui)
+        else:
+            for cui in lista_cui:
                 es_valido, cui_procesado = self._validar_cui(cui)
-                
                 if es_valido:
                     cuis_validos.add(cui_procesado)
                 else:
@@ -406,32 +413,40 @@ class Application(ttk.Frame):
                 ):
                 # Indicar al usuario que el proceso ha comenzado
                 self.progress["value"] = 0.1
-                self.text_widget.insert(tk.END, "Proceso iniciado...\n")
+                self.text_widget.insert(tk.END, "\nProceso iniciado...\n")
                 # self.text_widget.insert(tk.END, "CARPETAS PROCESADAS:\n")
                 self.update_idletasks()
 
-                for i, sublista in lista_subcarpetas:
+                i = 0
+                for sublista in lista_subcarpetas:
                     # Obtiene el nombre del despacho judicial del campo de entrada
                     despacho = self.entry01.get()
                     # Obtiene la serie o subserie documental del combobox
                     subserie = self.entry02.get()
                     for ruta in sublista:
+                        i = i + 1
+                        
+                        # Validacion de datos en consola
+                        """ print("Despacho: ", despacho)
+                        print("Subserie: ", subserie)   
+                        print("sublista: ", sublista)
+                        print("Ruta: ", ruta) """
+
                         # Obtiene el valor del radicado
-                        rdo = analyzer._extraer_cui(ruta)
-                        # Imprime el radicado en la consola para debugging
-                        print("RDO: ", rdo)
+                        rdo = analyzer._formater_cui(self.expediente)
+
                         # Muestra en el widget de texto la ruta subserie/radicado
-                        self.text_widget.insert(tk.END, subserie+"/"+ruta+"\n")
+                        self.text_widget.insert(tk.END, "- "+os.path.normpath(os.path.basename(self.expediente)+"/"+ruta)+"\n")
                         # Asegura que el último texto insertado sea visible
                         self.text_widget.see(tk.END)
 
                         # Concatena la ruta con la carpeta a procesar y normaliza la ruta
-                        carpeta = os.path.normpath(self.expediente+ruta)
+                        carpeta = os.path.normpath(self.expediente+"/"+ruta)
 
                         # Crea una instancia de AutomatizacionEmpleado con los parámetros necesarios
-                        obj = AutomatizacionEmpleado(carpeta, "", despacho, subserie, rdo)
+                        #obj = AutomatizacionEmpleado(carpeta, "", despacho, subserie, rdo)
                         # Ejecuta el procesamiento de la carpeta
-                        obj.process()
+                        #obj.process()
 
                         # Actualiza la barra de progreso basado en el progreso actual (10% inicial + progreso proporcional)
                         self.progress["value"] = 0.1 + ((i + 1) / total_carpetas) * 0.9
@@ -443,7 +458,7 @@ class Application(ttk.Frame):
                 self.update_idletasks()
                 self.expediente = ""
                 self.carpetas = []
-                self.text_widget.insert(tk.END, "Proceso completado.\n")
+                self.text_widget.insert(tk.END, "Proceso completado.\n*******************\n")
                 self.update_idletasks()
                 self.mensaje(1)
             else:

@@ -302,6 +302,35 @@ class CarpetasAnalyzer:
         """Extrae el CUI (radicado) de una ruta."""
         partes = ruta.split('\\')
         return partes[0] if partes else None
+    
+    def _formater_cui(self, ruta):
+        """
+        Extrae el CUI (radicado) de una ruta y limpia caracteres no deseados.
+        
+        Args:
+            ruta (str): Ruta completa del archivo
+            
+        Returns:
+            str: CUI limpio (solo dígitos) o None si no hay datos válidos
+        """
+        try:
+            # Obtener la primera parte de la ruta (antes del primer backslash)
+            partes = ruta.split('\\')
+            if not partes:
+                return None
+
+            # Tomar solo la primera parte y eliminar espacios iniciales y finales
+            cui = partes[0].strip()
+
+            # Extraer solo los dígitos
+            cui_limpio = ''.join(caracter for caracter in cui if caracter.isdigit())
+
+            # Verificar que tengamos al menos un dígito
+            return cui_limpio if cui_limpio else None
+
+        except Exception as e:
+            print(f"Error al extraer CUI: {str(e)}")
+            return None
 
     # Función recursiva para construir el diccionario de estructura de directorios
     def construir_estructura(self, ruta):
