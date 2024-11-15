@@ -125,7 +125,9 @@ python app_package/main.py
 
 ## Registro de cambios
 
-- 2024-11-14 Mejoras significativas en la interfaz de usuario, corrección de errores menores y manejo de la estructura de carpetas con dos opciones de niveles.
+- 2024-11-15 Nuevo Release 🚀 GestionExpedienteElectronico v1.4.0
+- 2024-11-14 Actualización de documentación y mejoras en la funcionalidad general.
+- 2024-11-13 Mejoras significativas en la interfaz de usuario, corrección de errores menores y manejo de la estructura de carpetas con dos opciones de niveles.
 - 2024-09-17 Nuevo Release 🚀 GestionExpedienteElectronico v1.3.0
 - 2024-09-17 Optimización en el manejo de archivos excel y mejora en el conteo del progressBar
 - 2024-09-17 eliminación de comentarios y agrega upperCase a primera letra
