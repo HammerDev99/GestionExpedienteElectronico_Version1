@@ -11,6 +11,8 @@ import random
 import traceback
 from metadata_extractor import MetadataExtractor
 import logging
+from concurrent.futures import ThreadPoolExecutor
+import asyncio
 
 class FileProcessor:
 
@@ -23,7 +25,7 @@ class FileProcessor:
 
     def __init__(self, input: str, indice, despacho, subserie, rdo, logger=None):
         # @param: input tipo str; Obtiene ruta de la carpeta a procesar
-        self.logger = logger or logging.getLogger('GestionExpediente.file_processor')
+        self.logger = logger or logging.getLogger('file_processor')
         self.logger.info(f"Iniciando procesamiento para expediente: {input}")
         
         self.obj1 = MetadataExtractor(logger=self.logger)
@@ -46,21 +48,6 @@ class FileProcessor:
             self.logger.error(f"Error en inicialización: {str(e)}", exc_info=True)
             raise
 
-    def separatePath(self, files):
-        """
-        @param: files (List)
-        @return: nombres, extensiones ambos de tipo List
-        @modules: os
-        """
-
-        nombres = []
-        extensiones = []
-        for x in files:
-            nombres.append(os.path.splitext(x)[0])
-            extensiones.append(os.path.splitext(x)[1])
-        return nombres, extensiones
-
-    # Renombrar el archivo que quedó como Documento electrónico (por formateo de nombres en indice) también en el sistema de archivos
     def renameFiles(self, files, nombresExtensiones, ruta):
         """
         @param: files, nombresExtensiones (List), ruta (string)
@@ -90,9 +77,7 @@ class FileProcessor:
                     )
             except Exception as e:
                 self.logger.error(f"Error renombrando archivo: {str(e)}", exc_info=True)
-                print("Excepcion presentada: \n")
 
-    # Validar sistema de archivos segun SO
     def copyXlsm(self, rutaFinal):
         """
         @param: rutaFinal tipo string; contiene ruta expediente
@@ -114,34 +99,14 @@ class FileProcessor:
         shutil.copy(ruta, rutaFinal)
         self.indice = os.path.join(rutaFinal, "000IndiceElectronicoC0.xlsm")
 
-    # Función pendiente de actualizar
     def createDataFrame(self, files, ruta):
         """
         @return: df (contiene los metadatos)
         @modules: pandas
-
-        - Formatea nombres y los almacena en varias variables
-        - Renombra los archivos de la carpeta a procesar
-        - Obtiene metadatos de los archivos y carpetas a procesar en un df
-        - Adiciona informacion en columna de observaciones para el anexo que conste de un carpeta
-        - Renombra archivos de carpetas dentro del expediente
-        - Crea df con los datos a registrar en xlsm
         """
-
-        # *********************************************
-        # Separar instrucciones en funcion a parte
         nombresExtensiones, nombres, extensiones, numeraciones, ban, nombres_indice = (
             self.obj1.formatNames(ruta, files)
         )
-
-        """ print(nombresExtensiones)
-        print(nombres)
-        print(extensiones)
-        print(numeraciones)
-        print(ban)
-        print(nombres_indice)
-        print(files)
-        print(ruta) """
 
         nombresExtensiones = self.capitalize_first_letter(nombresExtensiones)
 
@@ -152,31 +117,27 @@ class FileProcessor:
         fechamod, tama, cantidadpag, observaciones = self.obj1.getMetadata(
             fullFilePaths
         )
-        # *********************************************
-        df = pd.DataFrame()
-        df["Nombre documento"] = None
-        df["Fecha"] = None
-        df["Orden"] = None
-        df["Paginas"] = None
-        df["Formato"] = None
-        df["Tamaño"] = None
-        df["Origen"] = None
-        df["Observaciones"] = None
+
+        # Crear DataFrame inicial vacío
+        df = pd.DataFrame(columns=[
+            "Nombre documento", "Fecha", "Orden", "Paginas",
+            "Formato", "Tamaño", "Origen", "Observaciones"
+        ])
+
         for y in range(len(nombres)):
-            nueva_fila = pd.Series(
-                [
-                    str(nombres_indice[y]),
-                    str(fechamod[y]),
-                    str(numeraciones[y]),
-                    str(cantidadpag[y]),
-                    str(extensiones[y].replace(".", "")),
-                    str(tama[y]),
-                    "Electrónico",
-                    str(observaciones[y]),
-                ],
-                index=df.columns,
-            )
-            df = df.append(nueva_fila, ignore_index=True)
+            nueva_fila = pd.DataFrame([[
+                str(nombres_indice[y]),
+                str(fechamod[y]),
+                str(numeraciones[y]),
+                str(cantidadpag[y]),
+                str(extensiones[y].replace(".", "")),
+                str(tama[y]),
+                "Electrónico",
+                str(observaciones[y])
+            ]], columns=df.columns)
+            
+            df = pd.concat([df, nueva_fila], ignore_index=True)
+            
         return df
     
     def capitalize_first_letter(self, file_names):
@@ -204,10 +165,66 @@ class FileProcessor:
             pathArchivos.append(fulldirct)
         return pathArchivos
 
-    # Probar usando el modulo OpenPyXl para manipular los archivos de excel
-    # https://programacion.net/articulo/como_trabajar_con_archivos_excel_utilizando_python_1419
-    # https://openpyxl.readthedocs.io/en/stable/editing_worksheets.html?highlight=insert%20row
-    def process(self):
+    async def process(self):
+        """Versión asíncrona simplificada del método process"""
+        try:
+            # Crear un executor para las operaciones bloqueantes de Excel
+            loop = asyncio.get_event_loop()
+            with ThreadPoolExecutor() as pool:
+                # Ejecutar las operaciones de Excel en el thread pool
+                await loop.run_in_executor(pool, self._process_excel)
+            return 1
+        except Exception as e:
+            self.logger.error("Error procesando archivo", exc_info=True)
+            raise
+
+    def _process_excel(self):
+        """Método que contiene todas las operaciones síncronas de Excel"""
+        auxFiles, extension = MetadataExtractor.separatePath(self.files)
+        listAux = [os.path.basename(self.indice)]
+        indexName, indexExtension = MetadataExtractor.separatePath(listAux)
+
+        # Extraer índice
+        for x in range(len(auxFiles)):
+            if auxFiles[x] == indexName[0]:
+                auxFiles.pop(x)
+                break
+
+        app = None
+        try:
+            # Inicializar Excel en modo invisible desde el principio
+            app = xw.App(visible=False, add_book=False)
+            app.display_alerts = False
+            app.screen_updating = False
+            
+            # Abrir el libro después de configurar la visibilidad
+            wb = app.books.open(self.indice)
+            
+            pid_excel = app.pid
+            self.pids_creados.append(pid_excel)
+
+            macro_vba = app.macro(
+                "'" + str(os.path.basename(self.indice)) + "'" + "!Macro1InsertarFila"
+            )
+            sheet = wb.sheets.active
+
+            df = self.createDataFrame(self.files, self.ruta)
+            self.createXlsm(df, macro_vba, sheet)
+
+            wb.save()
+            wb.close()
+
+        finally:
+            if app:
+                try:
+                    app.quit()
+                except Exception:
+                    pass
+                finally:
+                    del app
+                    self.cerrar_procesos_por_pid(self.pids_creados)
+
+    def process_old(self):
         """
         @param: None
         @modules: xlwings, os, traceback, pandas 
@@ -217,9 +234,9 @@ class FileProcessor:
 
         #self.close_excel_processes()
 
-        auxFiles, extension = self.separatePath(self.files)  # datos en variales files
+        auxFiles, extension = MetadataExtractor.separatePath(self.files)  # datos en variales files
         listAux = [os.path.basename(self.indice)]  # datos en carpeta
-        indexName, indexExtension = self.separatePath(listAux)
+        indexName, indexExtension = MetadataExtractor.separatePath(listAux)
 
         # extrae el indice de la lista
         for x in range(len(auxFiles)): 
@@ -252,9 +269,7 @@ class FileProcessor:
             wb.close()
 
         except Exception:
-            print("Excepcion presentada al intentar acceder al indice electronico\n")
             self.logger.error("Excepcion presentada al intentar acceder al indice electronico", exc_info=True)
-            traceback.print_exc()
 
         finally:
             if app:  # Si la aplicación de Excel fue creada correctamente
@@ -295,7 +310,7 @@ class FileProcessor:
             sheet.range("B4").value = self.subserie  # Subserie
             sheet.range("B5").value = self.rdo  # Radicado
         except Exception as e:
-            print(f"Error al escribir en las celdas del archivo Excel: {e}")
+            self.logger.error(f"Error al escribir en las celdas del archivo Excel: {e}")
 
         for i in range(df.shape[0]):
             for j in range(len(columnas)):
@@ -312,8 +327,7 @@ class FileProcessor:
             try:
                 proc = psutil.Process(pid)
                 proc.kill()  # forzar el cierre
-                print(f"Proceso {proc.name()} con PID {pid} cerrado.")
+                self.logger.info(f"Proceso {proc.name()} con PID {pid} cerrado.")
                 self.pids_creados.remove(pid)
             except (psutil.NoSuchProcess, psutil.AccessDenied, psutil.ZombieProcess) as e:
-                print(f"No se pudo cerrar el proceso con PID {pid}: {e}")
                 self.logger.error(f"No se pudo cerrar el proceso con PID {pid}: {e}")

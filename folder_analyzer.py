@@ -1,7 +1,9 @@
 import os
+import logging
 
 class FolderAnalyzer:
-    def __init__(self, estructura_directorios, profundidad_maxima = None):
+    def __init__(self, estructura_directorios, profundidad_maxima = None, logger=None):
+        self.logger = logger or logging.getLogger('FolderAnalyzer')
         self.estructura_directorios = estructura_directorios
         self.profundidad_maxima = profundidad_maxima
         self.todas_las_carpetas = set()
@@ -256,9 +258,6 @@ class FolderAnalyzer:
                     lista_rutas_subcarpetas.append(rutas_normalizadas)
                     carpetas_procesadas.update(rutas_normalizadas)
                 
-                """ if rutas_nivel_cuatro:
-                    lista_cui.extend(self._normalizar_rutas(rutas_nivel_cuatro)) """
-                
                 # Validar con opcion 1 con opcion 2 ya es funcional
                 if folder_selected:
                     if os.path.basename(folder_selected) not in lista_cui:
@@ -271,7 +270,7 @@ class FolderAnalyzer:
             return lista_cui, lista_rutas_subcarpetas
 
         except Exception as e:
-            print(f"Error al procesar la estructura de directorios: {str(e)}")
+            self.logger.error(f"Error al procesar la estructura de directorios: {str(e)}")
             return [], [], set()
 
     
@@ -329,7 +328,7 @@ class FolderAnalyzer:
             return cui_limpio if cui_limpio else None
 
         except Exception as e:
-            print(f"Error al extraer CUI: {str(e)}")
+            self.logger.error(f"Error al extraer CUI: {str(e)}")
             return None
 
     # Función recursiva para construir el diccionario de estructura de directorios

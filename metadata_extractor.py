@@ -7,12 +7,13 @@ import warnings
 import PyPDF2
 import random 
 import win32com.client as win32
+import logging
 
 
 class MetadataExtractor:
 
     def __init__(self, logger=None):
-        pass
+        self.logger = logger or logging.getLogger('metadata_extractor')
 
     def getMetadata(self, files):
         """
@@ -48,7 +49,7 @@ class MetadataExtractor:
                 nombres, extensiones = self.separatePath(list_files)
                 comments = dict(
                     zip(extensiones, map(lambda x: extensiones.count(x), extensiones))
-                )  # combinar los valores para posteriormente pasarlo a un diccionario. Utilizamos map() y le aplicamos una lambda esta lambda obtendrá la veces que se repite un valor, esto para cada valer de la lista. Luego se utiliza zip() para mezclar ambos datos y obtener una tapa para posteriormente pasarlo a un diccionario.
+                )  
                 nombresExtensiones, nombres, extensionesR, numeraciones, ban = (
                     self.formatNames(x, list_files)
                 )
@@ -72,26 +73,14 @@ class MetadataExtractor:
         )
 
         return resultado
-        """ conteo=Counter(extensiones)
-
-        resultado={}
-        for clave in conteo:  
-            valor = conteo[clave]
-            if valor != 1:
-                resultado[clave] = valor
-        return(resultado) """
-
-    """ ************ """
-
-    # Función duplicada
-    def separatePath(self, files):
+    
+    def separatePath(files):
         """
         Separa los nombres de archivo y sus extensiones de una lista de rutas de archivos.
         Args:
             files (List[str]): Una lista de rutas de archivos.
         Returns:
-            Tuple[List[str], List[str]]: Dos listas, una que contiene los nombres de archivo sin extensiones,
-                                         y la otra que contiene las extensiones de archivo.
+            Tuple[List[str], List[str]]: Dos listas, una que contiene los nombres de archivo sin extensiones, y la otra que contiene las extensiones de archivo.
         Modules:
             os: Esta función utiliza el módulo os para dividir las rutas de archivo.
         """
@@ -137,11 +126,8 @@ class MetadataExtractor:
                         )
                         + os.path.splitext(nombresExtensiones[i])[1],
                     )
-                except:
-                    #print("Excepcion presentada: \n")
-                    self.logger.exception("Excepcion presentada intentando el renombrado archivos")
-
-    """ ************ """
+                except Exception as e:
+                    self.logger.exception("Excepcion presentada intentando el renombrado archivos" + str(e))
 
     # Separar función en funciones más pequeñas
     """ La solucion más efectiva es crear una funcion principal que cuente con un ciclo y envie cada nombre de archivo llamando a otra funcion que luego controle cada palabra del nombre del archivo y así gestionar hasta el detalle más mínimo  """
@@ -199,7 +185,6 @@ class MetadataExtractor:
                 ban = True
             else:
                 # Entran los archivos sin extensión
-                # print("entró: ",nombres[x])
                 pass
             cont = 0
             for caracter in nombres[x]:
@@ -377,14 +362,14 @@ class MetadataExtractor:
                     pdf_path = file
                     total_pages = count_pages_in_pdf(pdf_path)
                     return total_pages
-                except:
+                except Exception as e:
                     return 0
             elif extension == ".docx" or extension == ".doc":
                 try:
                     docx_path = file
                     total_pages = count_pages_in_docx(docx_path)
                     return total_pages
-                except:
+                except Exception as e:
                     return 0
             elif (
                 extension == ".xls"
@@ -432,7 +417,6 @@ def count_pages_in_pdf(self, pdf_path):
                 warnings.simplefilter("ignore")
             return pdf.getNumPages()
     except Exception as e:
-        #print(f"Error al contar páginas con PyPDF2.PdfFileReader: {e}")
         self.logger.exception(f"Error al contar páginas con PyPDF2.PdfFileReader: {e}")
 
     # Segundo método: PyPDF2.PdfReader
@@ -441,7 +425,6 @@ def count_pages_in_pdf(self, pdf_path):
             reader = PdfReader(file)
             return len(reader.pages)
     except Exception as e:
-        #print(f"Error al contar páginas con PyPDF2.PdfReader: {e}")
         self.logger.exception(f"Error al contar páginas con PyPDF2.PdfReader: {e}")
         return 0
 
@@ -478,6 +461,5 @@ def count_pages_in_docx(self, doc_path):
 
         return pages
     except Exception as e:
-        #print(f"Error al contar páginas en el archivo {doc_path}: {e}")
         self.logger.exception(f"Error al contar páginas en el archivo {doc_path}: {e}")
         return 0
