@@ -9,11 +9,10 @@ import random
 import win32com.client as win32
 
 
-class AutomatizacionData:
+class MetadataExtractor:
 
-    def __init__(self):
+    def __init__(self, logger=None):
         pass
-
 
     def getMetadata(self, files):
         """
@@ -139,7 +138,8 @@ class AutomatizacionData:
                         + os.path.splitext(nombresExtensiones[i])[1],
                     )
                 except:
-                    print("Excepcion presentada: \n")
+                    #print("Excepcion presentada: \n")
+                    self.logger.exception("Excepcion presentada intentando el renombrado archivos")
 
     """ ************ """
 
@@ -410,7 +410,7 @@ class AutomatizacionData:
             return 1
 
 
-def count_pages_in_pdf(pdf_path):
+def count_pages_in_pdf(self, pdf_path):
     """
     Cuenta el número de páginas en un archivo PDF utilizando dos métodos diferentes.
     Args:
@@ -432,7 +432,8 @@ def count_pages_in_pdf(pdf_path):
                 warnings.simplefilter("ignore")
             return pdf.getNumPages()
     except Exception as e:
-        print(f"Error al contar páginas con PyPDF2.PdfFileReader: {e}")
+        #print(f"Error al contar páginas con PyPDF2.PdfFileReader: {e}")
+        self.logger.exception(f"Error al contar páginas con PyPDF2.PdfFileReader: {e}")
 
     # Segundo método: PyPDF2.PdfReader
     try:
@@ -440,11 +441,12 @@ def count_pages_in_pdf(pdf_path):
             reader = PdfReader(file)
             return len(reader.pages)
     except Exception as e:
-        print(f"Error al contar páginas con PyPDF2.PdfReader: {e}")
+        #print(f"Error al contar páginas con PyPDF2.PdfReader: {e}")
+        self.logger.exception(f"Error al contar páginas con PyPDF2.PdfReader: {e}")
         return 0
 
 
-def count_pages_in_docx(doc_path):
+def count_pages_in_docx(self, doc_path):
     """
     Cuenta el número de páginas en un archivo .doc o .docx utilizando Microsoft Word.
     Args:
@@ -476,5 +478,6 @@ def count_pages_in_docx(doc_path):
 
         return pages
     except Exception as e:
-        print(f"Error al contar páginas en el archivo {doc_path}: {e}")
+        #print(f"Error al contar páginas en el archivo {doc_path}: {e}")
+        self.logger.exception(f"Error al contar páginas en el archivo {doc_path}: {e}")
         return 0

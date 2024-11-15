@@ -8,9 +8,10 @@ import sys
 import webbrowser
 import requests
 import json
-from automatizacionEmpleado import AutomatizacionEmpleado
-from carpetas_analyzer import CarpetasAnalyzer
+from file_processor import FileProcessor
+from folder_analyzer import FolderAnalyzer
 from tooltip import Tooltip
+import logging
 
 import csv
 
@@ -23,20 +24,26 @@ class Application(ttk.Frame):
     lista_subcarpetas = []
     analyzer = None
 
-    def __init__(self, root, is_updated=True):
+    def __init__(self, root, logger=None):
         """
         @param: root tipo Tk; contiene la raíz de la aplicación Tkinter
         @modules: tkinter
         - Inicializa la aplicación, configura la ventana principal y crea los widgets.
         """
-
-        super().__init__(root)
-        root.title("GestionExpedienteElectronico")
-        root.resizable(False, False)
-        # root.geometry("350x300")
-        root.protocol("WM_DELETE_WINDOW", self.on_closing)
-        self.pack(padx=20, pady=20)  # Añadir padding aquí
-        self.create_oneProcessWidgets()
+        self.root = root
+        self.logger = logger or logging.getLogger('GestionExpediente.GUI')
+        self.logger.info("Iniciando interfaz gráfica")
+        try:
+            super().__init__(root)
+            root.title("GestionExpedienteElectronico")
+            root.resizable(False, False)
+            # root.geometry("350x300")
+            root.protocol("WM_DELETE_WINDOW", self.on_closing)
+            self.pack(padx=20, pady=20)  # Añadir padding aquí
+            self.create_oneProcessWidgets()
+        except Exception as e:
+            self.logger.error(f"Error en inicialización GUI: {str(e)}", exc_info=True)
+            raise
 
     def create_oneProcessWidgets(self):
         """
@@ -212,11 +219,65 @@ class Application(ttk.Frame):
     def on_closing(self):
         """
         @modules: tkinter
-        - Maneja el evento de cierre de la ventana principal.
+
+        Maneja el evento de cierre de la ventana.
+        Se llama tanto para la X como para el botón Cancelar.
         """
-        print("Cerrando aplicación")
-        root.destroy()
-        # root.quit()
+        self.logger.info("Iniciando proceso de cierre de aplicación")
+        try:
+            # Preguntar si realmente quiere cerrar
+            if tk.messagebox.askokcancel("Confirmar cierre", 
+                                    "¿Está seguro que desea cerrar la aplicación?"):
+                
+                self.logger.debug("Usuario confirmó cierre de aplicación")
+                
+                # Limpiar recursos
+                #self._cleanup()
+                
+                # Cerrar ventana principal y terminar aplicación
+                self.root.quit()
+                self.root.destroy()
+                self.logger.info("Aplicación cerrada correctamente")
+            else:
+                self.logger.debug("Usuario canceló cierre de aplicación")
+                
+        except Exception as e:
+            self.logger.error(f"Error al cerrar la aplicación: {str(e)}", exc_info=True)
+            # Forzar cierre en caso de error
+            self.root.destroy()
+
+    def _cleanup(self):
+        """
+        Limpia recursos antes de cerrar.
+        """
+        try:
+            self.logger.debug("Iniciando limpieza de recursos")
+            
+            # Cerrar procesos de Excel si existen
+            if hasattr(self, 'analyzer') and self.analyzer:
+                self.logger.debug("Cerrando procesos de Excel")
+                # Implementar cierre de procesos Excel
+            
+            # Limpiar archivos temporales
+            temp_files = ['temp_process_data.json', 'temp_excel_script.py']
+            for file in temp_files:
+                if os.path.exists(file):
+                    try:
+                        os.remove(file)
+                        self.logger.debug(f"Archivo temporal eliminado: {file}")
+                    except Exception as e:
+                        self.logger.warning(f"No se pudo eliminar archivo temporal {file}: {str(e)}")
+            
+            # Restablecer variables
+            self.expediente = ""
+            self.carpetas = []
+            self.lista_subcarpetas = []
+            self.analyzer = None
+            
+            self.logger.debug("Limpieza de recursos completada")
+            
+        except Exception as e:
+            self.logger.error(f"Error en limpieza de recursos: {str(e)}", exc_info=True)
 
     def load_csv_values(self):
         """
@@ -254,7 +315,7 @@ class Application(ttk.Frame):
 
         self.expediente = folder_selected
 
-        analyzer = CarpetasAnalyzer({}, None)
+        analyzer = FolderAnalyzer({}, None)
         estructura_directorios = analyzer.construir_estructura(folder_selected)
         if not estructura_directorios:
             tk.messagebox.showwarning("Advertencia", "La carpeta seleccionada está vacía o no es accesible.")
@@ -262,7 +323,7 @@ class Application(ttk.Frame):
 
         #print("Estructura de Directorios:", estructura_directorios)
         profundidad_maxima = analyzer.obtener_profundidad_maxima(estructura_directorios)
-        analyzer = CarpetasAnalyzer(estructura_directorios, profundidad_maxima)
+        analyzer = FolderAnalyzer(estructura_directorios, profundidad_maxima)
 
         if self.selected_value == "2" and profundidad_maxima == 4:
             self.profundidad = 4
@@ -391,6 +452,8 @@ class Application(ttk.Frame):
         - Crea objeto y llama metodo procesaCarpetas() u otro en su defecto para cada expediente en la lista
         - Genera reporte de lista de rutas procesadas
         """
+        self.logger.info(f"Procesando {len(self.lista_subcarpetas)} expedientes")
+        
         lista_subcarpetas = self.lista_subcarpetas
         analyzer = self.analyzer
 
@@ -411,6 +474,7 @@ class Application(ttk.Frame):
 
                 i = 0
                 for sublista in lista_subcarpetas:
+                    self.logger.debug(f"Procesando sublista con {len(sublista)} elementos")
                     despacho = self.entry01.get()
                     subserie = self.entry02.get()
                     for ruta in sublista:
@@ -431,8 +495,8 @@ class Application(ttk.Frame):
                         # Concatena la ruta con la carpeta a procesar y normaliza la ruta
                         carpeta = self.get_bundled_path(os.path.normpath(os.path.join(self.expediente, ruta)))
                         print("Carpeta a procesar:", carpeta)
-                        # Crea una instancia de AutomatizacionEmpleado con los parámetros necesarios
-                        obj = AutomatizacionEmpleado(carpeta, "", despacho, subserie, rdo)
+                        # Crea una instancia de FileProcessor con los parámetros necesarios
+                        obj = FileProcessor(carpeta, "", despacho, subserie, rdo, logger=self.logger)
                         obj.process()
 
                         # Actualiza la barra de progreso basado en el progreso actual (10% inicial + progreso proporcional)
@@ -471,8 +535,6 @@ class Application(ttk.Frame):
             1: "Procedimiento finalizado",
             2: "Archivos sin procesar",
             3: "Seleccione una carpeta para procesar",
-            4: "Agregue archivos a la lista",
-            5: "La carpeta electrónica del expediente se encuentra actualizada",
             6: "Procedimiento detenido"
         }
         if result != None:
@@ -480,34 +542,13 @@ class Application(ttk.Frame):
                 message=switcher.get(result), title=os.path.basename(self.expediente)
             )
             self.text_widget.insert(tk.END, "\n")
-            # self.text_widget.insert(tk.END, switcher.get(result))
-            lista_vacia = list()
-            self.agregaNombreBase(lista_vacia, False)
+            self.logger.info(result, exc_info=True)
         
         if mensaje != None:
             tk.messagebox.showinfo(
                 message=mensaje, title=os.path.basename(self.expediente)
             )
-
-    def agregaNombreBase(self, items, bandera):
-        """
-        @param: items tipo List, bandera tipo bool;  items contiene nombre(s) de archivo(s)
-        @widgets: listbox1, entry1
-        - Crea lista auxiliar con nombres base de items
-        - Bandera controla Widget a modificar
-        """
-
-        nombres = []
-        if bandera:
-            for x in items:
-                nombres.append(os.path.basename(x))
-            self.listbox1.delete(0, tk.END)
-            self.listbox1.insert(0, *nombres)
-        else:
-            """ self.entry1.config(state=tk.NORMAL)
-            self.entry1.delete(0, tk.END)
-            self.entry1.insert(0, items)
-            self.entry1.config(state=tk.DISABLED) """
+            self.logger.info(result, exc_info=True)
 
     def get_bundled_path(self, ruta):
         """
@@ -547,7 +588,3 @@ class Application(ttk.Frame):
                 return True # la variable is_updated se mantiene en True
         except requests.RequestException as e:
             print(f"Error al comprobar actualizaciones: {e}")
-
-root = tk.Tk()
-app = Application(root)
-app.mainloop()

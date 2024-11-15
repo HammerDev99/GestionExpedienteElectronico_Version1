@@ -1,6 +1,6 @@
 import os
 
-class CarpetasAnalyzer:
+class FolderAnalyzer:
     def __init__(self, estructura_directorios, profundidad_maxima = None):
         self.estructura_directorios = estructura_directorios
         self.profundidad_maxima = profundidad_maxima

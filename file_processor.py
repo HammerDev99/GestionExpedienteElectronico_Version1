@@ -1,5 +1,5 @@
 # coding=utf-8
-
+# Empleado
 import os
 import sys
 import psutil
@@ -9,34 +9,42 @@ import xlwings as xw
 import string
 import random
 import traceback
-from automatizacionData import AutomatizacionData
+from metadata_extractor import MetadataExtractor
+import logging
 
-class AutomatizacionEmpleado:
+class FileProcessor:
 
     ruta = ""
     indice = ""
     files = []
     pids_creados = []
 
-    obj1 = AutomatizacionData()
+    obj1 = None
 
-    def __init__(self, input: str, indice, despacho, subserie, rdo):
+    def __init__(self, input: str, indice, despacho, subserie, rdo, logger=None):
         # @param: input tipo str; Obtiene ruta de la carpeta a procesar
+        self.logger = logger or logging.getLogger('GestionExpediente.file_processor')
+        self.logger.info(f"Iniciando procesamiento para expediente: {input}")
+        
+        self.obj1 = MetadataExtractor(logger=self.logger)
 
-        ### Inicializa variables globales con lista de archivos ordenados por nombre
-        self.ruta = input
+        try:
+            self.ruta = input
+            self.files = os.listdir(self.ruta)
+            self.logger.debug(f"Archivos encontrados: {len(self.files)}")
 
-        # LISTAR SOLO LOS ARCHIVOS QUE NO ESTAN OCULTOS (.ds_store)
-        self.files = os.listdir(self.ruta)
+            if indice == "":
+                self.copyXlsm(self.ruta)
+            else:
+                self.indice = indice
 
-        if indice == "":
-            self.copyXlsm(self.ruta)
-        else:
-            self.indice = indice
-
-        self.despacho = despacho
-        self.subserie = subserie
-        self.rdo = rdo
+            self.despacho = despacho
+            self.subserie = subserie
+            self.rdo = rdo
+            
+        except Exception as e:
+            self.logger.error(f"Error en inicialización: {str(e)}", exc_info=True)
+            raise
 
     def separatePath(self, files):
         """
@@ -59,12 +67,14 @@ class AutomatizacionEmpleado:
         @modules: os
         """
 
+        self.logger.info(f"Renombrando {len(files)} archivos en {ruta}")
         for i in range(len(files)):
-            fulldirct = os.path.join(ruta, files[i])
-            if os.path.exists(fulldirct):
-                os.rename(fulldirct, os.path.join(ruta, nombresExtensiones[i]))
-            else:
-                try:
+            try:
+                fulldirct = os.path.join(ruta, files[i])
+                self.logger.debug(f"Renombrando: {fulldirct}")
+                if os.path.exists(fulldirct):
+                    os.rename(fulldirct, os.path.join(ruta, nombresExtensiones[i]))
+                else:
                     # number_of_strings = 3
                     length_of_string = 3
                     os.rename(
@@ -78,8 +88,9 @@ class AutomatizacionEmpleado:
                         )
                         + os.path.splitext(nombresExtensiones[i])[1],
                     )
-                except:
-                    print("Excepcion presentada: \n")
+            except Exception as e:
+                self.logger.error(f"Error renombrando archivo: {str(e)}", exc_info=True)
+                print("Excepcion presentada: \n")
 
     # Validar sistema de archivos segun SO
     def copyXlsm(self, rutaFinal):
@@ -242,6 +253,7 @@ class AutomatizacionEmpleado:
 
         except Exception:
             print("Excepcion presentada al intentar acceder al indice electronico\n")
+            self.logger.error("Excepcion presentada al intentar acceder al indice electronico", exc_info=True)
             traceback.print_exc()
 
         finally:
@@ -290,23 +302,13 @@ class AutomatizacionEmpleado:
                 sheet.range(columnas[j] + str(contFila)).value = df.iloc[i, j]
             contFila = contFila + 1
 
-    def close_excel_processes(self):
-        # Iterar sobre todos los procesos en ejecución
-        for proc in psutil.process_iter(['pid', 'name']):
-            if proc.info['name'] == 'EXCEL.EXE':
-                try:
-                    # Finalizar el proceso de Excel
-                    os.kill(proc.info['pid'], 9)  # 9 es la señal para "matar" el proceso
-                    print(f"Finalizado proceso de Excel con PID: {proc.info['pid']}")
-                except Exception as e:
-                    print(f"No se pudo finalizar el proceso de Excel con PID: {proc.info['pid']}. Error: {e}")
-
     def cerrar_procesos_por_pid(self, pids):
         """
         Cierra los procesos especificados en la lista de PID.
         @param: pids tipo list; lista de PID de los procesos a cerrar
         """
         for pid in pids:
+            self.logger.info(f"Cerrando proceso con PID {pid}")
             try:
                 proc = psutil.Process(pid)
                 proc.kill()  # forzar el cierre
@@ -314,3 +316,4 @@ class AutomatizacionEmpleado:
                 self.pids_creados.remove(pid)
             except (psutil.NoSuchProcess, psutil.AccessDenied, psutil.ZombieProcess) as e:
                 print(f"No se pudo cerrar el proceso con PID {pid}: {e}")
+                self.logger.error(f"No se pudo cerrar el proceso con PID {pid}: {e}")

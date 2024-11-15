@@ -1,23 +1,28 @@
 # coding=utf-8
 
-import automatizacionGUI
+import gui
+from logger_config import setup_logger
 import sys
-import logging
-
-logging.basicConfig(
-    level=logging.DEBUG,
-    format='%(asctime)s - %(levelname)s - %(message)s',
-    handlers=[
-        logging.FileHandler('debug.log'),
-        logging.StreamHandler(sys.stdout)
-    ]
-)
+import tkinter as tk
 
 def main():
+    # Configurar el logger
+    logger = setup_logger()
+    logger.info("Iniciando aplicación...")
+
     try:
-        logging.info("Iniciando aplicación...")
-        obj = automatizacionGUI()
-        obj.__init__()
+        # Crear ventana principal
+        root = tk.Tk()
+        
+        # Iniciar GUI pasando el logger como parámetro
+        app = gui.Application(root, logger=logger)
+        
+        # Iniciar el loop principal
+        root.mainloop()
+        
     except Exception as e:
-        logging.error(f"Error en la aplicación: {str(e)}", exc_info=True)
+        logger.exception("Error crítico en la aplicación")
         sys.exit(1)
+
+if __name__ == '__main__':
+    main()
