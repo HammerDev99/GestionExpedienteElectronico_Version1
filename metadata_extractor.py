@@ -8,6 +8,7 @@ import PyPDF2
 import random 
 import win32com.client as win32
 import logging
+from PyPDF2 import PdfReader
 
 
 class MetadataExtractor:
@@ -360,14 +361,14 @@ class MetadataExtractor:
             if extension == ".pdf":
                 try:
                     pdf_path = file
-                    total_pages = count_pages_in_pdf(pdf_path)
+                    total_pages = count_pages_in_pdf(self, pdf_path)
                     return total_pages
                 except Exception as e:
                     return 0
             elif extension == ".docx" or extension == ".doc":
                 try:
                     docx_path = file
-                    total_pages = count_pages_in_docx(docx_path)
+                    total_pages = count_pages_in_docx(self, docx_path)
                     return total_pages
                 except Exception as e:
                     return 0
