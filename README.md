@@ -94,17 +94,14 @@ Con estos pasos, deberías haber creado un fork del repositorio original en tu c
 1. Para preparar el programa con buenas prácticas debes de crear el ambiente virtual con el siguiente comando:
 
 ```BASH
-python3 -m venv venv
+python -m venv .venv
 ```
 
   Para activar el ambiente virtual usa:
 
 ```BASH
-#MAC
-source venv/bin/activate
-
 #WINDOWS
-.venv\Scripts\Activate.ps1
+.venv\Scripts\Activate
 ```
 
 2. Luego instala las dependencias necesarias:
@@ -116,7 +113,7 @@ pip install --upgrade -r requirements.txt
 3. Una vez instalados los modulos, puedes ejecutar el programa:
 
 ```BASH
-python app_package/main.py
+python main.py
 ```
 
 4. Por último, debes comprobar que tengas **Microsoft Excel** instalado en tu computador.

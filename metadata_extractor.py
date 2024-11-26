@@ -395,7 +395,6 @@ class MetadataExtractor:
         else:
             return 1
 
-
 def count_pages_in_pdf(self, pdf_path):
     """
     Cuenta el número de páginas en un archivo PDF utilizando dos métodos diferentes.
@@ -410,7 +409,7 @@ def count_pages_in_pdf(self, pdf_path):
         - Imprime un mensaje de error si falla el conteo de páginas en cualquiera de los métodos.
     """
 
-    # Primer método: PyPDF2.PdfFileReader
+    """ # Primer método: PyPDF2.PdfFileReader
     try:
         with open(pdf_path, "rb") as f:
             pdf = PyPDF2.PdfFileReader(f)
@@ -418,7 +417,7 @@ def count_pages_in_pdf(self, pdf_path):
                 warnings.simplefilter("ignore")
             return pdf.getNumPages()
     except Exception as e:
-        self.logger.exception(f"Error al contar páginas con PyPDF2.PdfFileReader: {e}")
+        self.logger.exception(f"Error al contar páginas con PyPDF2.PdfFileReader: {e}") """
 
     # Segundo método: PyPDF2.PdfReader
     try:
