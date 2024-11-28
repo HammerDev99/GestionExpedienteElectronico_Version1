@@ -224,62 +224,6 @@ class FileProcessor:
                     del app
                     self.cerrar_procesos_por_pid(self.pids_creados)
 
-    def process_old(self):
-        """
-        @param: None
-        @modules: xlwings, os, traceback, pandas 
-        @return: int
-        @modules: xlwings
-        """
-
-        #self.close_excel_processes()
-
-        auxFiles, extension = MetadataExtractor.separatePath(self.files)  # datos en variales files
-        listAux = [os.path.basename(self.indice)]  # datos en carpeta
-        indexName, indexExtension = MetadataExtractor.separatePath(listAux)
-
-        # extrae el indice de la lista
-        for x in range(len(auxFiles)): 
-            if auxFiles[x] == indexName[0]:
-                auxFiles.pop(x)
-                break
-
-        indexPath = self.indice
-        app = None # Inicializar app fuera del bloque try
-
-        try:
-            wb = xw.Book(indexPath) # Abrir el libro
-            app = wb.app # Obtener la aplicación de Excel AQUI SE CREA EL PID
-
-            pid_excel = app.pid # Obtener el PID de la aplicación de Excel
-            self.pids_creados.append(pid_excel) # Agregar el PID a la lista de PIDs creados
-
-            app.visible = False  # Hacer que la aplicación de Excel no sea visible
-            macro_vba = app.macro(
-                "'" + str(os.path.basename(self.indice)) + "'" + "!Macro1InsertarFila"
-            )
-            sheet = wb.sheets.active # Obtener la hoja activa
-
-            # Crear el DataFrame y realizar el resto de operaciones
-            df = self.createDataFrame(self.files, self.ruta)
-            self.createXlsm(df, macro_vba, sheet)
-
-            # Guardar y cerrar el libro
-            wb.save()
-            wb.close()
-
-        except Exception:
-            self.logger.error("Excepcion presentada al intentar acceder al indice electronico", exc_info=True)
-
-        finally:
-            if app:  # Si la aplicación de Excel fue creada correctamente
-                app.quit()  # Cerrar la aplicación de Excel
-                del app  # Eliminar la referencia para liberar memoria
-
-                self.cerrar_procesos_por_pid(self.pids_creados)  # Cerrar los procesos de Excel
-
-        return 1  # Retornar 1 si todo salió bien
-
     def createXlsm(self, df, macro_vba, sheet):
         """
         @param: df tipo DataFrame; contiene los datos a escribir en el archivo Excel

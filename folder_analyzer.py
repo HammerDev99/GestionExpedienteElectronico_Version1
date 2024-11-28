@@ -9,38 +9,7 @@ class FolderAnalyzer:
         self.todas_las_carpetas = set()
         self.carpetas_procesadas = set()
         self.problemas = []
-
-    # getters y setters para los atributos
-    def get_estructura_directorios(self):
-        return self.estructura_directorios
     
-    def set_estructura_directorios(self, estructura_directorios):
-        self.estructura_directorios = estructura_directorios
-
-    def get_profundidad_maxima(self):
-        return self.profundidad_maxima
-    
-    def set_profundidad_maxima(self, profundidad_maxima):
-        self.profundidad_maxima = profundidad_maxima
-
-    def get_todas_las_carpetas(self):
-        return self.todas_las_carpetas
-    
-    def set_todas_las_carpetas(self, todas_las_carpetas):
-        self.todas_las_carpetas = todas_las_carpetas
-
-    def get_carpetas_procesadas(self):
-        return self.carpetas_procesadas
-    
-    def set_carpetas_procesadas(self, carpetas_procesadas):
-        self.carpetas_procesadas = carpetas_procesadas
-
-    def get_problemas(self):
-        return self.problemas
-    
-    def set_problemas(self, problemas):
-        self.problemas = problemas
-
     def obtener_todas_carpetas(self, directorio, nivel_deseado, nivel_actual=1, ruta_actual=""):
         """Obtiene todas las carpetas en un nivel específico."""
         todas_carpetas = set()
