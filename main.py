@@ -15,12 +15,12 @@ def main():
         root = tk.Tk()
         
         # Iniciar GUI pasando el logger como parámetro
-        app = gui.Application(root, logger=logger)
+        gui.Application(root, logger=logger)
         
         # Iniciar el loop principal
         root.mainloop()
         
-    except Exception as e:
+    except Exception:
         logger.exception("Error crítico en la aplicación")
         sys.exit(1)
 

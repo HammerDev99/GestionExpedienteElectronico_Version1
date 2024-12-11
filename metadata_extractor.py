@@ -47,11 +47,11 @@ class MetadataExtractor:
                 tama.append("-")
                 cantidadpag.append("1")
                 list_files = os.listdir(x)
-                nombres, extensiones = self.separate_path(list_files)
+                _, extensiones = self.separate_path(list_files)
                 comments = dict(
                     zip(extensiones, map(lambda x: extensiones.count(x), extensiones))
                 )  
-                nombres_extensiones, nombres, extensiones_r, numeraciones, ban = (
+                nombres_extensiones, _, _, _, _ = (
                     self.format_names(x, list_files)
                 )
                 self.rename_files(list_files, nombres_extensiones, x)

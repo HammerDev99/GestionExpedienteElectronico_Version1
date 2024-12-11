@@ -179,9 +179,9 @@ class FileProcessor:
 
     def _process_excel(self):
         """Método que contiene todas las operaciones síncronas de Excel"""
-        aux_files, extension = MetadataExtractor.separate_path(self.files)
+        aux_files, _ = MetadataExtractor.separate_path(self.files)
         list_aux = [os.path.basename(self.indice)]
-        index_name, index_extension = MetadataExtractor.separate_path(list_aux)
+        index_name, _ = MetadataExtractor.separate_path(list_aux)
 
         # Extraer índice
         for x in range(len(aux_files)):

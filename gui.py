@@ -41,7 +41,7 @@ class Application(ttk.Frame):
             root.title("GestionExpedienteElectronico")
             root.resizable(False, False)
             # root.geometry("350x300")
-            root.protocol("WM_DELETE_WINDOW", self.on_closing)
+            root.protocol("WM_DELETE_WINDOW", self._on_closing)
             self.pack(padx=20, pady=20)  # Añadir padding aquí
             self.create_oneProcessWidgets()
         except Exception as e:
@@ -53,13 +53,13 @@ class Application(ttk.Frame):
         @modules: tkinter
         - Crea y configura los widgets de la interfaz gráfica.
         """
-        self.is_updated = self.comprobar_actualizaciones() # Comprobar actualizaciones al iniciar la aplicación
+        self.is_updated = self._comprobar_actualizaciones() # Comprobar actualizaciones al iniciar la aplicación
 
         self.label = tk.Label(self, text=r"Daniel Arbelaez Alvarez - HammerDev99", fg="blue", cursor="hand2")
         self.label.pack(side=tk.BOTTOM, padx=10, pady=10)
         self.label.bind(
             "<Button-1>",
-            lambda e: self.callback(
+            lambda e: self._callback(
                 "https://github.com/HammerDev99/GestionExpedienteElectronico_Version1"
             ),
         )
@@ -75,7 +75,7 @@ class Application(ttk.Frame):
             self.update_label.pack(side=tk.RIGHT, padx=0, pady=0)
             self.update_label.bind(
                 "<Button-1>",
-                lambda e: self.callback(
+                lambda e: self._callback(
                     "https://github.com/HammerDev99/GestionExpedienteElectronico_Version1/releases/tag/latest"
                 ),
             )
@@ -109,7 +109,7 @@ class Application(ttk.Frame):
 
         # Variable para los Radiobuttons
         self.radio_var = tk.StringVar(value="2")
-        self.radio_var.trace("w", self.on_radio_change)
+        self.radio_var.trace("w", self._on_radio_change)
 
         # Crear los Radiobuttons
         """ self.radio1 = ttk.Radiobutton(self.radio_frame, text="Opción 1: Índice de una \nsola carpeta específica", variable=self.radio_var, value="1")
@@ -120,7 +120,7 @@ class Application(ttk.Frame):
         self.radio3.pack(side=tk.LEFT, padx=10)
 
         # Crear tooltips con imágenes para los Radiobuttons
-        self.create_tooltips()
+        self._create_tooltips()
 
         """ self.scrollbar = tk.Scrollbar(self, orient=tk.VERTICAL)
         self.scrollbar.pack(fill="x", padx=5) """
@@ -163,7 +163,7 @@ class Application(ttk.Frame):
 
         # Botón Cancelar
         self.cancelar = tk.Button(
-            self, text="Cancelar", fg="red", command=self.on_closing, height=1, width=7
+            self, text="Cancelar", fg="red", command=self._on_closing, height=1, width=7
         )
         self.cancelar.pack(side=tk.LEFT, padx=5)
 
@@ -173,31 +173,31 @@ class Application(ttk.Frame):
 
         self.pack()
 
-    def on_radio_change(self, *args):
+    def _on_radio_change(self, *args):
         self.selected_value = self.radio_var.get()
         self.logger.info(f"Opción seleccionada: {self.selected_value}")
 
-    def create_tooltips(self):
+    def _create_tooltips(self):
         """
         Crea tooltips para los radiobuttons usando imágenes.
         """
         image_paths = [
-            self.get_bundled_path('assets/tooltip1.png'),
-            self.get_bundled_path('assets/tooltip2.png'),
-            self.get_bundled_path('assets/tooltip3.png')
+            self._get_bundled_path('assets/tooltip1.png'),
+            self._get_bundled_path('assets/tooltip2.png'),
+            self._get_bundled_path('assets/tooltip3.png')
         ]
 
         # Tooltip(self.radio1, image_paths[0])  # Comentado
         Tooltip(self.radio2, image_paths[1])
         Tooltip(self.radio3, image_paths[2])
 
-    def callback(self, url):
+    def _callback(self, url):
         """
         @modules: webbrowser
         """
         webbrowser.open_new(url)
 
-    def on_closing(self):
+    def _on_closing(self):
         """
         @modules: tkinter
 
@@ -264,7 +264,7 @@ class Application(ttk.Frame):
         """
         Carga los valores del archivo CSV en el combobox.
         """
-        csv_file_path = self.get_bundled_path('assets/TRD.csv')
+        csv_file_path = self._get_bundled_path('assets/TRD.csv')
         values = []
         
         with open(csv_file_path, newline='', encoding='utf-8') as csvfile:
@@ -344,43 +344,66 @@ class Application(ttk.Frame):
         # Verificar que tenga exactamente 23 dígitos
         return (len(cui_limpio) >= 23, cui_limpio[:23] if len(cui_limpio) >= 23 else cui)
 
-    def handle_directory_analysis(self, folder_selected, estructura_directorios, lista_cui, lista_subcarpetas, carpetas_omitidas = None, analyzer = None):
+    def _mostrar_carpeta_seleccionada(self, folder_selected):
         """
-        @param: folder_selected tipo str, estructura_directorios tipo dict, lista_cui tipo list, lista_subcarpetas tipo list, carpetas_omitidas tipo set
-
-        Muestra mensaje de carpeta seleccionada
-        Guarda las listas en atributos de la clase
-        Muestra mensaje de carpetas omitidas
+        Muestra en el widget de texto la carpeta seleccionada.
+        
+        Args:
+            folder_selected (str): Ruta de la carpeta seleccionada
         """
         self.text_widget.insert(tk.END, f"\n*******************\nCarpeta seleccionada: {folder_selected}")
         self.text_widget.see(tk.END)
 
-        # Conjuntos para almacenar CUIs válidos e inválidos
+    def _procesar_cuis(self, lista_cui, lista_subcarpetas):
+        """
+        Procesa y valida los CUIs de las carpetas.
+        
+        Args:
+            lista_cui (list): Lista de CUIs
+            lista_subcarpetas (list): Lista de subcarpetas
+            
+        Returns:
+            tuple: Conjuntos de CUIs válidos e inválidos
+        """
         cuis_validos = set()
         cuis_invalidos = set()
 
-        # Procesar cada sublista en lista_subcarpetas
         if self.selected_value == "3":
             for sublista in lista_subcarpetas:
                 for ruta in sublista:
-                    # Obtener la parte antes del primer backslash
                     cui = ruta.split('\\')[0]
-                    
-                    # Validar el CUI
-                    es_valido, cui_procesado = self._validar_cui(cui)
-                    if es_valido:
-                        cuis_validos.add(cui_procesado)
-                    else:
-                        cuis_invalidos.add(cui)
+                    self._validar_y_agregar_cui(cui, cuis_validos, cuis_invalidos)
         else:
             for cui in lista_cui:
-                es_valido, cui_procesado = self._validar_cui(cui)
-                if es_valido:
-                    cuis_validos.add(cui_procesado)
-                else:
-                    cuis_invalidos.add(cui)
+                self._validar_y_agregar_cui(cui, cuis_validos, cuis_invalidos)
 
-        # Actualiza las listas en atributos de la clase
+        return cuis_validos, cuis_invalidos
+
+    def _validar_y_agregar_cui(self, cui, cuis_validos, cuis_invalidos):
+        """
+        Valida un CUI individual y lo agrega al conjunto correspondiente.
+        
+        Args:
+            cui (str): CUI a validar
+            cuis_validos (set): Conjunto de CUIs válidos
+            cuis_invalidos (set): Conjunto de CUIs inválidos
+        """
+        es_valido, cui_procesado = self._validar_cui(cui)
+        if es_valido:
+            cuis_validos.add(cui_procesado)
+        else:
+            cuis_invalidos.add(cui)
+
+    def _actualizar_atributos_clase(self, lista_cui, lista_subcarpetas, estructura_directorios, analyzer):
+        """
+        Actualiza los atributos de la clase con los datos procesados.
+        
+        Args:
+            lista_cui (list): Lista de CUIs
+            lista_subcarpetas (list): Lista de subcarpetas
+            estructura_directorios (dict): Estructura de directorios
+            analyzer (FolderAnalyzer): Instancia del analizador de carpetas
+        """
         try:
             self.lista_cui = lista_cui
             self.lista_subcarpetas = lista_subcarpetas
@@ -389,32 +412,64 @@ class Application(ttk.Frame):
                 self.carpetas_omitidas = analyzer.encontrar_cuis_faltantes(lista_cui, lista_subcarpetas)
         except Exception as e:
             self.logger.error(f"Error al guardar las listas en atributos de la clase: {str(e)}", exc_info=True)
-        
-        # Mostrar carpetas omitidas
+
+    def _mostrar_carpetas_omitidas(self):
+        """
+        Muestra información sobre las carpetas que fueron omitidas por no cumplir con la estructura.
+        """
         try:
             if self.carpetas_omitidas:
-                mensaje = f"Se encontraron {len(self.carpetas_omitidas)} carpetas que no cumplen con la estructura de directorios"
-                self.mensaje(None, mensaje)
-                mensaje = "\n-Las siguientes carpetas no cumplen con la estructura de carpetas y no serán incluidas en el procesamiento:\n"
-                for carpeta in sorted(self.carpetas_omitidas):
-                    mensaje += f" {carpeta}, "
-                self.text_widget.insert(tk.END, mensaje + "\n")
+                mensaje_principal = f"Se encontraron {len(self.carpetas_omitidas)} carpetas que no cumplen con la estructura de directorios"
+                self._mensaje(None, mensaje_principal)
+                
+                mensaje_detalle = "\n-Las siguientes carpetas no cumplen con la estructura de carpetas y no serán incluidas en el procesamiento:\n"
+                mensaje_detalle += " ".join(f"{carpeta}, " for carpeta in sorted(self.carpetas_omitidas))
+                
+                self.text_widget.insert(tk.END, mensaje_detalle + "\n")
                 self.text_widget.see(tk.END)
         except Exception as e:
             self.logger.error(f"Error al mostrar las carpetas omitidas. No se eligio una estructura de carpetas adecuada: {str(e)}", exc_info=True)
 
-        # Muestra los CUIs inválidos
+    def _mostrar_cuis_invalidos(self, cuis_invalidos, lista_cui):
+        """
+        Muestra información sobre los CUIs que no cumplen con el formato requerido.
+        
+        Args:
+            cuis_invalidos (set): Conjunto de CUIs inválidos
+            lista_cui (list): Lista original de CUIs
+        """
         if cuis_invalidos:
             mensaje = "- Se encontraron carpetas que no cumplen con el formato de 23 dígitos:\n"
             if self.selected_value == "3":
-                for cui in sorted(cuis_invalidos):
-                    mensaje += f" {cui}, "
+                mensaje += " ".join(f"{cui}, " for cui in sorted(cuis_invalidos))
             else:
-                for cui in lista_cui:
-                    mensaje += f" {cui}, "
+                mensaje += " ".join(f"{cui}, " for cui in lista_cui)
+                
             self.text_widget.insert(tk.END, mensaje)
             self.text_widget.see(tk.END)
-            self.mensaje(None, "Algunas carpetas no cumplen con el formato requerido de 23 dígitos numéricos.")
+            self._mensaje(None, "Algunas carpetas no cumplen con el formato requerido de 23 dígitos numéricos.")
+
+    def handle_directory_analysis(self, folder_selected, estructura_directorios, lista_cui, lista_subcarpetas, carpetas_omitidas=None, analyzer=None):
+        """
+        Analiza y procesa la estructura de directorios seleccionada.
+        
+        Args:
+            folder_selected (str): Ruta de la carpeta seleccionada
+            estructura_directorios (dict): Estructura de directorios
+            lista_cui (list): Lista de CUIs
+            lista_subcarpetas (list): Lista de subcarpetas
+            carpetas_omitidas (set, opcional): Conjunto de carpetas omitidas
+            analyzer (FolderAnalyzer, opcional): Instancia del analizador de carpetas
+        """
+        self._mostrar_carpeta_seleccionada(folder_selected)
+        
+        _, cuis_invalidos = self._procesar_cuis(lista_cui, lista_subcarpetas)
+        
+        self._actualizar_atributos_clase(lista_cui, lista_subcarpetas, estructura_directorios, analyzer)
+        
+        self._mostrar_carpetas_omitidas()
+        
+        self._mostrar_cuis_invalidos(cuis_invalidos, lista_cui)
 
     def run_async_process(self, app):
         """Inicia el procesamiento asíncrono"""
@@ -423,7 +478,7 @@ class Application(ttk.Frame):
     async def procesa_expedientes(self):
         """Versión asíncrona simplificada del procesamiento de expedientes"""
         if not self.lista_subcarpetas:
-            self.mensaje(3)
+            self._mensaje(3)
             return
 
         self.logger.info(f"Procesando {len(self.lista_subcarpetas)} expedientes")
@@ -436,7 +491,7 @@ class Application(ttk.Frame):
                 title=os.path.basename(self.expediente)):
             self.expediente = ""
             self.carpetas = []
-            self.mensaje(6)
+            self._mensaje(6)
             return
 
         # Iniciar procesamiento
@@ -463,7 +518,7 @@ class Application(ttk.Frame):
                     self.text_widget.see(tk.END)
 
                     # Procesar archivo
-                    carpeta = self.get_bundled_path(os.path.normpath(os.path.join(self.expediente, ruta)))
+                    carpeta = self._get_bundled_path(os.path.normpath(os.path.join(self.expediente, ruta)))
                     processor = FileProcessor(carpeta, "", despacho, subserie, rdo, logger=self.logger)
                     
                     # Procesar de forma asíncrona
@@ -481,7 +536,7 @@ class Application(ttk.Frame):
             self.text_widget.insert(tk.END, "Proceso completado.\n*******************\n")
             self.progress["value"] = 0
             self.update_idletasks()
-            self.mensaje(1)
+            self._mensaje(1)
 
         except Exception as e:
             self.logger.error(f"Error en procesamiento: {str(e)}", exc_info=True)
@@ -495,7 +550,7 @@ class Application(ttk.Frame):
         self.estructura_directorios = {}
         self.analyzer = None
 
-    def mensaje(self, result = None, mensaje = None):
+    def _mensaje(self, result = None, mensaje = None):
         """
         @param: result tipo int
         @modules: tkinter
@@ -521,7 +576,7 @@ class Application(ttk.Frame):
             )
             self.logger.info(result, exc_info=True)
 
-    def get_bundled_path(self, ruta):
+    def _get_bundled_path(self, ruta):
         """
         Obtiene la ruta correcta según el entorno de ejecución.
         
@@ -534,22 +589,22 @@ class Application(ttk.Frame):
         bundle_dir = sys._MEIPASS if getattr(sys, 'frozen', False) else os.path.abspath(os.path.dirname(__file__))
         return os.path.normpath(os.path.join(bundle_dir, ruta))
 
-    def obtener_version_actual(self):
+    def _obtener_version_actual(self):
         # Determinar la ruta del archivo xlsm
-        ruta_json = self.get_bundled_path('assets/last_version.json')
+        ruta_json = self._get_bundled_path('assets/last_version.json')
         with open(ruta_json, 'r', encoding='utf-8') as file:
             data = json.load(file)
             version = data.get('version')
         return version
 
-    def comprobar_actualizaciones(self):
+    def _comprobar_actualizaciones(self):
         url = "https://raw.githubusercontent.com/HammerDev99/GestionExpedienteElectronico_Version1/refs/heads/master/assets/last_version.json"  # O usa la URL de raw.githubusercontent.com
         try:
             response = requests.get(url)
             response.raise_for_status()
             datos = response.json()
 
-            version_actual = list(map(int, self.obtener_version_actual().split(".")))
+            version_actual = list(map(int, self._obtener_version_actual().split(".")))
             ultima_version = list(map(int, datos.get('version').split(".")))
 
             if version_actual < ultima_version:
