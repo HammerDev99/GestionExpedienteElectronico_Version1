@@ -141,9 +141,9 @@ python main.py
 - 2024-09-12 Refactorizar manejo de archivos del expediente electrónico
 - 2023-05-30 Set "DocumentoElectronico" into "nombres" list
 - 2023-05-29 Modifies index name format and enables cross-platform function. (v.1.0.1)
-- 2023-05-26 Identificando valores en variables de la función formatNames
+- 2023-05-26 Identificando valores en variables de la función format_names
 - 2023-05-26 Versión estable
-- 2023-05-26 separa_cadena, renameFile2, type of encode line added, createDataFrame update
+- 2023-05-26 separa_cadena, renameFile2, type of encode line added, create_dataframe update
 - 2023-04-25 AutomatizacionEmpleado.py update
 - 2023-04-25 code path selector in cross platform form added for refactoring_base
 - 2023-01-24 update folder schema, add textchain class

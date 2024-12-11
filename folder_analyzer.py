@@ -216,7 +216,7 @@ class FolderAnalyzer:
 
             # Procesar cada directorio
             for dir_actual, ruta_base in directorios_a_procesar:
-                todas_nivel_dos, rutas_nivel_dos, rutas_nivel_cuatro = self._procesar_nivel_dos(
+                todas_nivel_dos, rutas_nivel_dos, _rutas_nivel_cuatro = self._procesar_nivel_dos(
                     dir_actual, ruta_base
                 )
                 

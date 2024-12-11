@@ -24,6 +24,7 @@ class Application(ttk.Frame):
     selected_value = "2"
     lista_subcarpetas = []
     analyzer = None
+    profundidad = None
 
     def __init__(self, root, logger=None):
         """
@@ -34,6 +35,7 @@ class Application(ttk.Frame):
         self.root = root
         self.logger = logger or logging.getLogger('GUI')
         self.logger.info("Iniciando interfaz gráfica")
+        self.profundidad = None
         try:
             super().__init__(root)
             root.title("GestionExpedienteElectronico")

@@ -16,7 +16,7 @@ class MetadataExtractor:
     def __init__(self, logger=None):
         self.logger = logger or logging.getLogger('metadata_extractor')
 
-    def getMetadata(self, files):
+    def get_metadata(self, files):
         """
         Extrae metadatos de una lista de archivos.
         Args:
@@ -39,22 +39,22 @@ class MetadataExtractor:
         for x in files:
             if os.path.isfile(x):
                 fechamod.append(str(datetime.date.fromtimestamp(os.path.getmtime(x))))
-                tama.append(self.sizeUnitsConverter(os.path.getsize(x)))
-                cantidadpag.append(self.pageCounter(x))
+                tama.append(self.size_units_converter(os.path.getsize(x)))
+                cantidadpag.append(self.page_counter(x))
                 observaciones.append("")
             else:
                 fechamod.append(str(datetime.date.fromtimestamp(os.path.getmtime(x))))
                 tama.append("-")
                 cantidadpag.append("1")
                 list_files = os.listdir(x)
-                nombres, extensiones = self.separatePath(list_files)
+                nombres, extensiones = self.separate_path(list_files)
                 comments = dict(
                     zip(extensiones, map(lambda x: extensiones.count(x), extensiones))
                 )  
-                nombresExtensiones, nombres, extensionesR, numeraciones, ban = (
-                    self.formatNames(x, list_files)
+                nombres_extensiones, nombres, extensiones_r, numeraciones, ban = (
+                    self.format_names(x, list_files)
                 )
-                self.renameFiles(list_files, nombresExtensiones, x)
+                self.rename_files(list_files, nombres_extensiones, x)
                 observaciones.append("Archivos contenidos: " + str(comments))
         return fechamod, tama, cantidadpag, observaciones
 
@@ -75,7 +75,7 @@ class MetadataExtractor:
 
         return resultado
     
-    def separatePath(files):
+    def separate_path(files):
         """
         Separa los nombres de archivo y sus extensiones de una lista de rutas de archivos.
         Args:
@@ -94,13 +94,13 @@ class MetadataExtractor:
         return nombres, extensiones
 
     # Función duplicada
-    def renameFiles(self, files, nombresExtensiones, ruta):
+    def rename_files(self, files, nombres_extensiones, ruta):
         """
-        Renombra una lista de archivos a nuevos nombres proporcionados en `nombresExtensiones`. Si un archivo no existe,
+        Renombra una lista de archivos a nuevos nombres proporcionados en `nombres_extensiones`. Si un archivo no existe,
         agrega una cadena aleatoria al nuevo nombre.
         Args:
             files (list): Lista de nombres de archivos a renombrar.
-            nombresExtensiones (list): Lista de nuevos nombres de archivos con extensiones.
+            nombres_extensiones (list): Lista de nuevos nombres de archivos con extensiones.
             ruta (str): Ruta del directorio donde se encuentran los archivos.
         Modules:
             os
@@ -111,21 +111,20 @@ class MetadataExtractor:
         for i in range(len(files)):
             fulldirct = os.path.join(ruta, files[i])
             if os.path.exists(fulldirct):
-                os.rename(fulldirct, os.path.join(ruta, nombresExtensiones[i]))
+                os.rename(fulldirct, os.path.join(ruta, nombres_extensiones[i]))
             else:
                 try:
-                    # number_of_strings = 3
                     length_of_string = 3
                     os.rename(
                         ruta + chr(92) + files[i],
                         ruta
                         + chr(92)
-                        + os.path.splitext(nombresExtensiones[i])[0]
+                        + os.path.splitext(nombres_extensiones[i])[0]
                         + "".join(
                             random.choice(string.ascii_letters + string.digits)
                             for _ in range(length_of_string)
                         )
-                        + os.path.splitext(nombresExtensiones[i])[1],
+                        + os.path.splitext(nombres_extensiones[i])[1],
                     )
                 except Exception as e:
                     self.logger.exception("Excepcion presentada intentando el renombrado archivos" + str(e))
@@ -133,7 +132,7 @@ class MetadataExtractor:
     # Separar función en funciones más pequeñas
     """ La solucion más efectiva es crear una funcion principal que cuente con un ciclo y envie cada nombre de archivo llamando a otra funcion que luego controle cada palabra del nombre del archivo y así gestionar hasta el detalle más mínimo  """
 
-    def formatNames(self, ruta, files):
+    def format_names(self, ruta, files):
         """
         Formatea los nombres de archivos y directorios en una ruta dada.
         Args:
@@ -141,7 +140,7 @@ class MetadataExtractor:
             files (list): Una lista de nombres de archivos y directorios a procesar.
         Returns:
             tuple: Una tupla que contiene los siguientes elementos:
-                - nombresExtensiones (list): Lista de nombres formateados con extensiones.
+                - nombres_extensiones (list): Lista de nombres formateados con extensiones.
                 - nombres (list): Lista de nombres formateados sin extensiones.
                 - extensiones (list): Lista de extensiones de archivos o 'Carpeta' para directorios.
                 - numeraciones (list): Lista de números consecutivos para cada archivo.
@@ -159,7 +158,7 @@ class MetadataExtractor:
             - En caso de estar vacio asigna el nombre DocumentoElectronico
             - Crea consecutivos
             - Agrega consecutivo al comienzo del nombre en el mismo orden de la carpeta
-            - Valida con isorderCorrect si los archivos estan en orden, en caso negativo ban = true
+            - Valida con is_order_correct si los archivos estan en orden, en caso negativo ban = true
         """
 
         # Función para procesar nombres del índice
@@ -195,7 +194,6 @@ class MetadataExtractor:
                 else:
                     if caracter.isnumeric():
                         cont = cont + 1
-                        continue
             nombres[x] = nombres[x][0:36]
             # Compara valores de nombre_indice y nombres para aplicar nombre a archivo
             if (nombres_indice[x] == "Documento electronico") or (nombres[x] == ""):
@@ -203,20 +201,20 @@ class MetadataExtractor:
 
             nombres[x] = str(f"{x+1:03}") + nombres[x]
 
-        nombresExtensiones = []
+        nombres_extensiones = []
         for x in range(len(nombres)):
             if extensiones[x] != "Carpeta":
-                nombresExtensiones.append(str(nombres[x]) + str(extensiones[x]))
+                nombres_extensiones.append(str(nombres[x]) + str(extensiones[x]))
             else:
-                nombresExtensiones.append(str(nombres[x]))
+                nombres_extensiones.append(str(nombres[x]))
         numeraciones = list(range(len(nombres) + 1))
         numeraciones.pop(0)
 
-        if self.isOrderCorrect(files, nombresExtensiones):
+        if self.is_order_correct(files, nombres_extensiones):
             ban = True
 
         return (
-            nombresExtensiones,
+            nombres_extensiones,
             nombres,
             extensiones,
             numeraciones,
@@ -285,19 +283,19 @@ class MetadataExtractor:
             lista_cadena[i] = resultado  # Modificar la cadena de la lista
         return lista_cadena
 
-    def isOrderCorrect(self, files, nombresExtensiones):
+    def is_order_correct(self, files, nombres_extensiones):
         """
         Verifica el orden de los archivos consecutivos.
         Args:
             files (List): Lista de nombres de archivos.
-            nombresExtensiones (List): Lista de nombres de archivos esperados con extensiones.
+            nombres_extensiones (List): Lista de nombres de archivos esperados con extensiones.
         Returns:
             bool: True si el orden es incorrecto, False en caso contrario.
         """
 
         cont = 0
         for i in files:
-            for j in nombresExtensiones:
+            for j in nombres_extensiones:
                 if i != j:
                     cont = cont + 1
         if cont != 0:
@@ -305,7 +303,7 @@ class MetadataExtractor:
         else:
             return False
 
-    def sizeUnitsConverter(self, size):
+    def size_units_converter(self, size):
         """
         Convierte el tamaño del archivo de bytes a una cadena legible con las unidades apropiadas.
         Args:
@@ -318,7 +316,7 @@ class MetadataExtractor:
         """
 
         kb = 1024
-        bytes = kb / 1024
+        file_size_bytes = kb / 1024
         mb = kb * 1024
         gb = mb * 1024
         tb = gb * 1024
@@ -331,11 +329,11 @@ class MetadataExtractor:
         if size >= kb:
             return "%.1f KB" % float(size / kb)
         if size < kb:
-            return "%.0f BYTES" % float(size / bytes)
+            return "%.0f file_size_bytes" % float(size / file_size_bytes)
         if size == 0:
-            return "0 BYTES"
+            return "0 file_size_bytes"
 
-    def pageCounter(self, file):
+    def page_counter(self, file):
         """
         Cuenta el número de páginas en un archivo dado.
         Parámetros:
@@ -363,14 +361,14 @@ class MetadataExtractor:
                     pdf_path = file
                     total_pages = count_pages_in_pdf(self, pdf_path)
                     return total_pages
-                except Exception as e:
+                except Exception:
                     return 0
             elif extension == ".docx" or extension == ".doc":
                 try:
                     docx_path = file
                     total_pages = count_pages_in_docx(self, docx_path)
                     return total_pages
-                except Exception as e:
+                except Exception:
                     return 0
             elif (
                 extension == ".xls"

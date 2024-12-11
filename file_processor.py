@@ -36,7 +36,7 @@ class FileProcessor:
             self.logger.debug(f"Archivos encontrados: {len(self.files)}")
 
             if indice == "":
-                self.copyXlsm(self.ruta)
+                self.copy_xlsm(self.ruta)
             else:
                 self.indice = indice
 
@@ -48,9 +48,9 @@ class FileProcessor:
             self.logger.error(f"Error en inicialización: {str(e)}", exc_info=True)
             raise
 
-    def renameFiles(self, files, nombresExtensiones, ruta):
+    def rename_files(self, files, nombres_extensiones, ruta):
         """
-        @param: files, nombresExtensiones (List), ruta (string)
+        @param: files, nombres_extensiones (List), ruta (string)
         @modules: os
         """
 
@@ -60,27 +60,26 @@ class FileProcessor:
                 fulldirct = os.path.join(ruta, files[i])
                 self.logger.debug(f"Renombrando: {fulldirct}")
                 if os.path.exists(fulldirct):
-                    os.rename(fulldirct, os.path.join(ruta, nombresExtensiones[i]))
+                    os.rename(fulldirct, os.path.join(ruta, nombres_extensiones[i]))
                 else:
-                    # number_of_strings = 3
                     length_of_string = 3
                     os.rename(
                         ruta + chr(92) + files[i],
                         ruta
                         + chr(92)
-                        + os.path.splitext(nombresExtensiones[i])[0]
+                        + os.path.splitext(nombres_extensiones[i])[0]
                         + "".join(
                             random.choice(string.ascii_letters + string.digits)
                             for _ in range(length_of_string)
                         )
-                        + os.path.splitext(nombresExtensiones[i])[1],
+                        + os.path.splitext(nombres_extensiones[i])[1],
                     )
             except Exception as e:
                 self.logger.error(f"Error renombrando archivo: {str(e)}", exc_info=True)
 
-    def copyXlsm(self, rutaFinal):
+    def copy_xlsm(self, ruta_final):
         """
-        @param: rutaFinal tipo string; contiene ruta expediente
+        @param: ruta_final tipo string; contiene ruta expediente
         @modules: os, shutil
         """
 
@@ -96,26 +95,26 @@ class FileProcessor:
         ruta = os.path.join(bundle_dir, "assets/000IndiceElectronicoC0.xlsm")
 
         # Copiar el archivo xlsm
-        shutil.copy(ruta, rutaFinal)
-        self.indice = os.path.join(rutaFinal, "000IndiceElectronicoC0.xlsm")
+        shutil.copy(ruta, ruta_final)
+        self.indice = os.path.join(ruta_final, "000IndiceElectronicoC0.xlsm")
 
-    def createDataFrame(self, files, ruta):
+    def create_dataframe(self, files, ruta):
         """
         @return: df (contiene los metadatos)
         @modules: pandas
         """
-        nombresExtensiones, nombres, extensiones, numeraciones, ban, nombres_indice = (
-            self.obj1.formatNames(ruta, files)
+        nombres_extensiones, nombres, extensiones, numeraciones, ban, nombres_indice = (
+            self.obj1.format_names(ruta, files)
         )
 
-        nombresExtensiones = self.capitalize_first_letter(nombresExtensiones)
+        nombres_extensiones = self.capitalize_first_letter(nombres_extensiones)
 
         if ban:
-            self.renameFiles(files, nombresExtensiones, ruta)
-        fullFilePaths = self.fullFilePath(nombresExtensiones, ruta)
+            self.rename_files(files, nombres_extensiones, ruta)
+        full_file_paths = self.full_file_paths(nombres_extensiones, ruta)
 
-        fechamod, tama, cantidadpag, observaciones = self.obj1.getMetadata(
-            fullFilePaths
+        fechamod, tama, cantidadpag, observaciones = self.obj1.get_metadata(
+            full_file_paths
         )
 
         # Crear DataFrame inicial vacío
@@ -150,20 +149,20 @@ class FileProcessor:
                     break
         return capitalized_names
 
-    def fullFilePath(self, files, ruta):
+    def full_file_paths(self, files, ruta):
         """
         @param: files tipo list; contiene la lista de archivos
         @param: ruta tipo string; contiene la ruta base
         @modules: os
-        @return: pathArchivos tipo List
+        @return: files_path tipo List
         """
 
-        pathArchivos = []
+        files_path = []
         for y in files:
             fulldirct = os.path.join(ruta, y)
             fulldirct.replace("/", "\\")
-            pathArchivos.append(fulldirct)
-        return pathArchivos
+            files_path.append(fulldirct)
+        return files_path
 
     async def process(self):
         """Versión asíncrona simplificada del método process"""
@@ -174,20 +173,20 @@ class FileProcessor:
                 # Ejecutar las operaciones de Excel en el thread pool
                 await loop.run_in_executor(pool, self._process_excel)
             return 1
-        except Exception as e:
+        except Exception:
             self.logger.error("Error procesando archivo", exc_info=True)
             raise
 
     def _process_excel(self):
         """Método que contiene todas las operaciones síncronas de Excel"""
-        auxFiles, extension = MetadataExtractor.separatePath(self.files)
-        listAux = [os.path.basename(self.indice)]
-        indexName, indexExtension = MetadataExtractor.separatePath(listAux)
+        aux_files, extension = MetadataExtractor.separate_path(self.files)
+        list_aux = [os.path.basename(self.indice)]
+        index_name, index_extension = MetadataExtractor.separate_path(list_aux)
 
         # Extraer índice
-        for x in range(len(auxFiles)):
-            if auxFiles[x] == indexName[0]:
-                auxFiles.pop(x)
+        for x in range(len(aux_files)):
+            if aux_files[x] == index_name[0]:
+                aux_files.pop(x)
                 break
 
         app = None
@@ -208,8 +207,8 @@ class FileProcessor:
             )
             sheet = wb.sheets.active
 
-            df = self.createDataFrame(self.files, self.ruta)
-            self.createXlsm(df, macro_vba, sheet)
+            df = self.create_dataframe(self.files, self.ruta)
+            self.create_xlsm(df, macro_vba, sheet)
 
             wb.save()
             wb.close()
@@ -224,7 +223,7 @@ class FileProcessor:
                     del app
                     self.cerrar_procesos_por_pid(self.pids_creados)
 
-    def createXlsm(self, df, macro_vba, sheet):
+    def create_xlsm(self, df, macro_vba, sheet):
         """
         @param: df tipo DataFrame; contiene los datos a escribir en el archivo Excel
         @param: macro_vba tipo string; contiene el código VBA para la macro
@@ -242,10 +241,10 @@ class FileProcessor:
         dfcopy = df.iloc[:, 1]
         df.insert(loc=2, column="Fecham", value=dfcopy)
         columnas = ["A", "B", "C", "D", "E", "H", "I", "J", "K"]
-        filaInicial = 12
-        contFila = filaInicial
+        fila_inicial = 12
+        cont_fila = fila_inicial
         
-        for x in range(df.shape[0]):
+        for _ in range(df.shape[0]):
             macro_vba()
 
         # Agregar valores de entry01_value y entry02_value en celdas específicas
@@ -258,8 +257,8 @@ class FileProcessor:
 
         for i in range(df.shape[0]):
             for j in range(len(columnas)):
-                sheet.range(columnas[j] + str(contFila)).value = df.iloc[i, j]
-            contFila = contFila + 1
+                sheet.range(columnas[j] + str(cont_fila)).value = df.iloc[i, j]
+            cont_fila = cont_fila + 1
 
     def cerrar_procesos_por_pid(self, pids):
         """
