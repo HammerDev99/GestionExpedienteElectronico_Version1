@@ -13,6 +13,13 @@ from PyPDF2 import PdfReader
 
 class MetadataExtractor:
 
+    # Constantes de clase
+    DOCUMENTO_ELECTRONICO = "Documento electronico"
+    DOCUMENTO_ELECTRONICO_DEFAULT = "DocumentoElectronico"
+    CARPETA_TYPE = "Carpeta"
+    MAX_LENGTH = 36
+    MAX_NAME_LENGTH = 40
+
     def __init__(self, logger=None):
         self.logger = logger or logging.getLogger('metadata_extractor')
 
@@ -75,6 +82,7 @@ class MetadataExtractor:
 
         return resultado
     
+    @staticmethod
     def separate_path(files):
         """
         Separa los nombres de archivo y sus extensiones de una lista de rutas de archivos.
@@ -129,10 +137,101 @@ class MetadataExtractor:
                 except Exception as e:
                     self.logger.exception("Excepcion presentada intentando el renombrado archivos" + str(e))
 
-    # Separar función en funciones más pequeñas
-    """ La solucion más efectiva es crear una funcion principal que cuente con un ciclo y envie cada nombre de archivo llamando a otra funcion que luego controle cada palabra del nombre del archivo y así gestionar hasta el detalle más mínimo  """
-
     def format_names(self, ruta, files):
+        """
+        Formatea los nombres de archivos y directorios en una ruta dada.
+        Args:
+            ruta (str): La ruta al directorio que contiene los archivos.
+            files (list): Lista de nombres de archivos y directorios a procesar.
+        Returns:
+            tuple: (nombres_extensiones, nombres, extensiones, numeraciones, ban, nombres_indice)
+        """
+        nombres_indice = self.procesa_cadena_indice(files)
+        nombres, extensiones = self._extraer_nombres_extensiones(ruta, files)
+        nombres = self._formatear_nombres(nombres, nombres_indice)
+        nombres_extensiones = self._generar_nombres_finales(nombres, extensiones)
+        numeraciones = self._generar_numeraciones(len(nombres))
+        ban = self._verificar_orden(files, nombres_extensiones)
+        
+        return nombres_extensiones, nombres, extensiones, numeraciones, ban, nombres_indice
+
+    def _extraer_nombres_extensiones(self, ruta, files):
+        """Extrae nombres y extensiones de los archivos."""
+        nombres = []
+        extensiones = []
+        
+        for archivo in files:
+            nombre, extension = self._obtener_nombre_extension(ruta, archivo)
+            nombres.append(nombre)
+            extensiones.append(extension)
+        
+        return nombres, extensiones
+
+    def _obtener_nombre_extension(self, ruta, archivo):
+        """Obtiene el nombre y extensión de un archivo individual."""
+        ruta_completa = os.path.join(ruta, archivo)
+        if os.path.isfile(ruta_completa):
+            return os.path.splitext(archivo)
+        return archivo, self.CARPETA_TYPE
+
+    def _formatear_nombres(self, nombres, nombres_indice):
+        """Formatea la lista de nombres según las reglas establecidas."""
+        return [
+            self._formatear_nombre_individual(nombre, nombres_indice[i], i)
+            for i, nombre in enumerate(nombres)
+        ]
+
+    def _formatear_nombre_individual(self, nombre, nombre_indice, indice):
+        """Formatea un nombre individual aplicando todas las reglas."""
+        nombre_procesado = self._limpiar_caracteres(nombre)
+        nombre_procesado = self._aplicar_nombre_por_defecto(nombre_procesado, nombre_indice)
+        return f"{indice+1:03}{nombre_procesado}"
+
+    def _limpiar_caracteres(self, nombre):
+        """Limpia y normaliza un nombre según las reglas establecidas."""
+        if self._requiere_limpieza(nombre):
+            nombre = self._aplicar_formato_basico(nombre)
+        nombre = self._eliminar_numeros_iniciales(nombre)
+        return nombre[:self.MAX_LENGTH]
+
+    def _requiere_limpieza(self, nombre):
+        """Determina si un nombre requiere limpieza."""
+        return not nombre.isalnum() or len(nombre) > self.MAX_NAME_LENGTH
+
+    def _aplicar_formato_basico(self, nombre):
+        """Aplica el formato básico al nombre."""
+        nombre = string.capwords(nombre)
+        return re.sub("[^a-zA-Z0-9]+", "", nombre)
+
+    def _eliminar_numeros_iniciales(self, nombre):
+        """Elimina los números iniciales del nombre."""
+        for i, char in enumerate(nombre):
+            if char.isalpha():
+                return nombre[i:]
+        return nombre
+
+    def _aplicar_nombre_por_defecto(self, nombre, nombre_indice):
+        """Aplica el nombre por defecto si es necesario."""
+        if nombre_indice == self.DOCUMENTO_ELECTRONICO or not nombre:
+            return self.DOCUMENTO_ELECTRONICO_DEFAULT
+        return nombre
+
+    def _generar_nombres_finales(self, nombres, extensiones):
+        """Genera los nombres finales combinando nombres y extensiones."""
+        return [
+            f"{nombre}{extension}" if extension != self.CARPETA_TYPE else nombre
+            for nombre, extension in zip(nombres, extensiones)
+        ]
+
+    def _generar_numeraciones(self, cantidad):
+        """Genera la lista de numeraciones."""
+        return list(range(1, cantidad + 1))
+
+    def _verificar_orden(self, files, nombres_extensiones):
+        """Verifica si los archivos están en orden."""
+        return self.is_order_correct(files, nombres_extensiones)
+
+    def old_format_names(self, ruta, files):
         """
         Formatea los nombres de archivos y directorios en una ruta dada.
         Args:
@@ -174,7 +273,7 @@ class MetadataExtractor:
                 extensiones.append(os.path.splitext(x)[1])
             else:
                 nombres.append(x)
-                extensiones.append("Carpeta")
+                extensiones.append(self.CARPETA_TYPE)
 
         ban = False
         for x in range(len(nombres)):
@@ -196,14 +295,14 @@ class MetadataExtractor:
                         cont = cont + 1
             nombres[x] = nombres[x][0:36]
             # Compara valores de nombre_indice y nombres para aplicar nombre a archivo
-            if (nombres_indice[x] == "Documento electronico") or (nombres[x] == ""):
+            if (nombres_indice[x] == self.DOCUMENTO_ELECTRONICO) or (nombres[x] == ""):
                 nombres[x] = "DocumentoElectronico"
 
             nombres[x] = str(f"{x+1:03}") + nombres[x]
 
         nombres_extensiones = []
         for x in range(len(nombres)):
-            if extensiones[x] != "Carpeta":
+            if extensiones[x] != self.CARPETA_TYPE:
                 nombres_extensiones.append(str(nombres[x]) + str(extensiones[x]))
             else:
                 nombres_extensiones.append(str(nombres[x]))
@@ -275,7 +374,7 @@ class MetadataExtractor:
                 resultado = caracter_aleatorio + resultado
 
             if resultado == "":
-                resultado = "Documento electronico"
+                resultado = self.DOCUMENTO_ELECTRONICO
 
             if len(resultado) > 36:
                 resultado = resultado[:36]
