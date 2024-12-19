@@ -55,6 +55,17 @@ class Application(ttk.Frame):
         """
         self.is_updated = self._comprobar_actualizaciones() # Comprobar actualizaciones al iniciar la aplicación
 
+        # Crear barra de menú
+        self.menu_bar = tk.Menu(self.root)
+        self.root.config(menu=self.menu_bar)
+
+        # Crear menú de ayuda
+        self.help_menu = tk.Menu(self.menu_bar, tearoff=0)
+        self.menu_bar.add_cascade(label="Ayuda", menu=self.help_menu)
+        self.help_menu.add_command(label="Agente IA", command=lambda: self._callback("https://gestionexpedienteelectronico.streamlit.app/Experto_en_Expediente_Electronico"))
+        self.help_menu.add_command(label="Video Tutorial (Opción 1)", command=lambda: self._callback("https://etbcsj-my.sharepoint.com/personal/saladmconsecsucre_cendoj_ramajudicial_gov_co/_layouts/15/stream.aspx?id=%2Fpersonal%2Fsaladmconsecsucre%5Fcendoj%5Framajudicial%5Fgov%5Fco%2FDocuments%2FTutorial%20de%20uso%20Gestion%20Expediente%20Electronico%20v1%2E4%2E1%2Emp4&nav=eyJyZWZlcnJhbEluZm8iOnsicmVmZXJyYWxBcHAiOiJTdHJlYW1XZWJBcHAiLCJyZWZlcnJhbFZpZXciOiJTaGFyZURpYWxvZy1MaW5rIiwicmVmZXJyYWxBcHBQbGF0Zm9ybSI6IldlYiIsInJlZmVycmFsTW9kZSI6InZpZXcifX0&ga=1&referrer=StreamWebApp%2EWeb&referrerScenario=AddressBarCopied%2Eview%2E699f2548%2Df96e%2D4a34%2Db982%2Df8964354dd2e"))
+        self.help_menu.add_command(label="Video Tutorial (Opción 2)", command=lambda: self._callback("https://www.youtube.com/watch?v=zWfHNNcETgk"))
+
         self.label = tk.Label(self, text=r"Daniel Arbelaez Alvarez - HammerDev99", fg="blue", cursor="hand2")
         self.label.pack(side=tk.BOTTOM, padx=10, pady=10)
         self.label.bind(
