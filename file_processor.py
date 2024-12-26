@@ -35,6 +35,7 @@ class FileProcessor:
             self.files = os.listdir(self.ruta)
             self.logger.debug(f"Archivos encontrados: {len(self.files)}")
 
+            #if len(self.files) > 0:
             if indice == "":
                 self.copy_xlsm(self.ruta)
             else:

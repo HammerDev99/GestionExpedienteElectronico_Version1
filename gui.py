@@ -1,5 +1,6 @@
 # coding=utf-8
 
+from email import message
 import tkinter as tk
 from tkinter import ttk
 from tkinter import filedialog
@@ -25,6 +26,7 @@ class Application(ttk.Frame):
     lista_subcarpetas = []
     analyzer = None
     profundidad = None
+    carpetas_omitidas = list()
 
     def __init__(self, root, logger=None):
         """
@@ -32,6 +34,7 @@ class Application(ttk.Frame):
         @modules: tkinter
         - Inicializa la aplicación, configura la ventana principal y crea los widgets.
         """
+
         self.root = root
         self.logger = logger or logging.getLogger('GUI')
         self.logger.info("Iniciando interfaz gráfica")
@@ -318,17 +321,14 @@ class Application(ttk.Frame):
 
         if self.selected_value == "2" and profundidad_maxima == 4:
             self.profundidad = 4
-            lista_cui, lista_subcarpetas = analyzer.obtener_lista_rutas_subcarpetas(
-                estructura_directorios, 4, folder_selected)
+            lista_cui, lista_subcarpetas, self.carpetas_omitidas = analyzer.obtener_lista_rutas_subcarpetas(estructura_directorios, 4, folder_selected)
             self.handle_directory_analysis(folder_selected, estructura_directorios, lista_cui, lista_subcarpetas, self.carpetas_omitidas, None)
             self.lista_subcarpetas = lista_subcarpetas
             self.analyzer = analyzer
         elif self.selected_value == "3" and profundidad_maxima == 5:
             self.profundidad = 5
-            lista_cui, lista_subcarpetas = analyzer.obtener_lista_rutas_subcarpetas(
-                estructura_directorios, 5, None)
-            self.handle_directory_analysis(folder_selected, estructura_directorios, lista_cui, 
-            lista_subcarpetas, self.carpetas_omitidas, analyzer)
+            lista_cui, lista_subcarpetas, self.carpetas_omitidas = analyzer.obtener_lista_rutas_subcarpetas(estructura_directorios, 5, None)
+            self.handle_directory_analysis(folder_selected, estructura_directorios, lista_cui, lista_subcarpetas, self.carpetas_omitidas, analyzer)
             self.lista_subcarpetas = lista_subcarpetas
             self.analyzer = analyzer
         else:
@@ -405,35 +405,16 @@ class Application(ttk.Frame):
         else:
             cuis_invalidos.add(cui)
 
-    def _actualizar_atributos_clase(self, lista_cui, lista_subcarpetas, estructura_directorios, analyzer):
-        """
-        Actualiza los atributos de la clase con los datos procesados.
-        
-        Args:
-            lista_cui (list): Lista de CUIs
-            lista_subcarpetas (list): Lista de subcarpetas
-            estructura_directorios (dict): Estructura de directorios
-            analyzer (FolderAnalyzer): Instancia del analizador de carpetas
-        """
-        try:
-            self.lista_cui = lista_cui
-            self.lista_subcarpetas = lista_subcarpetas
-            self.estructura_directorios = estructura_directorios
-            if self.selected_value == "3":
-                self.carpetas_omitidas = analyzer.encontrar_cuis_faltantes(lista_cui, lista_subcarpetas)
-        except Exception as e:
-            self.logger.error(f"Error al guardar las listas en atributos de la clase: {str(e)}", exc_info=True)
-
     def _mostrar_carpetas_omitidas(self):
         """
         Muestra información sobre las carpetas que fueron omitidas por no cumplir con la estructura.
         """
         try:
             if self.carpetas_omitidas:
-                mensaje_principal = f"Se encontraron {len(self.carpetas_omitidas)} carpetas que no cumplen con la estructura de directorios"
-                self._mensaje(None, mensaje_principal)
+                #self._mensaje(None, f"Se encontraron {len(self.carpetas_omitidas)} carpetas que no cumplen con la estructura de directorios")
                 
-                mensaje_detalle = "\n-Las siguientes carpetas no cumplen con la estructura de carpetas y no serán incluidas en el procesamiento:\n"
+                mensaje_detalle = "\n\n-Las siguientes carpetas están vacías y no serán incluidas en el procesamiento:\n"
+                # o no cumplen con la estructura de carpetas
                 mensaje_detalle += " ".join(f"{carpeta}, " for carpeta in sorted(self.carpetas_omitidas))
                 
                 self.text_widget.insert(tk.END, mensaje_detalle + "\n")
@@ -450,7 +431,9 @@ class Application(ttk.Frame):
             lista_cui (list): Lista original de CUIs
         """
         if cuis_invalidos:
-            mensaje = "- Se encontraron carpetas que no cumplen con el formato de 23 dígitos:\n"
+            #self._mensaje(None, "Algunas carpetas no cumplen con el formato requerido de 23 dígitos numéricos.")
+
+            mensaje = "\n- Se encontraron carpetas que no cumplen con el formato de 23 dígitos:\n"
             if self.selected_value == "3":
                 mensaje += " ".join(f"{cui}, " for cui in sorted(cuis_invalidos))
             else:
@@ -458,7 +441,6 @@ class Application(ttk.Frame):
                 
             self.text_widget.insert(tk.END, mensaje)
             self.text_widget.see(tk.END)
-            self._mensaje(None, "Algunas carpetas no cumplen con el formato requerido de 23 dígitos numéricos.")
 
     def handle_directory_analysis(self, folder_selected, estructura_directorios, lista_cui, lista_subcarpetas, carpetas_omitidas=None, analyzer=None):
         """
@@ -474,10 +456,11 @@ class Application(ttk.Frame):
         """
         self._mostrar_carpeta_seleccionada(folder_selected)
         
-        _, cuis_invalidos = self._procesar_cuis(lista_cui, lista_subcarpetas)
-        
-        self._actualizar_atributos_clase(lista_cui, lista_subcarpetas, estructura_directorios, analyzer)
-        
+        _cuis_validos, cuis_invalidos = self._procesar_cuis(lista_cui, lista_subcarpetas)
+
+        # Actualizar atributos lista_subcarpetas de la clase
+        self.lista_subcarpetas = lista_subcarpetas
+
         self._mostrar_carpetas_omitidas()
         
         self._mostrar_cuis_invalidos(cuis_invalidos, lista_cui)
@@ -579,13 +562,13 @@ class Application(ttk.Frame):
                 message=switcher.get(result), title=os.path.basename(self.expediente)
             )
             self.text_widget.insert(tk.END, "\n")
-            self.logger.info(result, exc_info=True)
+            self.logger.info(switcher.get(result), exc_info=True)
         
         if mensaje != None:
             tk.messagebox.showinfo(
                 message=mensaje, title=os.path.basename(self.expediente)
             )
-            self.logger.info(result, exc_info=True)
+            self.logger.info(switcher.get(result), exc_info=True)
 
     def _get_bundled_path(self, ruta):
         """

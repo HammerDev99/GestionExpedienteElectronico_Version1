@@ -1,4 +1,5 @@
 import os
+from typing import Dict, List, Tuple, Any
 import logging
 
 class FolderAnalyzer:
@@ -92,7 +93,7 @@ class FolderAnalyzer:
         self.procesar_carpetas()
         self.analizar_estructura()
         
-        carpetas_omitidas = self.todas_las_carpetas - self.carpetas_procesadas
+        carpetas_omitidas = self.obtener_lista_rutas_subcarpetas - self.carpetas_procesadas
         
         return {
             "total_carpetas": len(self.todas_las_carpetas),
@@ -174,19 +175,72 @@ class FolderAnalyzer:
         return todas_nivel_dos, rutas_nivel_dos, rutas_nivel_cuatro
 
     def _procesar_directorio_profundidad_4(self, directorio):
-        """Procesa directorios con profundidad 4."""
-        return [
-            (subdirectorio, nombre)
-            for nombre, subdirectorio in directorio.items()
-        ]
+        """
+        Procesa un directorio con profundidad de 4 niveles, extrayendo los subdirectorios y sus nombres correspondientes.
+        
+        Args:
+            directorio (Dict[str, Any]): Diccionario que representa la estructura del directorio
+                donde las claves son los nombres y los valores son los subdirectorios
+        
+        Returns:
+            List[Tuple[Any, str]]: Lista de tuplas donde cada tupla contiene:
+                - El subdirectorio (primer elemento)
+                - El nombre del directorio (segundo elemento)
+        """
+        resultado_procesamiento = []
+        
+        # Iterar sobre cada entrada en el directorio
+        for nombre_directorio, contenido_subdirectorio in directorio.items():
+            # Crear tupla con el contenido del subdirectorio y su nombre
+            tupla_directorio = (contenido_subdirectorio, nombre_directorio)
+            
+            # Agregar la tupla a la lista de resultados
+            resultado_procesamiento.append(tupla_directorio)
+        
+        return resultado_procesamiento
 
-    def _procesar_directorio_profundidad_5(self, directorio):
-        """Procesa directorios con profundidad 5."""
-        return [
-            (subsubdirectorio, os.path.join(nombre, subnombre))
-            for nombre, subdirectorio in directorio.items()
-            for subnombre, subsubdirectorio in subdirectorio.items()
-        ]
+    def _procesar_directorio_profundidad_5(self, directorio: Dict[str, Dict[str, Any]]) -> List[Tuple[Any, str]]:
+        """
+        Procesa un directorio con profundidad de 5 niveles, procesando la estructura jerárquica
+        de directorios y subdirectorios.
+        
+        Args:
+            directorio (Dict[str, Dict[str, Any]]): Diccionario que representa la estructura del directorio,
+                donde el primer nivel contiene el año y el segundo nivel contiene los expedientes.
+                Estructura esperada:
+                {
+                    "año": {
+                        "expediente": contenido,
+                        ...
+                    },
+                    ...
+                }
+        
+        Returns:
+            List[Tuple[Any, str]]: Lista de tuplas donde cada tupla contiene:
+                - El contenido del subdirectorio de segundo nivel
+                - La ruta combinada (año/expediente)
+        """
+        resultado_procesamiento: List[Tuple[Any, str]] = []
+        
+        # Iterar sobre el primer nivel (años)
+        for nombre_primer_nivel, contenido_primer_nivel in directorio.items():
+            # Validar que el contenido del primer nivel sea un diccionario
+            if not isinstance(contenido_primer_nivel, dict):
+                continue
+                
+            # Iterar sobre el segundo nivel (expedientes)
+            for nombre_segundo_nivel, contenido_segundo_nivel in contenido_primer_nivel.items():
+                # Construir la ruta combinada
+                ruta_combinada: str = os.path.join(nombre_primer_nivel, nombre_segundo_nivel)
+                
+                # Crear la tupla con el contenido y la ruta
+                tupla_directorio: Tuple[Any, str] = (contenido_segundo_nivel, ruta_combinada)
+                
+                # Agregar la tupla al resultado
+                resultado_procesamiento.append(tupla_directorio)
+        
+        return resultado_procesamiento
 
     def obtener_lista_rutas_subcarpetas(self, directorio, profundidad_maxima, folder_selected=None):
         """
@@ -208,17 +262,15 @@ class FolderAnalyzer:
             carpetas_procesadas = set()
 
             # Seleccionar procesamiento según profundidad
-            directorios_a_procesar = (
-                self._procesar_directorio_profundidad_4(directorio) 
-                if profundidad_maxima == 4 
-                else self._procesar_directorio_profundidad_5(directorio)
-            )
+            directorios_a_procesar = None
+            if profundidad_maxima == 4:
+                directorios_a_procesar = self._procesar_directorio_profundidad_4(directorio)
+            else:
+                directorios_a_procesar = self._procesar_directorio_profundidad_5(directorio)
 
             # Procesar cada directorio
             for dir_actual, ruta_base in directorios_a_procesar:
-                todas_nivel_dos, rutas_nivel_dos, _rutas_nivel_cuatro = self._procesar_nivel_dos(
-                    dir_actual, ruta_base
-                )
+                todas_nivel_dos, rutas_nivel_dos, _rutas_nivel_cuatro = self._procesar_nivel_dos(dir_actual, ruta_base)
                 
                 todas_las_carpetas.update(todas_nivel_dos)
                 
@@ -227,7 +279,7 @@ class FolderAnalyzer:
                     lista_rutas_subcarpetas.append(rutas_normalizadas)
                     carpetas_procesadas.update(rutas_normalizadas)
                 
-                # Validar con opcion 1 con opcion 2 ya es funcional
+
                 if folder_selected:
                     if os.path.basename(folder_selected) not in lista_cui:
                         lista_cui.append(os.path.basename(folder_selected))
@@ -236,13 +288,42 @@ class FolderAnalyzer:
                     if cui and cui not in lista_cui:  # Solo añadir CUIs únicos
                         lista_cui.append(cui)
 
-            return lista_cui, lista_rutas_subcarpetas
+            # Crear conjunto a partir de lista_rutas_subcarpetas
+            set_rutas_subcarpetas = set()
+            for sublista in lista_rutas_subcarpetas:
+                for ruta in sublista:
+                    set_rutas_subcarpetas.add(ruta)
+
+            # Calcular carpetas omitidas usando operaciones de conjuntos
+            carpetas_omitidas = set_rutas_subcarpetas - todas_las_carpetas
+            #print(f"Carpetas omitidas: {carpetas_omitidas}")
+
+            lista_rutas_subcarpetas = self.filtrar_carpetas_a_procesar(lista_rutas_subcarpetas, carpetas_omitidas)
+
+            return lista_cui, lista_rutas_subcarpetas, list(carpetas_omitidas)
 
         except Exception as e:
             self.logger.error(f"Error al procesar la estructura de directorios: {str(e)}")
             return [], [], set()
 
-    
+    def filtrar_carpetas_a_procesar(self, lista_rutas_subcarpetas, carpetas_omitidas):
+        """
+        Filtra las carpetas omitidas de la lista de rutas de subcarpetas.
+        
+        Args:
+            lista_rutas_subcarpetas (list): Lista de listas con rutas de subcarpetas.
+            carpetas_omitidas (set): Conjunto de carpetas omitidas.
+        
+        Returns:
+            list: Lista de listas con rutas de subcarpetas a procesar.
+        """
+        carpetas_a_procesar = []
+        for sublista in lista_rutas_subcarpetas:
+            sublista_filtrada = [ruta for ruta in sublista if ruta not in carpetas_omitidas]
+            if sublista_filtrada:
+                carpetas_a_procesar.append(sublista_filtrada)
+        return carpetas_a_procesar
+
     def encontrar_cuis_faltantes(self, lista_cui, lista_subcarpetas_internas):
         """
         Encuentra los CUIs que no tienen carpetas internas correspondientes.
