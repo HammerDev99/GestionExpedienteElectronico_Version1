@@ -1,3 +1,5 @@
+# coding=utf-8
+
 import datetime
 import re
 import os
@@ -5,7 +7,7 @@ import string
 import sys
 import warnings
 import PyPDF2
-import random 
+import random
 import win32com.client as win32
 import logging
 from PyPDF2 import PdfReader
@@ -21,7 +23,7 @@ class MetadataExtractor:
     MAX_NAME_LENGTH = 40
 
     def __init__(self, logger=None):
-        self.logger = logger or logging.getLogger('metadata_extractor')
+        self.logger = logger or logging.getLogger("metadata_extractor")
 
     def get_metadata(self, files):
         """
@@ -29,7 +31,7 @@ class MetadataExtractor:
         Args:
             files (List[str]): Lista de rutas de archivos.
         Returns:
-            Tuple[List[str], List[str], List[str], List[str]]: 
+            Tuple[List[str], List[str], List[str], List[str]]:
             - fechamod: Lista de fechas de modificación como cadenas.
             - tama: Lista de tamaños de archivos convertidos a unidades legibles.
             - cantidadpag: Lista de conteos de páginas.
@@ -57,10 +59,8 @@ class MetadataExtractor:
                 _, extensiones = self.separate_path(list_files)
                 comments = dict(
                     zip(extensiones, map(lambda x: extensiones.count(x), extensiones))
-                )  
-                nombres_extensiones, _, _, _, _ = (
-                    self.format_names(x, list_files)
                 )
+                nombres_extensiones, _, _, _, _ = self.format_names(x, list_files)
                 self.rename_files(list_files, nombres_extensiones, x)
                 observaciones.append("Archivos contenidos: " + str(comments))
         return fechamod, tama, cantidadpag, observaciones
@@ -81,7 +81,7 @@ class MetadataExtractor:
         )
 
         return resultado
-    
+
     @staticmethod
     def separate_path(files):
         """
@@ -135,7 +135,10 @@ class MetadataExtractor:
                         + os.path.splitext(nombres_extensiones[i])[1],
                     )
                 except Exception as e:
-                    self.logger.exception("Excepcion presentada intentando el renombrado archivos" + str(e))
+                    self.logger.exception(
+                        "Excepcion presentada intentando el renombrado archivos"
+                        + str(e)
+                    )
 
     def format_names(self, ruta, files):
         """
@@ -152,19 +155,26 @@ class MetadataExtractor:
         nombres_extensiones = self._generar_nombres_finales(nombres, extensiones)
         numeraciones = self._generar_numeraciones(len(nombres))
         ban = self._verificar_orden(files, nombres_extensiones)
-        
-        return nombres_extensiones, nombres, extensiones, numeraciones, ban, nombres_indice
+
+        return (
+            nombres_extensiones,
+            nombres,
+            extensiones,
+            numeraciones,
+            ban,
+            nombres_indice,
+        )
 
     def _extraer_nombres_extensiones(self, ruta, files):
         """Extrae nombres y extensiones de los archivos."""
         nombres = []
         extensiones = []
-        
+
         for archivo in files:
             nombre, extension = self._obtener_nombre_extension(ruta, archivo)
             nombres.append(nombre)
             extensiones.append(extension)
-        
+
         return nombres, extensiones
 
     def _obtener_nombre_extension(self, ruta, archivo):
@@ -184,7 +194,9 @@ class MetadataExtractor:
     def _formatear_nombre_individual(self, nombre, nombre_indice, indice):
         """Formatea un nombre individual aplicando todas las reglas."""
         nombre_procesado = self._limpiar_caracteres(nombre)
-        nombre_procesado = self._aplicar_nombre_por_defecto(nombre_procesado, nombre_indice)
+        nombre_procesado = self._aplicar_nombre_por_defecto(
+            nombre_procesado, nombre_indice
+        )
         return f"{indice+1:03}{nombre_procesado}"
 
     def _limpiar_caracteres(self, nombre):
@@ -192,7 +204,7 @@ class MetadataExtractor:
         if self._requiere_limpieza(nombre):
             nombre = self._aplicar_formato_basico(nombre)
         nombre = self._eliminar_numeros_iniciales(nombre)
-        return nombre[:self.MAX_LENGTH]
+        return nombre[: self.MAX_LENGTH]
 
     def _requiere_limpieza(self, nombre):
         """Determina si un nombre requiere limpieza."""
@@ -401,6 +413,7 @@ class MetadataExtractor:
                 return 0
         else:
             return 1
+
 
 def count_pages_in_pdf(self, pdf_path):
     """

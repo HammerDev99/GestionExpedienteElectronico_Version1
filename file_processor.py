@@ -1,5 +1,5 @@
 # coding=utf-8
-# Empleado
+
 import os
 import sys
 import psutil
@@ -14,6 +14,7 @@ import logging
 from concurrent.futures import ThreadPoolExecutor
 import asyncio
 
+
 class FileProcessor:
 
     ruta = ""
@@ -25,9 +26,9 @@ class FileProcessor:
 
     def __init__(self, input: str, indice, despacho, subserie, rdo, logger=None):
         # @param: input tipo str; Obtiene ruta de la carpeta a procesar
-        self.logger = logger or logging.getLogger('file_processor')
+        self.logger = logger or logging.getLogger("file_processor")
         self.logger.info(f"Iniciando procesamiento para expediente: {input}")
-        
+
         self.obj1 = MetadataExtractor(logger=self.logger)
 
         try:
@@ -35,7 +36,7 @@ class FileProcessor:
             self.files = os.listdir(self.ruta)
             self.logger.debug(f"Archivos encontrados: {len(self.files)}")
 
-            #if len(self.files) > 0:
+            # if len(self.files) > 0:
             if indice == "":
                 self.copy_xlsm(self.ruta)
             else:
@@ -44,7 +45,7 @@ class FileProcessor:
             self.despacho = despacho
             self.subserie = subserie
             self.rdo = rdo
-            
+
         except Exception as e:
             self.logger.error(f"Error en inicialización: {str(e)}", exc_info=True)
             raise
@@ -85,7 +86,7 @@ class FileProcessor:
         """
 
         # Determinar la ruta del archivo xlsm
-        if getattr(sys, 'frozen', False):
+        if getattr(sys, "frozen", False):
             # Si se está ejecutando el archivo empaquetado
             bundle_dir = sys._MEIPASS
         else:
@@ -119,33 +120,46 @@ class FileProcessor:
         )
 
         # Crear DataFrame inicial vacío
-        df = pd.DataFrame(columns=[
-            "Nombre documento", "Fecha", "Orden", "Paginas",
-            "Formato", "Tamaño", "Origen", "Observaciones"
-        ])
+        df = pd.DataFrame(
+            columns=[
+                "Nombre documento",
+                "Fecha",
+                "Orden",
+                "Paginas",
+                "Formato",
+                "Tamaño",
+                "Origen",
+                "Observaciones",
+            ]
+        )
 
         for y in range(len(nombres)):
-            nueva_fila = pd.DataFrame([[
-                str(nombres_indice[y]),
-                str(fechamod[y]),
-                str(numeraciones[y]),
-                str(cantidadpag[y]),
-                str(extensiones[y].replace(".", "")),
-                str(tama[y]),
-                "Electrónico",
-                str(observaciones[y])
-            ]], columns=df.columns)
-            
+            nueva_fila = pd.DataFrame(
+                [
+                    [
+                        str(nombres_indice[y]),
+                        str(fechamod[y]),
+                        str(numeraciones[y]),
+                        str(cantidadpag[y]),
+                        str(extensiones[y].replace(".", "")),
+                        str(tama[y]),
+                        "Electrónico",
+                        str(observaciones[y]),
+                    ]
+                ],
+                columns=df.columns,
+            )
+
             df = pd.concat([df, nueva_fila], ignore_index=True)
-            
+
         return df
-    
+
     def capitalize_first_letter(self, file_names):
         capitalized_names = []
         for name in file_names:
             for i, char in enumerate(name):
                 if char.isalpha():
-                    capitalized_name = name[:i] + char.upper() + name[i+1:]
+                    capitalized_name = name[:i] + char.upper() + name[i + 1 :]
                     capitalized_names.append(capitalized_name)
                     break
         return capitalized_names
@@ -196,10 +210,10 @@ class FileProcessor:
             app = xw.App(visible=False, add_book=False)
             app.display_alerts = False
             app.screen_updating = False
-            
+
             # Abrir el libro después de configurar la visibilidad
             wb = app.books.open(self.indice)
-            
+
             pid_excel = app.pid
             self.pids_creados.append(pid_excel)
 
@@ -244,7 +258,7 @@ class FileProcessor:
         columnas = ["A", "B", "C", "D", "E", "H", "I", "J", "K"]
         fila_inicial = 12
         cont_fila = fila_inicial
-        
+
         for _ in range(df.shape[0]):
             macro_vba()
 
@@ -273,5 +287,9 @@ class FileProcessor:
                 proc.kill()  # forzar el cierre
                 self.logger.info(f"Proceso {proc.name()} con PID {pid} cerrado.")
                 self.pids_creados.remove(pid)
-            except (psutil.NoSuchProcess, psutil.AccessDenied, psutil.ZombieProcess) as e:
+            except (
+                psutil.NoSuchProcess,
+                psutil.AccessDenied,
+                psutil.ZombieProcess,
+            ) as e:
                 self.logger.error(f"No se pudo cerrar el proceso con PID {pid}: {e}")
