@@ -41,7 +41,7 @@ class Application(ttk.Frame):
         self.profundidad = None
         try:
             super().__init__(root)
-            root.title("GestionExpedienteElectronico")
+            root.title("GestionExpedienteElectronico"+ "_Version1"+".4.2")
             root.resizable(False, False)
             # root.geometry("350x300")
             root.protocol("WM_DELETE_WINDOW", self._on_closing)
@@ -50,6 +50,20 @@ class Application(ttk.Frame):
         except Exception as e:
             self.logger.error(f"Error en inicialización GUI: {str(e)}", exc_info=True)
             raise
+
+    def _restablecer_variables_clase(self):
+        """
+        Restablece las variables de la clase a su estado inicial.
+        """
+        self.expediente = ""
+        self.carpetas = []
+        self.lista_subcarpetas = []
+        self.analyzer = None
+        self.profundidad = None
+        self.carpetas_omitidas = list()
+
+        self.lista_cui = []
+        self.estructura_directorios = {}
 
     def create_oneProcessWidgets(self):
         """
@@ -107,12 +121,15 @@ class Application(ttk.Frame):
         self.label_frame = tk.Frame(self)
         self.label_frame.pack(side=tk.BOTTOM, padx=10, pady=10)
 
+        # Definir una constante para el literal "<Button-1>"
+        BUTTON_CLICK_EVENT = "<Button-1>"
+
         self.label1 = tk.Label(
             self.label_frame, text="Daniel Arbelaez Alvarez", fg="blue", cursor="hand2"
         )
         self.label1.pack(side=tk.LEFT)
         self.label1.bind(
-            "<Button-1>",
+            BUTTON_CLICK_EVENT,
             lambda e: self._callback("https://www.linkedin.com/in/daniel-arbelaez-/"),
         )
 
@@ -121,7 +138,7 @@ class Application(ttk.Frame):
         )
         self.label2.pack(side=tk.LEFT)
         self.label2.bind(
-            "<Button-1>",
+            BUTTON_CLICK_EVENT,
             lambda e: self._callback("https://github.com/HammerDev99"),
         )
 
@@ -209,17 +226,17 @@ class Application(ttk.Frame):
 
         self.text_widget.insert(
             tk.END,
-            "📋 Guía Rápida del Programa\n\n"
+            "\n📋 Guía Rápida del Programa\n\n"
             "1. Preparación de Carpetas\n"
             "• Carpetas limpias: Sin índice ni carpetas de anexos masivos\n"
-            "• Nombres de archivos: Organizados secuencialmente\n"
+            "• Nombres de archivos: Organizados mínimo secuencialmente\n"
             "• Radicado: Debe contener 23 dígitos\n\n"
-            "2 Estructura de Carpetas\n"
+            "2. Estructura de Carpetas\n"
             "🔹 Opción 1 (Un expediente):\n"
             "   RADICADO/01PrimeraInstancia/C01Principal/Archivos\n"
             "🔹 Opción 2 (Varios expedientes):\n"
             "   SERIE_SUBSERIE/RADICADO/01PrimeraInstancia/C01Principal/Archivos\n\n"
-            "3 Datos del SGDE\n"
+            "3. Datos del SGDE\n"
             "• Use exactamente los mismos datos de 'Juzgado' y 'Serie/Subserie' registrados en migrador/validador y/o la TRD\n\n",
         )
 
@@ -343,10 +360,7 @@ class Application(ttk.Frame):
                         )
 
             # Restablecer variables
-            self.expediente = ""
-            self.carpetas = []
-            self.lista_subcarpetas = []
-            self.analyzer = None
+            self._restablecer_variables_clase()
 
             self.logger.debug("Limpieza de recursos completada")
 
@@ -442,7 +456,9 @@ class Application(ttk.Frame):
                 "La estructura de directorios no coincide con la OPCIÓN seleccionada.\n\n"
                 "Por favor, verifique la estructura interna de los directorios seleccionados.",
             )
-            rutas_invalidas = self.validar_estructura_carpetas(estructura_directorios, self.selected_value)
+            rutas_invalidas = self.validar_estructura_carpetas(
+                estructura_directorios, self.selected_value
+            )
             self.logger.warning(
                 f"La estructura de los siguientes directorios no coincide con la OPCIÓN seleccionada: {rutas_invalidas}"
             )
@@ -450,38 +466,44 @@ class Application(ttk.Frame):
     def validar_estructura_carpetas(self, estructura_directorios, selected_value):
         """
         Valida la estructura de carpetas y retorna rutas inválidas.
-        
+
         Args:
             estructura_directorios (dict): Diccionario con estructura de carpetas
             selected_value (str): Opción seleccionada ("2" o "3")
-            
+
         Returns:
             list: Rutas que contienen subcarpetas no permitidas
         """
         rutas_invalidas = []
         nivel_maximo = self._obtener_nivel_maximo(selected_value)
-        
-        self._analizar_estructura(estructura_directorios, "", 0, nivel_maximo, rutas_invalidas)
+
+        self._analizar_estructura(
+            estructura_directorios, "", 0, nivel_maximo, rutas_invalidas
+        )
         self._mostrar_rutas_invalidas(rutas_invalidas)
-        
+
         return rutas_invalidas
 
     def _obtener_nivel_maximo(self, selected_value):
         """Determina nivel máximo según opción seleccionada."""
         return 2 if selected_value == "2" else 3
 
-    def _analizar_estructura(self, directorio, ruta_actual, nivel, nivel_maximo, rutas_invalidas):
+    def _analizar_estructura(
+        self, directorio, ruta_actual, nivel, nivel_maximo, rutas_invalidas
+    ):
         """Analiza recursivamente la estructura buscando carpetas invalidas."""
         if not isinstance(directorio, dict):
             return
-            
+
         if nivel >= nivel_maximo:
             self._verificar_subcarpetas(directorio, ruta_actual, rutas_invalidas)
             return
-            
+
         for nombre, contenido in directorio.items():
             nueva_ruta = os.path.join(ruta_actual, nombre)
-            self._analizar_estructura(contenido, nueva_ruta, nivel + 1, nivel_maximo, rutas_invalidas)
+            self._analizar_estructura(
+                contenido, nueva_ruta, nivel + 1, nivel_maximo, rutas_invalidas
+            )
 
     def _verificar_subcarpetas(self, directorio, ruta_actual, rutas_invalidas):
         """Verifica si existen subcarpetas en el nivel actual."""
@@ -526,7 +548,8 @@ class Application(ttk.Frame):
             folder_selected (str): Ruta de la carpeta seleccionada
         """
         self.text_widget.insert(
-            tk.END, f"\n*******************\n❕ Carpeta seleccionada: {folder_selected}"
+            tk.END,
+            f"\n*******************\n❕ Carpeta seleccionada: {folder_selected}\n",
         )
         self.text_widget.see(tk.END)
 
@@ -578,11 +601,14 @@ class Application(ttk.Frame):
             if self.carpetas_omitidas:
                 # self._mensaje(None, f"Se encontraron {len(self.carpetas_omitidas)} carpetas que no cumplen con la estructura de directorios")
 
-                mensaje_detalle = "\n\n📂 Las siguientes carpetas están vacías y no serán incluidas en el procesamiento: "
-                # o no cumplen con la estructura de carpetas
-                mensaje_detalle += " ".join(
-                    f"{carpeta}, " for carpeta in sorted(self.carpetas_omitidas)
-                )
+                mensaje_detalle = "❕ Las siguientes carpetas están vacías y no serán incluidas en el procesamiento:\n- "
+                carpetas_omitidas_ordenadas = sorted(self.carpetas_omitidas)
+
+                if carpetas_omitidas_ordenadas:
+                    mensaje_detalle += ".\n- ".join(carpetas_omitidas_ordenadas[:-1])
+                    if len(carpetas_omitidas_ordenadas) > 1:
+                        mensaje_detalle += ".\n- "
+                    mensaje_detalle += carpetas_omitidas_ordenadas[-1] + "."
 
                 self.text_widget.insert(tk.END, mensaje_detalle + "\n")
                 self.text_widget.see(tk.END)
@@ -603,13 +629,22 @@ class Application(ttk.Frame):
         if cuis_invalidos:
             # self._mensaje(None, "Algunas carpetas no cumplen con el formato requerido de 23 dígitos numéricos.")
 
-            mensaje = "\n#️⃣ Se encontraron carpetas que no cumplen con el formato de 23 dígitos:\n"
+            mensaje = "❕ Se encontraron radicados (CUI) que no tienen los 23 dígitos: "
             if self.selected_value == "3":
-                mensaje += " ".join(f"{cui}, " for cui in sorted(cuis_invalidos))
+                cuis_invalidos_ordenados = sorted(cuis_invalidos)
+                if cuis_invalidos_ordenados:
+                    mensaje += ", ".join(cuis_invalidos_ordenados[:-1])
+                    if len(cuis_invalidos_ordenados) > 1:
+                        mensaje += ", "
+                    mensaje += cuis_invalidos_ordenados[-1] + "."
             else:
-                mensaje += " ".join(f"{cui}, " for cui in lista_cui)
+                if lista_cui:
+                    mensaje += ", ".join(lista_cui[:-1])
+                    if len(lista_cui) > 1:
+                        mensaje += ", "
+                    mensaje += lista_cui[-1] + "."
 
-            self.text_widget.insert(tk.END, mensaje)
+            self.text_widget.insert(tk.END, mensaje + "\n")
             self.text_widget.see(tk.END)
 
     def handle_directory_analysis(
@@ -633,6 +668,7 @@ class Application(ttk.Frame):
             analyzer (FolderAnalyzer, opcional): Instancia del analizador de carpetas
         """
         # Verificar si las listas están vacías o tienen valores por defecto de error
+        # Analizar si se debe hacer la validación en este método o en obtener_rutas
         if not self._validar_estructura_expediente(
             lista_cui, lista_subcarpetas, carpetas_omitidas
         ):
@@ -711,17 +747,16 @@ class Application(ttk.Frame):
 
         # Confirmar procesamiento
         if not tk.messagebox.askyesno(
-            message=f'Se procesarán {total_carpetas} carpetas que contiene la carpeta {os.path.basename(self.expediente)}". \n¿Desea continuar?.',
+            message=f'Se procesarán {total_carpetas} cuadernos/expedientes que contiene la carpeta {os.path.basename(self.expediente)}". \n¿Desea continuar?.',
             title=os.path.basename(self.expediente),
         ):
-            self.expediente = ""
-            self.carpetas = []
+            self._restablecer_variables_clase()
             self._mensaje(6)
             return
 
         # Iniciar procesamiento
         self.progress["value"] = 0.1
-        self.text_widget.insert(tk.END, "\n\nProceso iniciado...\n")
+        self.text_widget.insert(tk.END, "❕Proceso iniciado...\n")
         self.update_idletasks()
 
         try:
@@ -768,9 +803,9 @@ class Application(ttk.Frame):
             # Finalizar procesamiento
             self.progress["value"] = 1.0
             self.update_idletasks()
-            self._cleanup_state()
+            self._restablecer_variables_clase()
             self.text_widget.insert(
-                tk.END, "✅ Proceso completado.\n*******************\n"
+                tk.END, "✅ Proceso completado.\n*******************\n\n"
             )
             self.progress["value"] = 0
             self.update_idletasks()
@@ -778,15 +813,6 @@ class Application(ttk.Frame):
 
         except Exception as e:
             self.logger.error(f"Error en procesamiento: {str(e)}", exc_info=True)
-
-    def _cleanup_state(self):
-        """Limpia el estado de la aplicación"""
-        self.expediente = ""
-        self.carpetas = []
-        self.lista_cui = []
-        self.lista_subcarpetas = []
-        self.estructura_directorios = {}
-        self.analyzer = None
 
     def _mensaje(self, result=None, mensaje=None):
         """

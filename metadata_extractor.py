@@ -52,6 +52,7 @@ class MetadataExtractor:
                 cantidadpag.append(self.page_counter(x))
                 observaciones.append("")
             else:
+                # Si es carpeta o anexo masivo
                 fechamod.append(str(datetime.date.fromtimestamp(os.path.getmtime(x))))
                 tama.append("-")
                 cantidadpag.append("1")
@@ -60,27 +61,10 @@ class MetadataExtractor:
                 comments = dict(
                     zip(extensiones, map(lambda x: extensiones.count(x), extensiones))
                 )
-                nombres_extensiones, _, _, _, _ = self.format_names(x, list_files)
+                nombres_extensiones, _, _, _, _, _ = self.format_names(x, list_files)
                 self.rename_files(list_files, nombres_extensiones, x)
                 observaciones.append("Archivos contenidos: " + str(comments))
         return fechamod, tama, cantidadpag, observaciones
-
-    def set_comments_folder(self, extensiones):
-        """
-        Establece la carpeta de comentarios contando las ocurrencias de cada extensión.
-        Args:
-            extensiones (List): Una lista de extensiones de archivos.
-        Returns:
-            Dict: Un diccionario con las extensiones como claves y sus conteos como valores.
-        Ejemplo:
-            >>> set_comments_folder(['.txt', '.pdf', '.txt'])
-            {'.txt': 2, '.pdf': 1}
-        """
-        resultado = dict(
-            zip(extensiones, map(lambda x: extensiones.count(x), extensiones))
-        )
-
-        return resultado
 
     @staticmethod
     def separate_path(files):
@@ -162,7 +146,7 @@ class MetadataExtractor:
             extensiones,
             numeraciones,
             ban,
-            nombres_indice,
+            nombres_indice
         )
 
     def _extraer_nombres_extensiones(self, ruta, files):

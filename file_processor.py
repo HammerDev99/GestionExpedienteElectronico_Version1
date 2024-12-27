@@ -47,7 +47,7 @@ class FileProcessor:
             self.rdo = rdo
 
         except Exception as e:
-            self.logger.error(f"Error en inicialización: {str(e)}", exc_info=True)
+            self.logger.error(f"Error en inicializació de FileProcessor¨: {str(e)}", exc_info=True)
             raise
 
     def rename_files(self, files, nombres_extensiones, ruta):

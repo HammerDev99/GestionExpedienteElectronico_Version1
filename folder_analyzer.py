@@ -306,13 +306,9 @@ class FolderAnalyzer:
 
                 if hay_archivos:
                     self.logger.error(
-                        "Error en la estructura: Se encontraron archivos donde debería haber carpetas"
+                        "Error en la estructura: Se encontraron archivos o carpetas vacías donde debería haber carpetas con contenido"
                     )
-                    return (
-                        [],
-                        [],
-                        set(),
-                    )  # Retorna listas vacías si la estructura contiene archivos
+                    return [], [], set()
 
             # Procesar cada directorio
             for dir_actual, ruta_base in directorios_a_procesar:
