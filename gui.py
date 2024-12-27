@@ -69,12 +69,24 @@ class Application(ttk.Frame):
         self.help_menu.add_command(label="Video Tutorial (Opción 1)", command=lambda: self._callback("https://etbcsj-my.sharepoint.com/personal/saladmconsecsucre_cendoj_ramajudicial_gov_co/_layouts/15/stream.aspx?id=%2Fpersonal%2Fsaladmconsecsucre%5Fcendoj%5Framajudicial%5Fgov%5Fco%2FDocuments%2FTutorial%20de%20uso%20Gestion%20Expediente%20Electronico%20v1%2E4%2E1%2Emp4&nav=eyJyZWZlcnJhbEluZm8iOnsicmVmZXJyYWxBcHAiOiJTdHJlYW1XZWJBcHAiLCJyZWZlcnJhbFZpZXciOiJTaGFyZURpYWxvZy1MaW5rIiwicmVmZXJyYWxBcHBQbGF0Zm9ybSI6IldlYiIsInJlZmVycmFsTW9kZSI6InZpZXcifX0&ga=1&referrer=StreamWebApp%2EWeb&referrerScenario=AddressBarCopied%2Eview%2E699f2548%2Df96e%2D4a34%2Db982%2Df8964354dd2e"))
         self.help_menu.add_command(label="Video Tutorial (Opción 2)", command=lambda: self._callback("https://www.youtube.com/watch?v=zWfHNNcETgk"))
 
-        self.label = tk.Label(self, text=r"Daniel Arbelaez Alvarez - HammerDev99", fg="blue", cursor="hand2")
-        self.label.pack(side=tk.BOTTOM, padx=10, pady=10)
-        self.label.bind(
+        self.label_frame = tk.Frame(self)
+        self.label_frame.pack(side=tk.BOTTOM, padx=10, pady=10)
+
+        self.label1 = tk.Label(self.label_frame, text="Daniel Arbelaez Alvarez", fg="blue", cursor="hand2")
+        self.label1.pack(side=tk.LEFT)
+        self.label1.bind(
             "<Button-1>",
             lambda e: self._callback(
-                "https://github.com/HammerDev99/GestionExpedienteElectronico_Version1"
+            "https://www.linkedin.com/in/daniel-arbelaez-/"
+            ),
+        )
+
+        self.label2 = tk.Label(self.label_frame, text="| HammerDev99", fg="blue", cursor="hand2")
+        self.label2.pack(side=tk.LEFT)
+        self.label2.bind(
+            "<Button-1>",
+            lambda e: self._callback(
+            "https://github.com/HammerDev99"
             ),
         )
 
@@ -128,9 +140,9 @@ class Application(ttk.Frame):
         # Crear los Radiobuttons
         """ self.radio1 = ttk.Radiobutton(self.radio_frame, text="Opción 1: Índice de una \nsola carpeta específica", variable=self.radio_var, value="1")
         self.radio1.pack(side=tk.LEFT, padx=10) """
-        self.radio2 = ttk.Radiobutton(self.radio_frame, text="Opción 1: Índice de todas \nlas carpetas internas de un \nexpediente", variable=self.radio_var, value="2")
+        self.radio2 = ttk.Radiobutton(self.radio_frame, text="Opción 1: Crear índice \nde todas las subcarpetas \nde un único expediente", variable=self.radio_var, value="2")
         self.radio2.pack(side=tk.LEFT, padx=10)
-        self.radio3 = ttk.Radiobutton(self.radio_frame, text="Opción 2: Índice de múltiples \nexpedientes de una serie o \nsubserie documental", variable=self.radio_var, value="3")
+        self.radio3 = ttk.Radiobutton(self.radio_frame, text="Opción 2: Crear índice de varios \nexpedientes dentro de una misma \nserie documental", variable=self.radio_var, value="3")
         self.radio3.pack(side=tk.LEFT, padx=10)
 
         # Crear tooltips con imágenes para los Radiobuttons
@@ -151,7 +163,7 @@ class Application(ttk.Frame):
         self.text_widget = tk.Text(self, width=50, height=20, yscrollcommand=self.scrollbar.set)
         self.text_widget.pack(fill="both", expand=True, padx=5, pady=5)
 
-        self.text_widget.insert(tk.END, "Instrucciones de Uso del Programa\n\n1. Descargar la(s) carpeta(s): NO DEBEN TENER ÍNDICE.\n\n2. Validar esquema de carpetas: Asegúrate de que la estructura interna de carpetas cumple con el protocolo. Ejemplo:\n\n  -Opción 1: 05088/01PrimeraInstancia/C01Principal/Archivos\n  -Opción 2: SERIE_SUBSERIE/05088/01PrimeraInstancia/C01Principal/Archivos\n\n3. El radicado debe tener 23 dígitos y los nombres de los archivos deben tener un orden mínimo.\n\n4. Datos del SGDE: Ingresar exactamente los mismos datos de 'Juzgado' y 'serie o subserie' que registra en el SGDE.\n\n")
+        self.text_widget.insert(tk.END, "Instrucciones de Uso del Programa\n\n1. Descargar la(s) carpeta(s): NO DEBEN TENER ÍNDICE ni carpetas de ANEXOS MASIVOS.\n\n2. Validar esquema de carpetas: Asegúrate de que la estructura interna de carpetas cumple con el protocolo. Ejemplo:\n\n  -Opción 1: 05088/01PrimeraInstancia/C01Principal/Archivos\n  -Opción 2: SERIE_SUBSERIE/05088/01PrimeraInstancia/C01Principal/Archivos\n\n3. El radicado debe tener 23 dígitos y los nombres de los archivos deben tener un orden mínimo.\n\n4. Datos del SGDE: Ingresar exactamente los mismos datos de 'Juzgado' y 'serie o subserie' que registra en el SGDE.\n\n")
 
         # Configurar la barra de desplazamiento para el Text widget
         self.scrollbar.config(command=self.text_widget.yview)
@@ -413,7 +425,7 @@ class Application(ttk.Frame):
             if self.carpetas_omitidas:
                 #self._mensaje(None, f"Se encontraron {len(self.carpetas_omitidas)} carpetas que no cumplen con la estructura de directorios")
                 
-                mensaje_detalle = "\n\n-Las siguientes carpetas están vacías y no serán incluidas en el procesamiento:\n"
+                mensaje_detalle = "\n\n-Las siguientes carpetas están vacías y no serán incluidas en el procesamiento: "
                 # o no cumplen con la estructura de carpetas
                 mensaje_detalle += " ".join(f"{carpeta}, " for carpeta in sorted(self.carpetas_omitidas))
                 
@@ -454,8 +466,15 @@ class Application(ttk.Frame):
             carpetas_omitidas (set, opcional): Conjunto de carpetas omitidas
             analyzer (FolderAnalyzer, opcional): Instancia del analizador de carpetas
         """
-        self._mostrar_carpeta_seleccionada(folder_selected)
+        # Verificar si las listas están vacías o tienen valores por defecto de error
+        if not self._validar_estructura_expediente(lista_cui, lista_subcarpetas, carpetas_omitidas):
+            return
         
+        self._mostrar_carpeta_seleccionada(folder_selected)
+
+        # Si no hay error, continuar con el resto del procesamiento...
+        _cuis_validos, cuis_invalidos = self._procesar_cuis(lista_cui, lista_subcarpetas)
+
         _cuis_validos, cuis_invalidos = self._procesar_cuis(lista_cui, lista_subcarpetas)
 
         # Actualizar atributos lista_subcarpetas de la clase
@@ -464,6 +483,30 @@ class Application(ttk.Frame):
         self._mostrar_carpetas_omitidas()
         
         self._mostrar_cuis_invalidos(cuis_invalidos, lista_cui)
+
+    def _validar_estructura_expediente(self, lista_cui, lista_subcarpetas, carpetas_omitidas):
+        """
+        Valida si la estructura del expediente es correcta verificando las listas generadas.
+        
+        Args:
+            lista_cui (list): Lista de CUIs encontrados
+            lista_subcarpetas (list): Lista de subcarpetas encontradas
+            carpetas_omitidas (list/set): Carpetas omitidas durante el procesamiento
+            
+        Returns:
+            bool: True si la estructura es válida, False si es inválida
+        """
+        # Verificar si las listas están vacías o tienen valores por defecto de error
+        if (not lista_cui and not lista_subcarpetas and 
+            (not carpetas_omitidas or isinstance(carpetas_omitidas, set))):
+            
+            self._mensaje(
+                None, 
+                "Error en la estructura: Se encontraron archivos donde debería haber carpetas\n\nValidar si la opción elegida y el esquema de carpetas interno corresponde con el indicado en el protocolo de gestion de expediente electrónico"
+            )
+            return False
+            
+        return True
 
     def run_async_process(self, app):
         """Inicia el procesamiento asíncrono"""

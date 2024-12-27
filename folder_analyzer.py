@@ -87,8 +87,9 @@ class FolderAnalyzer:
                     if isinstance(subsubdirectorio, dict):
                         self.carpetas_procesadas.add(os.path.join(nombre, subnombre))
 
-    def generar_reporte(self):
-        """Genera el reporte final del análisis."""
+    # No usado en el código principal
+    """ def generar_reporte(self):
+        #Genera el reporte final del análisis.
         self.todas_las_carpetas = self.obtener_todas_carpetas(self.estructura_directorios, 2)
         self.procesar_carpetas()
         self.analizar_estructura()
@@ -101,7 +102,7 @@ class FolderAnalyzer:
             "carpetas_omitidas": len(carpetas_omitidas),
             "lista_omitidas": sorted(list(carpetas_omitidas)),
             "problemas_detectados": self.problemas
-        }
+        } """
     
     def obtener_rutas_nivel(self, directorio, nivel_deseado, nivel_actual=1, ruta_actual=""):
         """
@@ -191,12 +192,14 @@ class FolderAnalyzer:
         
         # Iterar sobre cada entrada en el directorio
         for nombre_directorio, contenido_subdirectorio in directorio.items():
-            # Crear tupla con el contenido del subdirectorio y su nombre
-            tupla_directorio = (contenido_subdirectorio, nombre_directorio)
+            # Verificar que sea una carpeta (el contenido debe ser un diccionario)
+            if isinstance(contenido_subdirectorio, dict):
+                # Crear tupla con el contenido del subdirectorio y su nombre
+                tupla_directorio = (contenido_subdirectorio, nombre_directorio)
+                
+                # Agregar la tupla a la lista de resultados
+                resultado_procesamiento.append(tupla_directorio)
             
-            # Agregar la tupla a la lista de resultados
-            resultado_procesamiento.append(tupla_directorio)
-        
         return resultado_procesamiento
 
     def _procesar_directorio_profundidad_5(self, directorio: Dict[str, Dict[str, Any]]) -> List[Tuple[Any, str]]:
@@ -226,19 +229,19 @@ class FolderAnalyzer:
         # Iterar sobre el primer nivel (años)
         for nombre_primer_nivel, contenido_primer_nivel in directorio.items():
             # Validar que el contenido del primer nivel sea un diccionario
-            if not isinstance(contenido_primer_nivel, dict):
-                continue
-                
-            # Iterar sobre el segundo nivel (expedientes)
-            for nombre_segundo_nivel, contenido_segundo_nivel in contenido_primer_nivel.items():
-                # Construir la ruta combinada
-                ruta_combinada: str = os.path.join(nombre_primer_nivel, nombre_segundo_nivel)
-                
-                # Crear la tupla con el contenido y la ruta
-                tupla_directorio: Tuple[Any, str] = (contenido_segundo_nivel, ruta_combinada)
-                
-                # Agregar la tupla al resultado
-                resultado_procesamiento.append(tupla_directorio)
+            if isinstance(contenido_primer_nivel, dict):
+                # Iterar sobre el segundo nivel (expedientes)
+                for nombre_segundo_nivel, contenido_segundo_nivel in contenido_primer_nivel.items():
+                    # Solo procesar si es un directorio (diccionario)
+                    if isinstance(contenido_segundo_nivel, dict):
+                        # Construir la ruta combinada
+                        ruta_combinada: str = os.path.join(nombre_primer_nivel, nombre_segundo_nivel)
+                        
+                        # Crear la tupla con el contenido y la ruta
+                        tupla_directorio: Tuple[Any, str] = (contenido_segundo_nivel, ruta_combinada)
+                        
+                        # Agregar la tupla al resultado
+                        resultado_procesamiento.append(tupla_directorio)
         
         return resultado_procesamiento
 
@@ -268,6 +271,19 @@ class FolderAnalyzer:
             else:
                 directorios_a_procesar = self._procesar_directorio_profundidad_5(directorio)
 
+            # Validar la estructura usando los datos procesados
+            if directorios_a_procesar:
+                # Verificar si hay elementos que son archivos (None)
+                hay_archivos = any(
+                    contenido is None 
+                    for dir_actual, _ in directorios_a_procesar 
+                    for contenido in (dir_actual.values() if isinstance(dir_actual, dict) else [dir_actual])
+                )
+                
+                if hay_archivos:
+                    self.logger.error("Error en la estructura: Se encontraron archivos donde debería haber carpetas")
+                    return [], [], set()  # Retorna listas vacías si la estructura contiene archivos
+
             # Procesar cada directorio
             for dir_actual, ruta_base in directorios_a_procesar:
                 todas_nivel_dos, rutas_nivel_dos, _rutas_nivel_cuatro = self._procesar_nivel_dos(dir_actual, ruta_base)
@@ -279,7 +295,6 @@ class FolderAnalyzer:
                     lista_rutas_subcarpetas.append(rutas_normalizadas)
                     carpetas_procesadas.update(rutas_normalizadas)
                 
-
                 if folder_selected:
                     if os.path.basename(folder_selected) not in lista_cui:
                         lista_cui.append(os.path.basename(folder_selected))
@@ -296,7 +311,6 @@ class FolderAnalyzer:
 
             # Calcular carpetas omitidas usando operaciones de conjuntos
             carpetas_omitidas = set_rutas_subcarpetas - todas_las_carpetas
-            #print(f"Carpetas omitidas: {carpetas_omitidas}")
 
             lista_rutas_subcarpetas = self.filtrar_carpetas_a_procesar(lista_rutas_subcarpetas, carpetas_omitidas)
 
