@@ -1,6 +1,7 @@
 # coding=utf-8
 
 from email import message
+from operator import le, length_hint
 import tkinter as tk
 from tkinter import ttk
 from tkinter import filedialog
@@ -82,6 +83,11 @@ class Application(ttk.Frame):
         self.help_menu = tk.Menu(self.menu_bar, tearoff=0)
         self.menu_bar.add_cascade(label="Ayuda", menu=self.help_menu)
         self.help_menu.add_command(
+            label="📋 Guía Rápida del Programa",
+            command=self.mostrar_guia_rapida
+        )
+        self.help_menu.add_separator()
+        self.help_menu.add_command(
             label="Experto en expediente electrónico (agente IA)",
             command=lambda: self._callback(
                 "https://gestionexpedienteelectronico.streamlit.app/Experto_en_Expediente_Electronico"
@@ -161,15 +167,38 @@ class Application(ttk.Frame):
                 ),
             )
 
-        self.label01 = tk.Label(self, text="Juzgado", font=("Helvetica", 12))
-        self.label01.pack(pady=5)
+        # Crear un Frame para contener el label01 y el icono de ayuda
+        self.frame_label01 = tk.Frame(self)
+        self.frame_label01.pack(pady=5, anchor='center')
+
+        self.label01 = tk.Label(self.frame_label01, text="Juzgado", font=("Helvetica", 12))
+        self.label01.pack(side=tk.LEFT)
+
+        # Crear icono de ayuda
+        self.icono_ayuda = tk.Label(self.frame_label01, text="ℹ️", font=("Helvetica", 12), fg="blue", cursor="hand2")
+        self.icono_ayuda.pack(side=tk.LEFT, padx=(5, 0))
+
+        # Añadir tooltip al icono de ayuda
+        Tooltip(self.icono_ayuda, image_path=None, text="Ingrese el nombre exacto del juzgado según el sistema validador/migrador")
 
         self.entry01 = tk.Entry(self, width=90, justify="center")
         self.entry01.pack(pady=5)
         self.entry01.insert(0, "CENTRO DE SERVICIOS JUDICIALES DE BELLO")
 
-        self.label02 = tk.Label(self, text="Serie o Subserie", font=("Helvetica", 12))
-        self.label02.pack(pady=5)
+        
+        # Crear un Frame para contener el label01 y el icono de ayuda
+        self.frame_label02 = tk.Frame(self)
+        self.frame_label02.pack(pady=5, anchor='center')
+
+        self.label02 = tk.Label(self.frame_label02, text="Serie o Subserie", font=("Helvetica", 12))
+        self.label02.pack(side=tk.LEFT)
+
+        # Crear icono de ayuda
+        self.icono_ayuda = tk.Label(self.frame_label02, text="ℹ️", font=("Helvetica", 12), fg="blue", cursor="hand2")
+        self.icono_ayuda.pack(side=tk.LEFT, padx=(5, 0))
+
+        # Añadir tooltip al icono de ayuda
+        Tooltip(self.icono_ayuda, image_path=None, text="Ingrese el nombre exacto de la serie documental según el sistema validador/migrador o la TRD")
 
         # Crear el Combobox para entry02
         self.entry02 = ttk.Combobox(self, width=90, state="normal", justify="center")
@@ -191,14 +220,14 @@ class Application(ttk.Frame):
         self.radio1.pack(side=tk.LEFT, padx=10) """
         self.radio2 = ttk.Radiobutton(
             self.radio_frame,
-            text="Opción 1: Crear índice \nde todas las subcarpetas \nde un único expediente",
+            text="Opción 1: Un expediente → Índice\npara todos sus cuadernos",
             variable=self.radio_var,
             value="2",
         )
         self.radio2.pack(side=tk.LEFT, padx=10)
         self.radio3 = ttk.Radiobutton(
             self.radio_frame,
-            text="Opción 2: Crear índice de varios \nexpedientes dentro de una misma \nserie documental",
+            text="Opción 2: Una serie documental →\nÍndices para varios expedientes",
             variable=self.radio_var,
             value="3",
         )
@@ -224,21 +253,16 @@ class Application(ttk.Frame):
         )
         self.text_widget.pack(fill="both", expand=True, padx=5, pady=5)
 
-        self.text_widget.insert(
-            tk.END,
-            "\n📋 Guía Rápida del Programa\n\n"
-            "1. Preparación de Carpetas\n"
-            "• Carpetas limpias: Sin índice ni carpetas de anexos masivos\n"
-            "• Nombres de archivos: Organizados mínimo secuencialmente\n"
-            "• Radicado: Debe contener 23 dígitos\n\n"
-            "2. Estructura de Carpetas\n"
-            "🔹 Opción 1 (Un expediente):\n"
-            "   RADICADO/01PrimeraInstancia/C01Principal/Archivos\n"
-            "🔹 Opción 2 (Varios expedientes):\n"
-            "   SERIE_SUBSERIE/RADICADO/01PrimeraInstancia/C01Principal/Archivos\n\n"
-            "3. Datos del SGDE\n"
-            "• Use exactamente los mismos datos de 'Juzgado' y 'Serie/Subserie' registrados en migrador/validador y/o la TRD\n\n",
+        # Mensaje inicial en el text widget
+        initial_message = (
+            "\n💡 Sistema listo para procesar expedientes\n\n"
+            "Pasos:\n"
+            "   1. Ingrese los datos de Juzgado y Serie/Subserie\n"
+            "   2. Seleccione una opción según su necesidad\n"
+            "   3. Agregue la carpeta a procesar\n"
+            "   4. Presione Aceptar para iniciar\n"
         )
+        self.text_widget.insert(tk.END, initial_message)
 
         # Configurar la barra de desplazamiento para el Text widget
         self.scrollbar.config(command=self.text_widget.yview)
@@ -252,11 +276,27 @@ class Application(ttk.Frame):
         )
         self.pathExpediente.pack(side=tk.LEFT, padx=5)
 
+        # Crear un Frame para contener la barra de progreso y el Label de estado
+        self.progress_frame = tk.Frame(self)
+        self.progress_frame.pack(side=tk.LEFT, padx=5, pady=5)
+
         # Barra de progreso
         self.progress = ttk.Progressbar(
-            self, orient="horizontal", length=300, mode="determinate"
+            self.progress_frame, orient="horizontal", length=300, mode="determinate"
         )
-        self.progress.pack(side=tk.LEFT, padx=5)
+        self.progress.pack(fill=tk.BOTH, expand=True)
+
+        # Variable de control para el estado
+        self.status_message = tk.StringVar(value="")
+
+        # Label de estado superpuesto a la barra de progreso
+        self.status_label = ttk.Label(
+            self.progress_frame,  # Usar el mismo contenedor que la barra de progreso
+            textvariable=self.status_message,
+            font=("Helvetica", 9),
+            background=""  # Fondo transparente
+        )
+        self.status_label.place(relx=0.5, rely=0.5, anchor="center")  # Centrar el Label sobre la barra de progreso
 
         # Botón Aceptar
         self.aceptar = tk.Button(
@@ -280,6 +320,41 @@ class Application(ttk.Frame):
 
         self.pack()
 
+    def update_status(self, message):
+        """Actualiza el mensaje de estado."""
+        self.status_message.set(message)
+
+    def mostrar_guia_rapida(self):
+        # Crear una ventana emergente
+        guia_rapida_window = tk.Toplevel(self.root)
+        guia_rapida_window.title("Guía Rápida del Programa")
+        guia_rapida_window.geometry("565x290")
+        guia_rapida_window.resizable(False, False)
+
+        # Crear un Text widget para mostrar el mensaje de la guía rápida
+        text_widget = tk.Text(guia_rapida_window, wrap="word", padx=10, pady=10)
+        text_widget.pack(expand=True, fill="both")
+
+        # Mensaje de la guía rápida
+        mensaje_guia_rapida = (
+            "📋 Guía Rápida del Programa\n\n"
+            "1. Preparación de Carpetas\n"
+            "• Carpetas limpias: Sin índice ni carpetas de anexos masivos\n"
+            "• Nombres de archivos: Organizados mínimo secuencialmente\n"
+            "• Radicado: Debe contener 23 dígitos\n\n"
+            "2. Estructura de Carpetas\n"
+            "🔹 Opción 1 (Un expediente):\n"
+            "   RADICADO/01PrimeraInstancia/C01Principal/Archivos\n"
+            "🔹 Opción 2 (Varios expedientes):\n"
+            "   SERIE_SUBSERIE/RADICADO/01PrimeraInstancia/C01Principal/Archivos\n\n"
+            "3. Datos del SGDE\n"
+            "• Use exactamente los mismos datos de 'Juzgado' y 'Serie/Subserie' registrados en migrador/validador y/o la TRD\n\n"
+        )
+
+        # Insertar el mensaje en el Text widget
+        text_widget.insert(tk.END, mensaje_guia_rapida)
+        text_widget.config(state=tk.DISABLED)  # Hacer que el Text widget sea de solo lectura
+
     def _on_radio_change(self, *args):
         self.selected_value = self.radio_var.get()
         self.logger.info(f"Opción seleccionada: {self.selected_value}")
@@ -295,8 +370,8 @@ class Application(ttk.Frame):
         ]
 
         # Tooltip(self.radio1, image_paths[0])  # Comentado
-        Tooltip(self.radio2, image_paths[1])
-        Tooltip(self.radio3, image_paths[2])
+        Tooltip(self.radio2, image_paths[1], text=None)
+        Tooltip(self.radio3, image_paths[2], text=None)
 
     def _callback(self, url):
         """
@@ -361,6 +436,7 @@ class Application(ttk.Frame):
 
             # Restablecer variables
             self._restablecer_variables_clase()
+            self.update_status("")
 
             self.logger.debug("Limpieza de recursos completada")
 
@@ -433,6 +509,7 @@ class Application(ttk.Frame):
             )
             self.lista_subcarpetas = lista_subcarpetas
             self.analyzer = analyzer
+            self.update_status("Listo para procesar")
         elif self.selected_value == "3" and profundidad_maxima == 5:
             self.profundidad = 5
             lista_cui, lista_subcarpetas, self.carpetas_omitidas = (
@@ -450,6 +527,7 @@ class Application(ttk.Frame):
             )
             self.lista_subcarpetas = lista_subcarpetas
             self.analyzer = analyzer
+            self.update_status("Listo para procesar")
         else:
             tk.messagebox.showwarning(
                 "Advertencia",
@@ -672,6 +750,11 @@ class Application(ttk.Frame):
         if not self._validar_estructura_expediente(
             lista_cui, lista_subcarpetas, carpetas_omitidas
         ):
+            
+            # Habilitar el envío de un mensaje con las carpetas que no cumplen con la estructura
+
+            self._restablecer_variables_clase()
+            self.update_status("")
             return
 
         self._mostrar_carpeta_seleccionada(folder_selected)
@@ -751,12 +834,15 @@ class Application(ttk.Frame):
             title=os.path.basename(self.expediente),
         ):
             self._restablecer_variables_clase()
+            self.update_status("")
             self._mensaje(6)
             return
 
         # Iniciar procesamiento
+        self.update_status("")
         self.progress["value"] = 0.1
         self.text_widget.insert(tk.END, "❕Proceso iniciado...\n")
+        self.update_status("")
         self.update_idletasks()
 
         try:
@@ -804,6 +890,7 @@ class Application(ttk.Frame):
             self.progress["value"] = 1.0
             self.update_idletasks()
             self._restablecer_variables_clase()
+            self.update_status("")
             self.text_widget.insert(
                 tk.END, "✅ Proceso completado.\n*******************\n\n"
             )
