@@ -5,23 +5,11 @@ __pycache__/
 
 # Folder
 .venv/
+docs/
 
 # Files
 setup.py
 pyproject.toml
-src/app/main_.py
-src/app/assets/test.py
-src/app/assets/test_document.docx
-src/app/assets/test_page_counter.py
-src/app/assets/test_page_counter_in_pdf.py
-src/app/assets/archivo_firmado_o_protegido.pdf
-src/app/assets/test_xlwings.py
-src/app/assets/Pasos manejo de archivos.md
-src/app/assets/004-2022-00023 (Pame-SALIÓ) impugnada.txt
-src/app/assets/chain_text_test00.ipynb
-src/app/assets/chain_text_test01.ipynb
-src/app/assets/textchain.py
-src/app/assets/000IndiceElectronicoC0 copy.xlsm
 
 #########
 
@@ -337,3 +325,17 @@ test/test_xlwings.py
 test/test.py
 test/textchain.py
 test/empaquetado.md
+test/old_tooltip2.png
+test/old_tooltip3.png
+test/tooltip3 - copia.png
+docs/archivo_firmado_o_protegido.pdf
+docs/chain_text_test00.ipynb
+docs/chain_text_test01.ipynb
+docs/empaquetado.md
+docs/law_logo.png
+docs/main_.py
+docs/old_tooltip2.png
+docs/old_tooltip3.png
+docs/Pasos manejo de archivos.md
+docs/textchain.py
+docs/tooltip3 - copia.png

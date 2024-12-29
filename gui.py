@@ -86,6 +86,18 @@ class Application(ttk.Frame):
             label="📋 Guía Rápida del Programa",
             command=self.mostrar_guia_rapida
         )
+        self.help_menu.add_command(
+            label="Video tutorial (link 1)",
+            command=lambda: self._callback(
+                "https://etbcsj-my.sharepoint.com/personal/saladmconsecsucre_cendoj_ramajudicial_gov_co/_layouts/15/stream.aspx?id=%2Fpersonal%2Fsaladmconsecsucre%5Fcendoj%5Framajudicial%5Fgov%5Fco%2FDocuments%2FTutorial%20de%20uso%20Gestion%20Expediente%20Electronico%20v1%2E4%2E1%2Emp4&nav=eyJyZWZlcnJhbEluZm8iOnsicmVmZXJyYWxBcHAiOiJTdHJlYW1XZWJBcHAiLCJyZWZlcnJhbFZpZXciOiJTaGFyZURpYWxvZy1MaW5rIiwicmVmZXJyYWxBcHBQbGF0Zm9ybSI6IldlYiIsInJlZmVycmFsTW9kZSI6InZpZXcifX0&ga=1&referrer=StreamWebApp%2EWeb&referrerScenario=AddressBarCopied%2Eview%2E699f2548%2Df96e%2D4a34%2Db982%2Df8964354dd2e"
+            ),
+        )
+        self.help_menu.add_command(
+            label="Video tutorial (link 2)",
+            command=lambda: self._callback(
+                "https://www.youtube.com/watch?v=zWfHNNcETgk"
+            ),
+        )
         self.help_menu.add_separator()
         self.help_menu.add_command(
             label="Experto en expediente electrónico (agente IA)",
@@ -109,18 +121,6 @@ class Application(ttk.Frame):
             label="Condiciones archivísticas mínimas para migrar a Alfresco",
             command=lambda: self._callback(
                 "https://etbcsj-my.sharepoint.com/:b:/g/personal/darbelaal_cendoj_ramajudicial_gov_co/EarfmwGQYoFEtXQRCsVmPIABMoZI4TRuIEq58mnOC0-Qyw?e=v6Tk1m"
-            ),
-        )
-        self.help_menu.add_command(
-            label="Video tutorial (link 1)",
-            command=lambda: self._callback(
-                "https://etbcsj-my.sharepoint.com/personal/saladmconsecsucre_cendoj_ramajudicial_gov_co/_layouts/15/stream.aspx?id=%2Fpersonal%2Fsaladmconsecsucre%5Fcendoj%5Framajudicial%5Fgov%5Fco%2FDocuments%2FTutorial%20de%20uso%20Gestion%20Expediente%20Electronico%20v1%2E4%2E1%2Emp4&nav=eyJyZWZlcnJhbEluZm8iOnsicmVmZXJyYWxBcHAiOiJTdHJlYW1XZWJBcHAiLCJyZWZlcnJhbFZpZXciOiJTaGFyZURpYWxvZy1MaW5rIiwicmVmZXJyYWxBcHBQbGF0Zm9ybSI6IldlYiIsInJlZmVycmFsTW9kZSI6InZpZXcifX0&ga=1&referrer=StreamWebApp%2EWeb&referrerScenario=AddressBarCopied%2Eview%2E699f2548%2Df96e%2D4a34%2Db982%2Df8964354dd2e"
-            ),
-        )
-        self.help_menu.add_command(
-            label="Video tutorial (link 2)",
-            command=lambda: self._callback(
-                "https://www.youtube.com/watch?v=zWfHNNcETgk"
             ),
         )
 
@@ -393,7 +393,7 @@ class Application(ttk.Frame):
                 "Confirmar cierre", "¿Está seguro que desea cerrar la aplicación?"
             ):
 
-                self.logger.debug("Usuario confirmó cierre de aplicación")
+                self.logger.info("Usuario confirmó cierre de aplicación")
 
                 # Limpiar recursos
                 # self._cleanup()
@@ -403,7 +403,7 @@ class Application(ttk.Frame):
                 self.root.destroy()
                 self.logger.info("Aplicación cerrada correctamente")
             else:
-                self.logger.debug("Usuario canceló cierre de aplicación")
+                self.logger.info("Usuario canceló cierre de aplicación")
 
         except Exception as e:
             self.logger.error(f"Error al cerrar la aplicación: {str(e)}", exc_info=True)
@@ -679,14 +679,14 @@ class Application(ttk.Frame):
             if self.carpetas_omitidas:
                 # self._mensaje(None, f"Se encontraron {len(self.carpetas_omitidas)} carpetas que no cumplen con la estructura de directorios")
 
-                mensaje_detalle = "❕ Las siguientes carpetas están vacías y no serán incluidas en el procesamiento:\n- "
+                mensaje_detalle = "❕ Las siguientes carpetas están vacías y no serán incluidas en el procesamiento:\n   🔹"
                 carpetas_omitidas_ordenadas = sorted(self.carpetas_omitidas)
 
                 if carpetas_omitidas_ordenadas:
-                    mensaje_detalle += ".\n- ".join(carpetas_omitidas_ordenadas[:-1])
+                    mensaje_detalle += ".\n   🔹".join(carpetas_omitidas_ordenadas[:-1])
                     if len(carpetas_omitidas_ordenadas) > 1:
-                        mensaje_detalle += ".\n- "
-                    mensaje_detalle += carpetas_omitidas_ordenadas[-1] + "."
+                        mensaje_detalle += ".\n   🔹"
+                    mensaje_detalle += carpetas_omitidas_ordenadas[-1]# + "."
 
                 self.text_widget.insert(tk.END, mensaje_detalle + "\n")
                 self.text_widget.see(tk.END)
@@ -711,10 +711,10 @@ class Application(ttk.Frame):
             if self.selected_value == "3":
                 cuis_invalidos_ordenados = sorted(cuis_invalidos)
                 if cuis_invalidos_ordenados:
-                    mensaje += ", ".join(cuis_invalidos_ordenados[:-1])
+                    mensaje += ":\n   🔹".join(cuis_invalidos_ordenados[:-1])
                     if len(cuis_invalidos_ordenados) > 1:
-                        mensaje += ", "
-                    mensaje += cuis_invalidos_ordenados[-1] + "."
+                        mensaje += "\n   🔹"
+                    mensaje += cuis_invalidos_ordenados[-1]# + "\n"
             else:
                 if lista_cui:
                     mensaje += ", ".join(lista_cui[:-1])
@@ -830,7 +830,7 @@ class Application(ttk.Frame):
 
         # Confirmar procesamiento
         if not tk.messagebox.askyesno(
-            message=f'Se procesarán {total_carpetas} cuadernos/expedientes que contiene la carpeta {os.path.basename(self.expediente)}". \n¿Desea continuar?.',
+            message=f'Se procesarán {total_carpetas} cuadernos que contiene la carpeta {os.path.basename(self.expediente)}". \n¿Desea continuar?.',
             title=os.path.basename(self.expediente),
         ):
             self._restablecer_variables_clase()
@@ -841,7 +841,7 @@ class Application(ttk.Frame):
         # Iniciar procesamiento
         self.update_status("")
         self.progress["value"] = 0.1
-        self.text_widget.insert(tk.END, "❕Proceso iniciado...\n")
+        self.text_widget.insert(tk.END, "\n🔄 Proceso iniciado...\n")
         self.update_status("")
         self.update_idletasks()
 
@@ -894,9 +894,9 @@ class Application(ttk.Frame):
             self.text_widget.insert(
                 tk.END, "✅ Proceso completado.\n*******************\n\n"
             )
+            self._mensaje(1)
             self.progress["value"] = 0
             self.update_idletasks()
-            self._mensaje(1)
 
         except Exception as e:
             self.logger.error(f"Error en procesamiento: {str(e)}", exc_info=True)
@@ -909,7 +909,7 @@ class Application(ttk.Frame):
         """
         switcher = {
             0: "Procedimiento detenido. No se encontraron los archivos indicados en el índice",
-            1: "Procedimiento finalizado",
+            1: "Proceso completado",
             2: "Archivos sin procesar",
             3: "Seleccione una carpeta para procesar",
             6: "Procedimiento detenido",

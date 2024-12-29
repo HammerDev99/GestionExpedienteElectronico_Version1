@@ -34,7 +34,7 @@ class FileProcessor:
         try:
             self.ruta = input
             self.files = os.listdir(self.ruta)
-            self.logger.debug(f"Archivos encontrados: {len(self.files)}")
+            self.logger.info(f"Archivos encontrados: {len(self.files)}")
 
             # if len(self.files) > 0:
             if indice == "":
@@ -60,7 +60,7 @@ class FileProcessor:
         for i in range(len(files)):
             try:
                 fulldirct = os.path.join(ruta, files[i])
-                self.logger.debug(f"Renombrando: {fulldirct}")
+                self.logger.info(f"Renombrando: {fulldirct}")
                 if os.path.exists(fulldirct):
                     os.rename(fulldirct, os.path.join(ruta, nombres_extensiones[i]))
                 else:
