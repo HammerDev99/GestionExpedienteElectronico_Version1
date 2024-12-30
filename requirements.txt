@@ -18,3 +18,4 @@ idna==3.10
 requests==2.32.3 
 urllib3==2.2.3
 pillow==11.0.0
+send2trash==1.8.3

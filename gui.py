@@ -16,6 +16,7 @@ from tooltip import Tooltip
 import logging
 import asyncio
 import csv
+import send2trash
 
 
 class Application(ttk.Frame):
@@ -507,15 +508,11 @@ class Application(ttk.Frame):
         # Crear una instancia del analizador de carpetas
         analyzer = FolderAnalyzer({}, None)
 
-        # Buscar y gestionar índices existentes
-        indices = analyzer.buscar_indices_electronicos(folder_selected)
-        if indices:
-            indices_eliminados = self.confirmar_eliminar_indices(indices)
-            if not indices_eliminados:
-                self._restablecer_variables_clase()
-                self.update_progressbar_status("")
-                return  # Detiene ejecución si se encontraron índices y no se eliminaron
-        
+        # Llamar al nuevo método para gestionar índices existentes
+        continuar = self.gestionar_indices_existentes(folder_selected, analyzer)
+        if not continuar:
+            return  # Detiene ejecución si se encontraron índices y no se eliminaron
+
         self.expediente = folder_selected
         estructura_directorios = analyzer.construir_estructura(folder_selected)
         if not estructura_directorios:
@@ -550,6 +547,7 @@ class Application(ttk.Frame):
                 self.update_progressbar_status("Listo para procesar")
         elif self.selected_value == "3" and profundidad_maxima == 5:
             self.profundidad = 5
+
             lista_cui, lista_subcarpetas, self.carpetas_omitidas = (
                 analyzer.obtener_lista_rutas_subcarpetas(
                     estructura_directorios, 5, None
@@ -582,6 +580,27 @@ class Application(ttk.Frame):
                 f"La estructura de los siguientes directorios no coincide con la OPCIÓN seleccionada: {rutas_invalidas}"
             )
 
+    def gestionar_indices_existentes(self, folder_selected, analyzer):
+        """
+        Busca y gestiona índices existentes.
+
+        Args:
+            folder_selected (str): Ruta de la carpeta seleccionada.
+            analyzer (FolderAnalyzer): Instancia del analizador de carpetas.
+
+        Returns:
+            bool: True si se deben continuar las operaciones, False si se deben detener.
+        """
+        # Buscar y gestionar índices existentes
+        indices = analyzer.buscar_indices_electronicos(folder_selected)
+        if indices:
+            indices_eliminados = self.confirmar_eliminar_indices(indices)
+            if not indices_eliminados:
+                self._restablecer_variables_clase()
+                self.update_progressbar_status("")
+                return False  # Detiene ejecución si se encontraron índices y no se eliminaron
+        return True  # Continúa ejecución si no se encontraron índices o si se eliminaron
+
     def confirmar_eliminar_indices(self, indices):
         """
         Confirma con el usuario si desea eliminar los índices encontrados.
@@ -590,11 +609,16 @@ class Application(ttk.Frame):
         cantidad = len(indices)
         mensaje = f"Se encontraron {cantidad} índice{'s' if cantidad > 1 else ''} electrónico{'s' if cantidad > 1 else ''} que impide el procesamiento"
         if tk.messagebox.askyesno("Índices Encontrados", f"{mensaje}. ¿Desea eliminarlos?"):
+            self.text_widget.insert(tk.END, f"\n*******************\n✅ Índices eliminados:\n")
             for indice in indices:
                 try:
-                    os.remove(indice)
+                    componentes = indice.split(os.sep)[-4:]
+                    ruta_relativa = os.path.join(*componentes)
+                    send2trash.send2trash(indice)
+                    self.text_widget.insert(tk.END, f"   🔹 {ruta_relativa}\n")
                 except Exception as e:
                     self.logger.error(f"Error eliminando índice {indice}: {str(e)}")
+            self.text_widget.see(tk.END)
             return True
         else:
             self.text_widget.insert(tk.END, f"\n*******************\n❕ {mensaje}:\n")
@@ -827,10 +851,10 @@ class Application(ttk.Frame):
         ):
 
             # Habilitar el envío de un mensaje con las carpetas que no cumplen con la estructura
+            
 
             self.update_progressbar_status("")
             self._restablecer_variables_clase()
-            return
 
         self._mostrar_carpeta_seleccionada(folder_selected)
 
