@@ -607,22 +607,34 @@ class Application(ttk.Frame):
     def _validar_cui(self, cui):
         """
         Valida que el CUI tenga exactamente 23 dígitos sin caracteres especiales.
-
+        
         Args:
-            cui (str): String a validar
-
+            cui (str): String a validar que puede contener números dispersos,
+                    caracteres especiales y letras
+        
         Returns:
             tuple: (bool, str) - (Es válido, CUI limpio)
+                    - Es válido: True si se obtuvieron al menos 23 dígitos
+                    - CUI limpio: Los primeros 23 dígitos encontrados o la cadena original
+                                si no hay suficientes dígitos
         """
-        # Eliminar espacios y cualquier texto después de estos
-        cui = cui.split()[0]
-        # Remover caracteres especiales y no numéricos
-        cui_limpio = "".join(c for c in cui if c.isdigit())
-        # Verificar que tenga exactamente 23 dígitos
-        return (
-            len(cui_limpio) >= 23,
-            cui_limpio[:23] if len(cui_limpio) >= 23 else cui,
-        )
+        try:
+            # Extraer todos los dígitos de la cadena completa
+            cui_limpio = ''.join(c for c in cui if c.isdigit())
+            
+            # Verificar que tenga al menos 23 dígitos
+            es_valido = len(cui_limpio) >= 23
+            
+            # Retornar los primeros 23 dígitos si hay suficientes, 
+            # o toda la cadena de dígitos si no hay 23
+            return (
+                es_valido,
+                cui_limpio[:23] if es_valido else cui_limpio
+            )
+            
+        except Exception as e:
+            self.logger.error(f"Error al validar CUI '{cui}': {str(e)}")
+            return False, cui
 
     def _mostrar_carpeta_seleccionada(self, folder_selected):
         """
