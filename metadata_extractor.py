@@ -146,7 +146,7 @@ class MetadataExtractor:
             extensiones,
             numeraciones,
             ban,
-            nombres_indice
+            nombres_indice,
         )
 
     def _extraer_nombres_extensiones(self, ruta, files):
@@ -283,7 +283,7 @@ class MetadataExtractor:
                 resultado = self.DOCUMENTO_ELECTRONICO
 
             # SE OMITE ESTA CONDICION PORQUE PUEDE ESTAR PROVOCANDO ERRORES EN EL PROCESO DE MIGRACION
-            #if len(resultado) > 36:
+            # if len(resultado) > 36:
             #    resultado = resultado[:36]
 
             lista_cadena[i] = resultado  # Modificar la cadena de la lista

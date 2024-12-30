@@ -42,7 +42,7 @@ class Application(ttk.Frame):
         self.profundidad = None
         try:
             super().__init__(root)
-            root.title("GestionExpedienteElectronico"+ "_Version1"+".4.2")
+            root.title("GestionExpedienteElectronico" + "_Version1" + ".4.2")
             root.resizable(False, False)
             # root.geometry("350x300")
             root.protocol("WM_DELETE_WINDOW", self._on_closing)
@@ -83,8 +83,7 @@ class Application(ttk.Frame):
         self.help_menu = tk.Menu(self.menu_bar, tearoff=0)
         self.menu_bar.add_cascade(label="Ayuda", menu=self.help_menu)
         self.help_menu.add_command(
-            label="📋 Guía Rápida del Programa",
-            command=self.mostrar_guia_rapida
+            label="📋 Guía Rápida del Programa", command=self.mostrar_guia_rapida
         )
         self.help_menu.add_command(
             label="Video tutorial (link 1)",
@@ -169,36 +168,59 @@ class Application(ttk.Frame):
 
         # Crear un Frame para contener el label01 y el icono de ayuda
         self.frame_label01 = tk.Frame(self)
-        self.frame_label01.pack(pady=5, anchor='center')
+        self.frame_label01.pack(pady=5, anchor="center")
 
-        self.label01 = tk.Label(self.frame_label01, text="Juzgado", font=("Helvetica", 12))
+        self.label01 = tk.Label(
+            self.frame_label01, text="Juzgado", font=("Helvetica", 12)
+        )
         self.label01.pack(side=tk.LEFT)
 
         # Crear icono de ayuda
-        self.icono_ayuda = tk.Label(self.frame_label01, text="ℹ️", font=("Helvetica", 12), fg="blue", cursor="hand2")
+        self.icono_ayuda = tk.Label(
+            self.frame_label01,
+            text="ℹ️",
+            font=("Helvetica", 12),
+            fg="blue",
+            cursor="hand2",
+        )
         self.icono_ayuda.pack(side=tk.LEFT, padx=(5, 0))
 
         # Añadir tooltip al icono de ayuda
-        Tooltip(self.icono_ayuda, image_path=None, text="Ingrese el nombre exacto del juzgado según el sistema validador/migrador")
+        Tooltip(
+            self.icono_ayuda,
+            image_path=None,
+            text="Ingrese el nombre exacto del juzgado según el sistema validador/migrador",
+        )
 
         self.entry01 = tk.Entry(self, width=90, justify="center")
         self.entry01.pack(pady=5)
         self.entry01.insert(0, "CENTRO DE SERVICIOS JUDICIALES DE BELLO")
 
-        
         # Crear un Frame para contener el label01 y el icono de ayuda
         self.frame_label02 = tk.Frame(self)
-        self.frame_label02.pack(pady=5, anchor='center')
+        self.frame_label02.pack(pady=5, anchor="center")
 
-        self.label02 = tk.Label(self.frame_label02, text="Serie o Subserie", font=("Helvetica", 12))
+        self.label02 = tk.Label(
+            self.frame_label02, text="Serie o Subserie", font=("Helvetica", 12)
+        )
         self.label02.pack(side=tk.LEFT)
 
         # Crear icono de ayuda
-        self.icono_ayuda = tk.Label(self.frame_label02, text="ℹ️", font=("Helvetica", 12), fg="blue", cursor="hand2")
+        self.icono_ayuda = tk.Label(
+            self.frame_label02,
+            text="ℹ️",
+            font=("Helvetica", 12),
+            fg="blue",
+            cursor="hand2",
+        )
         self.icono_ayuda.pack(side=tk.LEFT, padx=(5, 0))
 
         # Añadir tooltip al icono de ayuda
-        Tooltip(self.icono_ayuda, image_path=None, text="Ingrese el nombre exacto de la serie documental según el sistema validador/migrador o la TRD")
+        Tooltip(
+            self.icono_ayuda,
+            image_path=None,
+            text="Ingrese el nombre exacto de la serie documental según el sistema validador/migrador o la TRD",
+        )
 
         # Crear el Combobox para entry02
         self.entry02 = ttk.Combobox(self, width=90, state="normal", justify="center")
@@ -294,9 +316,11 @@ class Application(ttk.Frame):
             self.progress_frame,  # Usar el mismo contenedor que la barra de progreso
             textvariable=self.status_message,
             font=("Helvetica", 9),
-            background=""  # Fondo transparente
+            background="",  # Fondo transparente
         )
-        self.status_label.place(relx=0.5, rely=0.5, anchor="center")  # Centrar el Label sobre la barra de progreso
+        self.status_label.place(
+            relx=0.5, rely=0.5, anchor="center"
+        )  # Centrar el Label sobre la barra de progreso
 
         # Botón Aceptar
         self.aceptar = tk.Button(
@@ -353,7 +377,9 @@ class Application(ttk.Frame):
 
         # Insertar el mensaje en el Text widget
         text_widget.insert(tk.END, mensaje_guia_rapida)
-        text_widget.config(state=tk.DISABLED)  # Hacer que el Text widget sea de solo lectura
+        text_widget.config(
+            state=tk.DISABLED
+        )  # Hacer que el Text widget sea de solo lectura
 
     def _on_radio_change(self, *args):
         self.selected_value = self.radio_var.get()
@@ -478,9 +504,19 @@ class Application(ttk.Frame):
             )
             return
 
-        self.expediente = folder_selected
-
+        # Crear una instancia del analizador de carpetas
         analyzer = FolderAnalyzer({}, None)
+
+        # Buscar y gestionar índices existentes
+        indices = analyzer.buscar_indices_electronicos(folder_selected)
+        if indices:
+            indices_eliminados = self.confirmar_eliminar_indices(indices)
+            if not indices_eliminados:
+                self._restablecer_variables_clase()
+                self.update_progressbar_status("")
+                return  # Detiene ejecución si se encontraron índices y no se eliminaron
+        
+        self.expediente = folder_selected
         estructura_directorios = analyzer.construir_estructura(folder_selected)
         if not estructura_directorios:
             tk.messagebox.showwarning(
@@ -546,6 +582,30 @@ class Application(ttk.Frame):
                 f"La estructura de los siguientes directorios no coincide con la OPCIÓN seleccionada: {rutas_invalidas}"
             )
 
+    def confirmar_eliminar_indices(self, indices):
+        """
+        Confirma con el usuario si desea eliminar los índices encontrados.
+        """
+    
+        cantidad = len(indices)
+        mensaje = f"Se encontraron {cantidad} índice{'s' if cantidad > 1 else ''} electrónico{'s' if cantidad > 1 else ''} que impide el procesamiento"
+        if tk.messagebox.askyesno("Índices Encontrados", f"{mensaje}. ¿Desea eliminarlos?"):
+            for indice in indices:
+                try:
+                    os.remove(indice)
+                except Exception as e:
+                    self.logger.error(f"Error eliminando índice {indice}: {str(e)}")
+            return True
+        else:
+            self.text_widget.insert(tk.END, f"\n*******************\n❕ {mensaje}:\n")
+            for indice in indices:
+                # Obtener los últimos 4 componentes de la ruta
+                componentes = indice.split(os.sep)[-4:]
+                ruta_relativa = os.path.join(*componentes)
+                self.text_widget.insert(tk.END, f"   🔹 {ruta_relativa}\n")
+            self.text_widget.see(tk.END)
+            return False
+
     def validar_estructura_carpetas(self, estructura_directorios, selected_value):
         """
         Valida la estructura de carpetas y retorna rutas inválidas.
@@ -607,11 +667,11 @@ class Application(ttk.Frame):
     def _validar_cui(self, cui):
         """
         Valida que el CUI tenga exactamente 23 dígitos sin caracteres especiales.
-        
+
         Args:
             cui (str): String a validar que puede contener números dispersos,
                     caracteres especiales y letras
-        
+
         Returns:
             tuple: (bool, str) - (Es válido, CUI limpio)
                     - Es válido: True si se obtuvieron al menos 23 dígitos
@@ -620,18 +680,15 @@ class Application(ttk.Frame):
         """
         try:
             # Extraer todos los dígitos de la cadena completa
-            cui_limpio = ''.join(c for c in cui if c.isdigit())
-            
+            cui_limpio = "".join(c for c in cui if c.isdigit())
+
             # Verificar que tenga al menos 23 dígitos
             es_valido = len(cui_limpio) >= 23
-            
-            # Retornar los primeros 23 dígitos si hay suficientes, 
+
+            # Retornar los primeros 23 dígitos si hay suficientes,
             # o toda la cadena de dígitos si no hay 23
-            return (
-                es_valido,
-                cui_limpio[:23] if es_valido else cui_limpio
-            )
-            
+            return (es_valido, cui_limpio[:23] if es_valido else cui_limpio)
+
         except Exception as e:
             self.logger.error(f"Error al validar CUI '{cui}': {str(e)}")
             return False, cui
@@ -704,7 +761,7 @@ class Application(ttk.Frame):
                     mensaje_detalle += ".\n   🔹".join(carpetas_omitidas_ordenadas[:-1])
                     if len(carpetas_omitidas_ordenadas) > 1:
                         mensaje_detalle += ".\n   🔹"
-                    mensaje_detalle += carpetas_omitidas_ordenadas[-1]# + "."
+                    mensaje_detalle += carpetas_omitidas_ordenadas[-1]  # + "."
 
                 self.text_widget.insert(tk.END, mensaje_detalle + "\n")
                 self.text_widget.see(tk.END)
@@ -732,7 +789,7 @@ class Application(ttk.Frame):
                     mensaje += ":\n   🔹".join(cuis_invalidos_ordenados[:-1])
                     if len(cuis_invalidos_ordenados) > 1:
                         mensaje += "\n   🔹"
-                    mensaje += cuis_invalidos_ordenados[-1]# + "\n"
+                    mensaje += cuis_invalidos_ordenados[-1]  # + "\n"
             else:
                 if lista_cui:
                     mensaje += ", ".join(lista_cui[:-1])
@@ -768,9 +825,9 @@ class Application(ttk.Frame):
         if not self._validar_estructura_expediente(
             lista_cui, lista_subcarpetas, carpetas_omitidas
         ):
-            
+
             # Habilitar el envío de un mensaje con las carpetas que no cumplen con la estructura
-            
+
             self.update_progressbar_status("")
             self._restablecer_variables_clase()
             return

@@ -450,3 +450,24 @@ class FolderAnalyzer:
                 self.obtener_profundidad_maxima(subdirectorio, nivel_actual + 1)
                 for subdirectorio in directorio.values()
             )
+
+    def buscar_indices_electronicos(self, ruta):
+        """
+        Busca archivos .xlsm en la ruta especificada.
+        
+        Args:
+            ruta (str): Ruta del expediente
+            
+        Returns:
+            list: Lista de rutas de archivos .xlsm encontrados
+        """
+        indices = []
+        try:
+            for root, _, files in os.walk(ruta):
+                for file in files:
+                    if file.endswith('.xlsm'):
+                        indices.append(os.path.join(root, file))
+            return indices
+        except Exception as e:
+            self.logger.error(f"Error buscando índices: {str(e)}")
+            return []
