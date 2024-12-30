@@ -320,7 +320,7 @@ class Application(ttk.Frame):
 
         self.pack()
 
-    def update_status(self, message):
+    def update_progressbar_status(self, message):
         """Actualiza el mensaje de estado."""
         self.status_message.set(message)
 
@@ -436,8 +436,7 @@ class Application(ttk.Frame):
 
             # Restablecer variables
             self._restablecer_variables_clase()
-            self.update_status("")
-
+            self.update_progressbar_status("")
             self.logger.debug("Limpieza de recursos completada")
 
         except Exception as e:
@@ -509,7 +508,10 @@ class Application(ttk.Frame):
             )
             self.lista_subcarpetas = lista_subcarpetas
             self.analyzer = analyzer
-            self.update_status("Listo para procesar")
+            if not self.lista_subcarpetas:
+                self.update_progressbar_status("")
+            else:
+                self.update_progressbar_status("Listo para procesar")
         elif self.selected_value == "3" and profundidad_maxima == 5:
             self.profundidad = 5
             lista_cui, lista_subcarpetas, self.carpetas_omitidas = (
@@ -527,7 +529,10 @@ class Application(ttk.Frame):
             )
             self.lista_subcarpetas = lista_subcarpetas
             self.analyzer = analyzer
-            self.update_status("Listo para procesar")
+            if not self.lista_subcarpetas:
+                self.update_progressbar_status("")
+            else:
+                self.update_progressbar_status("Listo para procesar")
         else:
             tk.messagebox.showwarning(
                 "Advertencia",
@@ -596,6 +601,7 @@ class Application(ttk.Frame):
             for ruta in rutas_invalidas:
                 mensaje += f"- {ruta}\n"
             self.text_widget.insert(tk.END, mensaje)
+            self.update_progressbar_status("")
             self.text_widget.see(tk.END)
 
     def _validar_cui(self, cui):
@@ -752,18 +758,14 @@ class Application(ttk.Frame):
         ):
             
             # Habilitar el envío de un mensaje con las carpetas que no cumplen con la estructura
-
+            
+            self.update_progressbar_status("")
             self._restablecer_variables_clase()
-            self.update_status("")
             return
 
         self._mostrar_carpeta_seleccionada(folder_selected)
 
         # Si no hay error, continuar con el resto del procesamiento...
-        _cuis_validos, cuis_invalidos = self._procesar_cuis(
-            lista_cui, lista_subcarpetas
-        )
-
         _cuis_validos, cuis_invalidos = self._procesar_cuis(
             lista_cui, lista_subcarpetas
         )
@@ -834,15 +836,15 @@ class Application(ttk.Frame):
             title=os.path.basename(self.expediente),
         ):
             self._restablecer_variables_clase()
-            self.update_status("")
+            self.update_progressbar_status("")
             self._mensaje(6)
             return
 
         # Iniciar procesamiento
-        self.update_status("")
+        self.update_progressbar_status("")
         self.progress["value"] = 0.1
         self.text_widget.insert(tk.END, "\n🔄 Proceso iniciado...\n")
-        self.update_status("")
+        self.update_progressbar_status("")
         self.update_idletasks()
 
         try:
@@ -890,7 +892,7 @@ class Application(ttk.Frame):
             self.progress["value"] = 1.0
             self.update_idletasks()
             self._restablecer_variables_clase()
-            self.update_status("")
+            self.update_progressbar_status("")
             self.text_widget.insert(
                 tk.END, "✅ Proceso completado.\n*******************\n\n"
             )

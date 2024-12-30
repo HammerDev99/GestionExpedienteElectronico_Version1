@@ -282,8 +282,9 @@ class MetadataExtractor:
             if resultado == "":
                 resultado = self.DOCUMENTO_ELECTRONICO
 
-            if len(resultado) > 36:
-                resultado = resultado[:36]
+            # SE OMITE ESTA CONDICION PORQUE PUEDE ESTAR PROVOCANDO ERRORES EN EL PROCESO DE MIGRACION
+            #if len(resultado) > 36:
+            #    resultado = resultado[:36]
 
             lista_cadena[i] = resultado  # Modificar la cadena de la lista
         return lista_cadena
