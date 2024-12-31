@@ -122,43 +122,51 @@ python main.py
 
 ## Registro de cambios
 
-- 2024-11-15 Nuevo Release 🚀 GestionExpedienteElectronico v1.4.0
-- 2024-11-14 Actualización de documentación y mejoras en la funcionalidad general.
-- 2024-11-13 Mejoras significativas en la interfaz de usuario, corrección de errores menores y manejo de la estructura de carpetas con dos opciones de niveles.
+- ## Registro de cambios
+
+- 2024-12-31 Nuevo Release 🚀 GestionExpedienteElectronico v1.4.2
+  - Implementación de gestión segura de índices existentes utilizando send2trash y mejoras en la validación del CUI
+  - Mejora significativa en la interfaz de usuario (GUI) con principios de progressive disclosure y nuevo menú de ayuda
+  - Optimización del procesamiento de carpetas con validación mejorada para estructuras vacías y manejo de errores
+  - Refactorización completa del código para mejorar legibilidad y modularidad, especialmente en MetadataExtractor
+  - Actualización del sistema de mensajes y validaciones para una mejor experiencia de usuario
+- 2024-11-15 Nuevo Release 🚀 GestionExpedienteElectronico v1.4.1
+  - 2024-11-14 Actualización de documentación y mejoras en la funcionalidad general.
+  - 2024-11-13 Mejoras significativas en la interfaz de usuario, corrección de errores menores y manejo de la estructura de carpetas con dos opciones de niveles.
 - 2024-09-17 Nuevo Release 🚀 GestionExpedienteElectronico v1.3.0
-- 2024-09-17 Optimización en el manejo de archivos excel y mejora en el conteo del progressBar
-- 2024-09-17 eliminación de comentarios y agrega upperCase a primera letra
-- 2024-09-17 Agrega progressBar
-- 2024-09-17 Actualiza lista de modulos requeridos
-- 2024-09-17 Refactoriza el código para ajustar la configuración de carpetas para empaquetar
-- 2024-09-17 ajuste final con vulture
-- 2024-09-17 Agrega text widget con mensaje
-- 2024-09-17 actualiza funcionalidad de contar páginas en docx, doc y pdf protegido
-- 2024-09-17 Agregar datos adicionales a excel - Correccion de mensaje y ventana excel
-- 2024-09-13 Actualización del sistema funcional solo con pendientes mínimos
-- 2024-09-13 Actualización de procesamiento desde un nivel superior - PENDIENTES
-- 2024-09-13 Feature nueva para realizar proceso a varias carpetas
-- 2024-09-12 Refactorizar manejo de archivos del expediente electrónico
-- 2023-05-30 Set "DocumentoElectronico" into "nombres" list
-- 2023-05-29 Modifies index name format and enables cross-platform function. (v.1.0.1)
-- 2023-05-26 Identificando valores en variables de la función format_names
-- 2023-05-26 Versión estable
-- 2023-05-26 separa_cadena, renameFile2, type of encode line added, create_dataframe update
-- 2023-04-25 AutomatizacionEmpleado.py update
-- 2023-04-25 code path selector in cross platform form added for refactoring_base
-- 2023-01-24 update folder schema, add textchain class
-- 2022-12-16 add demo.gif
-- 2022-12-02 Update folder schema.
-- 2022-10-27 Add rda info
+  - 2024-09-17 Optimización en el manejo de archivos excel y mejora en el conteo del progressBar
+  - 2024-09-17 eliminación de comentarios y agrega upperCase a primera letra
+  - 2024-09-17 Agrega progressBar
+  - 2024-09-17 Actualiza lista de modulos requeridos
+  - 2024-09-17 Refactoriza el código para ajustar la configuración de carpetas para empaquetar
+  - 2024-09-17 ajuste final con vulture
+  - 2024-09-17 Agrega text widget con mensaje
+  - 2024-09-17 actualiza funcionalidad de contar páginas en docx, doc y pdf protegido
+  - 2024-09-17 Agregar datos adicionales a excel - Correccion de mensaje y ventana excel
+  - 2024-09-13 Actualización del sistema funcional solo con pendientes mínimos
+  - 2024-09-13 Actualización de procesamiento desde un nivel superior - PENDIENTES
+  - 2024-09-13 Feature nueva para realizar proceso a varias carpetas
+  - 2024-09-12 Refactorizar manejo de archivos del expediente electrónico
+  - 2023-05-30 Set "DocumentoElectronico" into "nombres" list
+  - 2023-05-29 Modifies index name format and enables cross-platform function. (v.1.0.1)
+  - 2023-05-26 Identificando valores en variables de la función format_names
+  - 2023-05-26 Versión estable
+  - 2023-05-26 separa_cadena, renameFile2, type of encode line added, create_dataframe update
+  - 2023-04-25 AutomatizacionEmpleado.py update
+  - 2023-04-25 code path selector in cross platform form added for refactoring_base
+  - 2023-01-24 update folder schema, add textchain class
+  - 2022-12-16 add demo.gif
+  - 2022-12-02 Update folder schema.
+  - 2022-10-27 Add rda info
 - 2022-10-26 First release 🚀. (v.1.0.0)
-- 2022-06-24 últimas actualizaciones
-- 2022-03-31 Actualiza lógica de los nombres
-- 2022-03-03 Create requirements.txt
-- 2022-03-02 Create LICENCE
-- 2022-02-18 Create README.md
-- 2022-02-02 GUI optimization
-- 2022-01-05 UpdateRepo
-- 2021-08-10 First use case with names format 
+  - 2022-06-24 últimas actualizaciones
+  - 2022-03-31 Actualiza lógica de los nombres
+  - 2022-03-03 Create requirements.txt
+  - 2022-03-02 Create LICENCE
+  - 2022-02-18 Create README.md
+  - 2022-02-02 GUI optimization
+  - 2022-01-05 UpdateRepo
+  - 2021-08-10 First use case with names format 
 
 ## Construido con
 

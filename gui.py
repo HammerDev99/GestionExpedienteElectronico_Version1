@@ -89,7 +89,7 @@ class Application(ttk.Frame):
         self.help_menu.add_command(
             label="Video tutorial (link 1)",
             command=lambda: self._callback(
-                "https://etbcsj-my.sharepoint.com/personal/saladmconsecsucre_cendoj_ramajudicial_gov_co/_layouts/15/stream.aspx?id=%2Fpersonal%2Fsaladmconsecsucre%5Fcendoj%5Framajudicial%5Fgov%5Fco%2FDocuments%2FTutorial%20de%20uso%20Gestion%20Expediente%20Electronico%20v1%2E4%2E1%2Emp4&nav=eyJyZWZlcnJhbEluZm8iOnsicmVmZXJyYWxBcHAiOiJTdHJlYW1XZWJBcHAiLCJyZWZlcnJhbFZpZXciOiJTaGFyZURpYWxvZy1MaW5rIiwicmVmZXJyYWxBcHBQbGF0Zm9ybSI6IldlYiIsInJlZmVycmFsTW9kZSI6InZpZXcifX0&ga=1&referrer=StreamWebApp%2EWeb&referrerScenario=AddressBarCopied%2Eview%2E699f2548%2Df96e%2D4a34%2Db982%2Df8964354dd2e"
+                "https://etbcsj-my.sharepoint.com/:v:/g/personal/darbelaal_cendoj_ramajudicial_gov_co/Eew3MvwgllNMiNaLn_qSFtwB9hkcfo6-O9SrD-muRvL_cg?nav=eyJyZWZlcnJhbEluZm8iOnsicmVmZXJyYWxBcHAiOiJPbmVEcml2ZUZvckJ1c2luZXNzIiwicmVmZXJyYWxBcHBQbGF0Zm9ybSI6IldlYiIsInJlZmVycmFsTW9kZSI6InZpZXciLCJyZWZlcnJhbFZpZXciOiJNeUZpbGVzTGlua0NvcHkifX0&e=ecwr1m"
             ),
         )
         self.help_menu.add_command(
