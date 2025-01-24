@@ -95,7 +95,7 @@ class Application(ttk.Frame):
         self.help_menu.add_command(
             label="Video tutorial (link 2)",
             command=lambda: self._callback(
-                "https://www.youtube.com/watch?v=zWfHNNcETgk"
+                "https://youtu.be/6adDdMvoC3g"
             ),
         )
         self.help_menu.add_separator()
@@ -599,17 +599,23 @@ class Application(ttk.Frame):
                 self._restablecer_variables_clase()
                 self.update_progressbar_status("")
                 return False  # Detiene ejecución si se encontraron índices y no se eliminaron
-        return True  # Continúa ejecución si no se encontraron índices o si se eliminaron
+        return (
+            True  # Continúa ejecución si no se encontraron índices o si se eliminaron
+        )
 
     def confirmar_eliminar_indices(self, indices):
         """
         Confirma con el usuario si desea eliminar los índices encontrados.
         """
-    
+
         cantidad = len(indices)
         mensaje = f"Se encontraron {cantidad} índice{'s' if cantidad > 1 else ''} electrónico{'s' if cantidad > 1 else ''} que impide el procesamiento"
-        if tk.messagebox.askyesno("Índices Encontrados", f"{mensaje}. ¿Desea eliminarlos?"):
-            self.text_widget.insert(tk.END, f"\n*******************\n✅ Índices eliminados:\n")
+        if tk.messagebox.askyesno(
+            "Índices Encontrados", f"{mensaje}. ¿Desea eliminarlos?"
+        ):
+            self.text_widget.insert(
+                tk.END, f"\n*******************\n✅ Índices eliminados:\n"
+            )
             for indice in indices:
                 try:
                     componentes = indice.split(os.sep)[-4:]
@@ -810,9 +816,9 @@ class Application(ttk.Frame):
             if self.selected_value == "3":
                 cuis_invalidos_ordenados = sorted(cuis_invalidos)
                 if cuis_invalidos_ordenados:
-                    mensaje += ":\n   🔹".join(cuis_invalidos_ordenados[:-1])
+                    mensaje += ".\n   🔹".join(cuis_invalidos_ordenados[:-1])
                     if len(cuis_invalidos_ordenados) > 1:
-                        mensaje += "\n   🔹"
+                        mensaje += ".\n   🔹"
                     mensaje += cuis_invalidos_ordenados[-1]  # + "\n"
             else:
                 if lista_cui:
@@ -851,11 +857,15 @@ class Application(ttk.Frame):
         ):
 
             # Habilitar el envío de un mensaje con las carpetas que no cumplen con la estructura
-            
+            # usar variable selected value y el diccionario folder_selected
+
+            # mostrar_lista_elementos_conflictivos(self.selected_value, estructura_directorios)
 
             self.update_progressbar_status("")
             self._restablecer_variables_clase()
+            return
 
+        # Este mensaje se esta viendo cada vez que se muestra en pantalla el mensaje de error de la guia rapida
         self._mostrar_carpeta_seleccionada(folder_selected)
 
         # Si no hay error, continuar con el resto del procesamiento...

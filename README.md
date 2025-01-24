@@ -125,11 +125,11 @@ python main.py
 - ## Registro de cambios
 
 - 2024-12-31 Nuevo Release 🚀 GestionExpedienteElectronico v1.4.2
-  - Implementación de gestión segura de índices existentes utilizando send2trash y mejoras en la validación del CUI
-  - Mejora significativa en la interfaz de usuario (GUI) con principios de progressive disclosure y nuevo menú de ayuda
-  - Optimización del procesamiento de carpetas con validación mejorada para estructuras vacías y manejo de errores
-  - Refactorización completa del código para mejorar legibilidad y modularidad, especialmente en MetadataExtractor
-  - Actualización del sistema de mensajes y validaciones para una mejor experiencia de usuario
+  - 2024-12-30 Implementación de gestión segura de índices existentes utilizando send2trash y mejoras en la validación del CUI
+  - 2024-12-27 Optimización del procesamiento de carpetas con validación mejorada para estructuras vacías y manejo de errores
+  - 2024-12-27 Refactorización completa del código para mejorar legibilidad y modularidad, especialmente en MetadataExtractor
+  - 2024-12-27 Actualización del sistema de mensajes y validaciones para una mejor experiencia de usuario
+  - 2024-12-19 Mejora significativa en la interfaz de usuario (GUI) con principios de progressive disclosure y nuevo menú de ayuda
 - 2024-11-15 Nuevo Release 🚀 GestionExpedienteElectronico v1.4.1
   - 2024-11-14 Actualización de documentación y mejoras en la funcionalidad general.
   - 2024-11-13 Mejoras significativas en la interfaz de usuario, corrección de errores menores y manejo de la estructura de carpetas con dos opciones de niveles.

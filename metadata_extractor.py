@@ -359,7 +359,7 @@ class MetadataExtractor:
             - Archivos HTML (.html)
         """
 
-        path, extension = os.path.splitext(file)
+        _path, extension = os.path.splitext(file)
         extension = extension.lower()
         if os.path.isfile(file):
             if extension == ".pdf":
