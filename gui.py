@@ -239,8 +239,8 @@ class Application(ttk.Frame):
         self.radio_var.trace("w", self._on_radio_change)
 
         # Crear los Radiobuttons
-        """ self.radio1 = ttk.Radiobutton(self.radio_frame, text="Opción 1: Índice de una \nsola carpeta específica", variable=self.radio_var, value="1")
-        self.radio1.pack(side=tk.LEFT, padx=10) """
+        self.radio1 = ttk.Radiobutton(self.radio_frame, text="Opción subcarpeta: Índice\nde una sola carpeta", variable=self.radio_var, value="1")
+        self.radio1.pack(side=tk.LEFT, padx=10)
         self.radio2 = ttk.Radiobutton(
             self.radio_frame,
             text="Opción 1: Un expediente → Índice\npara todos sus cuadernos",
