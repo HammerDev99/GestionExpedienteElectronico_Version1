@@ -94,9 +94,7 @@ class Application(ttk.Frame):
         )
         self.help_menu.add_command(
             label="Video tutorial (link 2)",
-            command=lambda: self._callback(
-                "https://youtu.be/6adDdMvoC3g"
-            ),
+            command=lambda: self._callback("https://youtu.be/6adDdMvoC3g"),
         )
         self.help_menu.add_separator()
         self.help_menu.add_command(
@@ -239,7 +237,12 @@ class Application(ttk.Frame):
         self.radio_var.trace("w", self._on_radio_change)
 
         # Crear los Radiobuttons
-        self.radio1 = ttk.Radiobutton(self.radio_frame, text="Opción subcarpeta: Índice\nde una sola carpeta", variable=self.radio_var, value="1")
+        self.radio1 = ttk.Radiobutton(
+            self.radio_frame,
+            text="Opción subcarpeta: Índice\nde un solo cuaderno",
+            variable=self.radio_var,
+            value="1",
+        )
         self.radio1.pack(side=tk.LEFT, padx=10)
         self.radio2 = ttk.Radiobutton(
             self.radio_frame,
@@ -259,17 +262,10 @@ class Application(ttk.Frame):
         # Crear tooltips con imágenes para los Radiobuttons
         self._create_tooltips()
 
-        """ self.scrollbar = tk.Scrollbar(self, orient=tk.VERTICAL)
-        self.scrollbar.pack(fill="x", padx=5) """
-        # self.scrollbar.config(command=self.entry1.xview)
         # Crear una barra de desplazamiento vertical
         self.scrollbar = tk.Scrollbar(self, orient=tk.VERTICAL)
         self.scrollbar.pack(side=tk.RIGHT, fill=tk.Y, padx=5)
 
-        """ self.entry1 = tk.Entry(self, width=50, xscrollcommand=self.scrollbar.set)
-        self.entry1.config(state=tk.DISABLED)
-        self.entry1.insert("end", str(dir(tk.Scrollbar)))
-        self.entry1.pack(fill="x", before=self.scrollbar) """
         # Crear un Text widget para mostrar los RDOs procesados
         self.text_widget = tk.Text(
             self, width=50, height=20, yscrollcommand=self.scrollbar.set
@@ -397,6 +393,7 @@ class Application(ttk.Frame):
         ]
 
         # Tooltip(self.radio1, image_paths[0])  # Comentado
+        Tooltip(self.radio1, image_paths[0], text=None)
         Tooltip(self.radio2, image_paths[1], text=None)
         Tooltip(self.radio3, image_paths[2], text=None)
 
@@ -614,7 +611,7 @@ class Application(ttk.Frame):
             "Índices Encontrados", f"{mensaje}. ¿Desea eliminarlos?"
         ):
             self.text_widget.insert(
-                tk.END, f"\n*******************\n✅ Índices eliminados:\n"
+                tk.END, "\n*******************\n✅ Índices eliminados:\n"
             )
             for indice in indices:
                 try:
@@ -784,13 +781,16 @@ class Application(ttk.Frame):
             if self.carpetas_omitidas:
                 # self._mensaje(None, f"Se encontraron {len(self.carpetas_omitidas)} carpetas que no cumplen con la estructura de directorios")
 
-                mensaje_detalle = "❕ Las siguientes carpetas están vacías y no serán incluidas en el procesamiento:\n   🔹"
+                text_aux = ".\n   🔹"
+                mensaje_detalle = (
+                    "❕ Las siguientes carpetas están vacías y no serán incluidas en el procesamiento:"
+                    + text_aux[1:]
+                )
                 carpetas_omitidas_ordenadas = sorted(self.carpetas_omitidas)
-
                 if carpetas_omitidas_ordenadas:
-                    mensaje_detalle += ".\n   🔹".join(carpetas_omitidas_ordenadas[:-1])
+                    mensaje_detalle += text_aux.join(carpetas_omitidas_ordenadas[:-1])
                     if len(carpetas_omitidas_ordenadas) > 1:
-                        mensaje_detalle += ".\n   🔹"
+                        mensaje_detalle += text_aux
                     mensaje_detalle += carpetas_omitidas_ordenadas[-1]  # + "."
 
                 self.text_widget.insert(tk.END, mensaje_detalle + "\n")
@@ -809,6 +809,7 @@ class Application(ttk.Frame):
             cuis_invalidos (set): Conjunto de CUIs inválidos
             lista_cui (list): Lista original de CUIs
         """
+        text_aux = ".\n   🔹"
         if cuis_invalidos:
             # self._mensaje(None, "Algunas carpetas no cumplen con el formato requerido de 23 dígitos numéricos.")
 
@@ -816,9 +817,9 @@ class Application(ttk.Frame):
             if self.selected_value == "3":
                 cuis_invalidos_ordenados = sorted(cuis_invalidos)
                 if cuis_invalidos_ordenados:
-                    mensaje += ".\n   🔹".join(cuis_invalidos_ordenados[:-1])
+                    mensaje += text_aux.join(cuis_invalidos_ordenados[:-1])
                     if len(cuis_invalidos_ordenados) > 1:
-                        mensaje += ".\n   🔹"
+                        mensaje += text_aux
                     mensaje += cuis_invalidos_ordenados[-1]  # + "\n"
             else:
                 if lista_cui:
