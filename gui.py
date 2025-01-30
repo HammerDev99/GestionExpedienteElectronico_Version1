@@ -17,6 +17,7 @@ import logging
 import asyncio
 import csv
 import send2trash
+from processing_context import ProcessingContext
 
 
 class Application(ttk.Frame):
@@ -49,6 +50,7 @@ class Application(ttk.Frame):
             root.protocol("WM_DELETE_WINDOW", self._on_closing)
             self.pack(padx=20, pady=20)  # Añadir padding aquí
             self.create_oneProcessWidgets()
+            self.processing_context = ProcessingContext(self)
         except Exception as e:
             self.logger.error(f"Error en inicialización GUI: {str(e)}", exc_info=True)
             raise
@@ -103,6 +105,7 @@ class Application(ttk.Frame):
                 "https://gestionexpedienteelectronico.streamlit.app/Experto_en_Expediente_Electronico"
             ),
         )
+        self.help_menu.add_separator()
         self.help_menu.add_command(
             label="Tablas de retención documental",
             command=lambda: self._callback(
@@ -274,8 +277,7 @@ class Application(ttk.Frame):
 
         # Mensaje inicial en el text widget
         initial_message = (
-            "\n💡 Sistema listo para procesar expedientes\n\n"
-            "Pasos:\n"
+            "\n   Pasos:\n"
             "   1. Ingrese los datos de Juzgado y Serie/Subserie\n"
             "   2. Seleccione una opción según su necesidad\n"
             "   3. Agregue la carpeta a procesar\n"
@@ -349,7 +351,7 @@ class Application(ttk.Frame):
         # Crear una ventana emergente
         guia_rapida_window = tk.Toplevel(self.root)
         guia_rapida_window.title("Guía Rápida del Programa")
-        guia_rapida_window.geometry("565x290")
+        guia_rapida_window.geometry("565x320")
         guia_rapida_window.resizable(False, False)
 
         # Crear un Text widget para mostrar el mensaje de la guía rápida
@@ -364,6 +366,8 @@ class Application(ttk.Frame):
             "• Nombres de archivos: Organizados mínimo secuencialmente\n"
             "• Radicado: Debe contener 23 dígitos\n\n"
             "2. Estructura de Carpetas\n"
+            "🔹 Opción subcarpeta:\n"
+            "   C01Principal/Archivos\n"
             "🔹 Opción 1 (Un expediente):\n"
             "   RADICADO/01PrimeraInstancia/C01Principal/Archivos\n"
             "🔹 Opción 2 (Varios expedientes):\n"
@@ -501,6 +505,10 @@ class Application(ttk.Frame):
                 "Advertencia", "No se ha seleccionado ninguna carpeta."
             )
             return
+
+        # Implementación del patron strategy
+        # Procesar la carpeta seleccionada utilizando el contexto
+        self.processing_context.process_folder(folder_selected, self.selected_value)
 
         # Crear una instancia del analizador de carpetas
         analyzer = FolderAnalyzer({}, None)
