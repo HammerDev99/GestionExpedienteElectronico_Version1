@@ -50,7 +50,7 @@ class Application(ttk.Frame):
             root.protocol("WM_DELETE_WINDOW", self._on_closing)
             self.pack(padx=20, pady=20)  # Añadir padding aquí
             self.create_oneProcessWidgets()
-            self.processing_context = ProcessingContext(self)
+            self.processing_context = ProcessingContext(self, logger=self.logger)
         except Exception as e:
             self.logger.error(f"Error en inicialización GUI: {str(e)}", exc_info=True)
             raise
@@ -507,11 +507,24 @@ class Application(ttk.Frame):
             return
 
         # Implementación del patron strategy
-        # Procesar la carpeta seleccionada utilizando el contexto
-        self.processing_context.process_folder(folder_selected, self.selected_value)
+        # Procesar la carpeta seleccionada utilizando el contexto para el caso de la opcion subcarpetas
+        if self.selected_value == "1":
 
+            # Procesar archivo
+            despacho = self.entry01.get()
+            subserie = self.entry02.get()
+
+            carpeta = self._get_bundled_path(
+                os.path.normpath(os.path.join(self.expediente))
+            )
+            processor = FileProcessor(
+                carpeta, "", despacho, subserie, "05088", logger=self.logger
+            )
+            self.processing_context.process_folder(folder_selected, self.selected_value, processor)
+            return
+        
         # Crear una instancia del analizador de carpetas
-        analyzer = FolderAnalyzer({}, None)
+        analyzer = FolderAnalyzer({}, None, logger=self.logger)
 
         # Llamar al nuevo método para gestionar índices existentes
         continuar = self.gestionar_indices_existentes(folder_selected, analyzer)
@@ -527,7 +540,7 @@ class Application(ttk.Frame):
             return
 
         profundidad_maxima = analyzer.obtener_profundidad_maxima(estructura_directorios)
-        analyzer = FolderAnalyzer(estructura_directorios, profundidad_maxima)
+        analyzer = FolderAnalyzer(estructura_directorios, profundidad_maxima, logger=self.logger)
 
         if self.selected_value == "2" and profundidad_maxima == 4:
             self.profundidad = 4
