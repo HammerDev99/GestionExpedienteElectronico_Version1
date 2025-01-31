@@ -514,11 +514,8 @@ class Application(ttk.Frame):
             despacho = self.entry01.get()
             subserie = self.entry02.get()
 
-            carpeta = self._get_bundled_path(
-                os.path.normpath(os.path.join(self.expediente))
-            )
             processor = FileProcessor(
-                carpeta, "", despacho, subserie, "05088", logger=self.logger
+                folder_selected, "", despacho, subserie, "05088", logger=self.logger
             )
             self.processing_context.process_folder(folder_selected, self.selected_value, processor)
             return

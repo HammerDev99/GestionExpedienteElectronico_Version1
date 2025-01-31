@@ -25,7 +25,8 @@ class SingleCuadernoStrategy(ProcessStrategy):
 
         # Procesar de forma asíncrona
         print("Procesando de forma asíncrona")
-        #asyncio.run(processor.process())
+        # NO DESCOMENTAR ESTA LÍNEA HASTA TANTO VALIDAR BIEN LA RUTA DE LA SUBCARPETA QUE SE EJECUTA
+        asyncio.run(processor.process())
 
     def gestionar_indices_existentes(self, folder_selected, analyzer):
         """
