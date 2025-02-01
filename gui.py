@@ -1,7 +1,5 @@
 # coding=utf-8
 
-from email import message
-from operator import le, length_hint
 import tkinter as tk
 from tkinter import ttk
 from tkinter import filedialog
@@ -24,8 +22,6 @@ from gui_notifier import (
     ProgressBarObserver,
     DialogObserver,
     StatusLabelObserver,
-    GUIMessage,
-    MessageType,
 )
 
 
@@ -553,6 +549,7 @@ class Application(ttk.Frame):
             )
             return
 
+        #**********************************
         # Implementación del patron strategy
         # Procesar la carpeta seleccionada utilizando el contexto para el caso de la opcion subcarpetas
         if self.selected_value == "1":
@@ -566,9 +563,10 @@ class Application(ttk.Frame):
                 folder_selected, "", despacho, subserie, radicado, logger=self.logger
             )
             self.processing_context.process_folder(
-                folder_selected, self.selected_value, processor
+                self.selected_value, processor
             )
             return
+        #**********************************
 
         # Crear una instancia del analizador de carpetas
         analyzer = FolderAnalyzer({}, None, logger=self.logger)
@@ -1085,7 +1083,7 @@ class Application(ttk.Frame):
         """
         switcher = {
             0: "Procedimiento detenido. No se encontraron los archivos indicados en el índice",
-            1: "Proceso completado",
+            1: "Proceso completado exitosamente",
             2: "Archivos sin procesar",
             3: "Seleccione una carpeta para procesar",
             6: "Procedimiento detenido",

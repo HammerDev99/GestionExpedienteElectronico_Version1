@@ -4,9 +4,6 @@ import datetime
 import re
 import os
 import string
-import sys
-import warnings
-import PyPDF2
 import random
 import win32com.client as win32
 import logging

@@ -8,7 +8,6 @@ import shutil
 import xlwings as xw
 import string
 import random
-import traceback
 from metadata_extractor import MetadataExtractor
 import logging
 from concurrent.futures import ThreadPoolExecutor
