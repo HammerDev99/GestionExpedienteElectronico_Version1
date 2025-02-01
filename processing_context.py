@@ -26,32 +26,29 @@ class ProcessingContext:
 
         # Procesa una carpeta usando la estrategia correspondiente al valor seleccionado.
 
-    def process_folder(self, folder_selected: str, selected_value: str, processor: FileProcessor):
+    def process_folder(
+        self, folder_selected: str, selected_value: str, processor: FileProcessor
+    ):
         strategy = self._strategies.get(selected_value)
-        self.logger.info(f"Procesando carpeta con estrategia {strategy.__class__.__name__}")
+        self.logger.info(
+            f"Procesando carpeta con estrategia {strategy.__class__.__name__}"
+        )
 
-        if folder_selected != '':
-            
-            #self.gui.mensaje("Se procesarán los archivos que contiene la carpeta \""+ os.path.basename(folder_selected))
-            
-
-            # Procesar archivo
-            folder_selected = self.gui._get_bundled_path(
-                os.path.normpath(os.path.join(folder_selected, os.path.normpath(folder_selected)))
+        # Procesar archivo
+        folder_selected = self.gui._get_bundled_path(
+            os.path.normpath(
+                os.path.join(folder_selected, os.path.normpath(folder_selected))
             )
+        )
 
-            strategy.process(processor)
+        # Se ejecuta la estrategia según el valor seleccionado
+        strategy.process(processor)
 
-        else:
-            self.gui.mensaje(3)
+        # self.analyzer = FolderAnalyzer({})
+        # structure_valid = strategy.validate_structure(folder_selected)
 
-        #self.analyzer = FolderAnalyzer({})
-        #structure_valid = strategy.validate_structure(folder_selected)
-
-        #if not structure_valid:
+        # if not structure_valid:
         #    return self.handle_invalid_structure(strategy)
-
-        return 
 
     """ # Nuevos métodos trasladados desde Application
     def handle_directory_analysis(self):

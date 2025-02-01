@@ -10,22 +10,19 @@ class ProcessStrategy(ABC):
     """Define la interfaz común para todas las estrategias de procesamiento."""
 
     @abstractmethod
-    def process(
-        self, processor: FileProcessor
-    ):
+    def process(self, processor: FileProcessor):
         """Ejecuta el procesamiento de la carpeta."""
         pass
+
 
 class SingleCuadernoStrategy(ProcessStrategy):
     """Estrategia para procesar un solo cuaderno sin estructura jerárquica."""
 
-    def process(
-        self, processor: FileProcessor):
+    def process(self, processor: FileProcessor):
         """Procesa una subcarpeta"""
 
         # Procesar de forma asíncrona
         print("Procesando de forma asíncrona")
-        # NO DESCOMENTAR ESTA LÍNEA HASTA TANTO VALIDAR BIEN LA RUTA DE LA SUBCARPETA QUE SE EJECUTA
         asyncio.run(processor.process())
 
     def gestionar_indices_existentes(self, folder_selected, analyzer):
@@ -54,8 +51,10 @@ class SingleCuadernoStrategy(ProcessStrategy):
     def get_expected_structure(self) -> str:
         """Retorna la descripción de la estructura esperada."""
         return "Carpeta con archivos (sin subcarpetas)"
-    
-    def process_files(self, folder_path: str, despacho: str, subserie: str, rdo: str) -> bool:
+
+    def process_files(
+        self, folder_path: str, despacho: str, subserie: str, rdo: str
+    ) -> bool:
         # Procesamiento de archivos para un solo cuaderno
         pass
 
@@ -85,19 +84,21 @@ class SingleExpedienteStrategy(ProcessStrategy):
         except Exception:
             return False
 
-    def process(
-        self, processor: FileProcessor):
+    def process(self, processor: FileProcessor):
         """Procesa un expediente con estructura de 4 niveles."""
-        #estructura = analyzer.construir_estructura(folder_selected)
-        #return analyzer.obtener_lista_rutas_subcarpetas(estructura, 4, folder_selected)
+        # estructura = analyzer.construir_estructura(folder_selected)
+        # return analyzer.obtener_lista_rutas_subcarpetas(estructura, 4, folder_selected)
 
     def get_expected_structure(self) -> str:
         """Retorna la descripción de la estructura esperada."""
         return "RADICADO/01PrimeraInstancia/C01Principal/Archivos"
-    
-    def process_files(self, folder_path: str, despacho: str, subserie: str, rdo: str) -> bool:
+
+    def process_files(
+        self, folder_path: str, despacho: str, subserie: str, rdo: str
+    ) -> bool:
         # Procesamiento de archivos para un solo cuaderno
         pass
+
 
 class MultiExpedienteStrategy(ProcessStrategy):
     """Estrategia para procesar múltiples expedientes con estructura de 5 niveles."""
@@ -111,17 +112,17 @@ class MultiExpedienteStrategy(ProcessStrategy):
         except Exception:
             return False
 
-    def process(
-        self, processor: FileProcessor
-    ):
+    def process(self, processor: FileProcessor):
         """Procesa expedientes con estructura de 5 niveles."""
-        #estructura = analyzer.construir_estructura(folder_selected)
-        #return analyzer.obtener_lista_rutas_subcarpetas(estructura, 5, None)
+        # estructura = analyzer.construir_estructura(folder_selected)
+        # return analyzer.obtener_lista_rutas_subcarpetas(estructura, 5, None)
 
     def get_expected_structure(self) -> str:
         """Retorna la descripción de la estructura esperada."""
         return "SERIE_SUBSERIE/RADICADO/01PrimeraInstancia/C01Principal/Archivos"
 
-    def process_files(self, folder_path: str, despacho: str, subserie: str, rdo: str) -> bool:
+    def process_files(
+        self, folder_path: str, despacho: str, subserie: str, rdo: str
+    ) -> bool:
         # Procesamiento de archivos para un solo cuaderno
         pass

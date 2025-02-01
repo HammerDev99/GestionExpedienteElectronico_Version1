@@ -44,7 +44,7 @@ class Application(ttk.Frame):
         self.profundidad = None
         try:
             super().__init__(root)
-            root.title("GestionExpedienteElectronico" + "_Version1" + ".4.2")
+            root.title("GestionExpedienteElectronico" + "_Version1" + ".4.3")
             root.resizable(False, False)
             # root.geometry("350x300")
             root.protocol("WM_DELETE_WINDOW", self._on_closing)
@@ -231,6 +231,16 @@ class Application(ttk.Frame):
         # Leer el archivo CSV y obtener los valores para el Combobox
         self.load_csv_values()
 
+        # Crear un Frame para contener el label03 y el icono de ayuda
+        self.frame_label03 = tk.Frame(self)
+        self.frame_label03.pack(pady=5, padx=5, anchor="center")
+
+        self.label03 = tk.Label(
+            self.frame_label03, text="Radicado", font=("Helvetica", 12), padx=5
+        )
+        
+        self.entry03 = tk.Entry(self.frame_label03, width=25, justify="center")
+
         # Crear un Frame para los Radiobuttons
         self.radio_frame = tk.Frame(self)
         self.radio_frame.pack(pady=5)
@@ -386,6 +396,15 @@ class Application(ttk.Frame):
         self.selected_value = self.radio_var.get()
         self.logger.info(f"Opción seleccionada: {self.selected_value}")
 
+        print(f"Opción seleccionada: {self.selected_value}")
+
+        if self.selected_value == "1":
+            self.label03.pack(side=tk.LEFT)
+            self.entry03.pack(pady=5)
+        else:
+            self.label03.pack_forget()
+            self.entry03.pack_forget()
+
     def _create_tooltips(self):
         """
         Crea tooltips para los radiobuttons usando imágenes.
@@ -513,9 +532,10 @@ class Application(ttk.Frame):
             # Procesar archivo
             despacho = self.entry01.get()
             subserie = self.entry02.get()
+            radicado = self.entry03.get()
 
             processor = FileProcessor(
-                folder_selected, "", despacho, subserie, "05088", logger=self.logger
+                folder_selected, "", despacho, subserie, radicado, logger=self.logger
             )
             self.processing_context.process_folder(folder_selected, self.selected_value, processor)
             return
