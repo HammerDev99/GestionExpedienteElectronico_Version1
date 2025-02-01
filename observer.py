@@ -1,92 +1,189 @@
 from abc import ABC, abstractmethod
 from enum import Enum
 import tkinter as tk
-from typing import List, Dict
+from tkinter import ttk, messagebox
+from typing import List, Union, Tuple
 
-# 1. Definición de tipos de mensajes y eventos
+
 class MessageType(Enum):
-    INFO = "INFO"
-    WARNING = "WARNING"
-    ERROR = "ERROR"
-    SUCCESS = "SUCCESS"
-    PROGRESS = "PROGRESS"
+    """
+    Define los tipos de mensajes soportados por el sistema de observadores.
+    Los tipos disponibles son:
+        TEXT: Para mensajes de texto en widgets
+        PROGRESS: Para actualización de barras de progreso
+        DIALOG: Para mostrar diálogos modales
+        STATUS: Para actualizar etiquetas de estado
+    """
+    TEXT = "text"
+    PROGRESS = "progress"
+    DIALOG = "dialog"
+    STATUS = "status"
+
+
+class DialogType(Enum):
+    """
+    Define los tipos de diálogos disponibles para mostrar al usuario.
+    Los tipos son:
+        INFO: Para mensajes informativos
+        WARNING: Para advertencias
+        ERROR: Para errores
+    """
+    INFO = "info"
+    WARNING = "warning"
+    ERROR = "error"
+
 
 class GUIMessage:
-    """Encapsula la información de un mensaje para la GUI"""
-    def __init__(self, content: str, message_type: MessageType, show_dialog: bool = False):
+    """
+    @param: content tipo Union[str, Tuple[float, float]]; contenido del mensaje
+    @param: message_type tipo MessageType; tipo de mensaje a enviar
+    @param: dialog_type tipo DialogType; tipo de diálogo a mostrar (opcional)
+    @modules: tkinter
+    
+    - Encapsula un mensaje para ser procesado por los observadores de la GUI
+    - El contenido puede ser texto o una tupla de valores para la barra de progreso
+    - Cada mensaje tiene un tipo específico que determina qué observador lo procesará
+    """
+    def __init__(
+        self,
+        content: Union[str, Tuple[float, float]],
+        message_type: MessageType,
+        dialog_type: DialogType = None,
+    ):
         self.content = content
         self.type = message_type
-        self.show_dialog = show_dialog
-        self.timestamp = None  # Opcional: para ordenar mensajes
+        self.dialog_type = dialog_type
 
-# 2. Interfaz Observer
+
 class GUIObserver(ABC):
-    """Interfaz base para observadores de la GUI"""
+    """
+    @param: message_type tipo MessageType; tipo de mensaje que el observador procesará
+    @modules: abc
+    
+    - Clase base abstracta para todos los observadores de la GUI
+    - Define la interfaz común que deben implementar todos los observadores
+    - Cada observador se especializa en un tipo específico de mensaje
+    """
+    def __init__(self, message_type: MessageType):
+        self.message_type = message_type
+
     @abstractmethod
     def update(self, message: GUIMessage) -> None:
         pass
 
-# 3. Implementación concreta de observadores
+
 class TextWidgetObserver(GUIObserver):
-    """Observador para el widget de texto"""
+    """
+    @param: text_widget tipo tk.Text; widget de texto a actualizar
+    @modules: tkinter
+    
+    - Observador especializado en actualizar widgets de texto
+    - Agrega nuevas líneas de texto al final del widget
+    - Mantiene el scroll en la última línea agregada
+    """
     def __init__(self, text_widget: tk.Text):
+        super().__init__(MessageType.TEXT)
         self.text_widget = text_widget
-        self._message_prefixes = {
-            MessageType.INFO: "ℹ️ ",
-            MessageType.WARNING: "⚠️ ",
-            MessageType.ERROR: "❌ ",
-            MessageType.SUCCESS: "✅ ",
-            MessageType.PROGRESS: "🔄 "
-        }
 
     def update(self, message: GUIMessage) -> None:
-        prefix = self._message_prefixes.get(message.type, "")
-        self.text_widget.insert(tk.END, f"\n{prefix}{message.content}")
-        self.text_widget.see(tk.END)
+        if message.type == self.message_type:
+            self.text_widget.insert(tk.END, f"\n{message.content}")
+            self.text_widget.see(tk.END)
+
 
 class ProgressBarObserver(GUIObserver):
-    """Observador para la barra de progreso"""
-    def __init__(self, progress_var: tk.StringVar):
-        self.progress_var = progress_var
+    """
+    @param: progress_bar tipo ttk.Progressbar; barra de progreso a actualizar
+    @modules: tkinter.ttk
+    
+    - Observador especializado en actualizar barras de progreso
+    - Procesa tuplas de (valor, máximo) para actualizar el progreso
+    - Maneja errores de formato en los valores recibidos
+    """
+    def __init__(self, progress_bar: ttk.Progressbar):
+        super().__init__(MessageType.PROGRESS)
+        self.progress_bar = progress_bar
 
     def update(self, message: GUIMessage) -> None:
-        if message.type == MessageType.PROGRESS:
-            self.progress_var.set(message.content)
-        elif message.type == MessageType.SUCCESS:
-            self.progress_var.set("")  # Limpiar al completar
+        if message.type == self.message_type:
+            try:
+                value, maximum = message.content
+                self.progress_bar["maximum"] = maximum
+                self.progress_bar["value"] = value
+            except (ValueError, TypeError) as e:
+                print(f"Error actualizando progress bar: {e}")
+
 
 class DialogObserver(GUIObserver):
-    """Observador para diálogos emergentes"""
+    """
+    @param: parent_window tipo tk.Tk; ventana padre para los diálogos
+    @modules: tkinter.messagebox
+    
+    - Observador especializado en mostrar diálogos modales
+    - Soporta diferentes tipos de diálogos: información, advertencia y error
+    - Los diálogos se muestran centrados respecto a la ventana padre
+    """
     def __init__(self, parent_window: tk.Tk):
+        super().__init__(MessageType.DIALOG)
         self.parent = parent_window
 
     def update(self, message: GUIMessage) -> None:
-        if message.show_dialog:
-            tk.messagebox.showinfo("Mensaje", message.content)
+        if message.type == self.message_type:
+            if message.dialog_type == DialogType.INFO:
+                messagebox.showinfo("Información", message.content)
+            elif message.dialog_type == DialogType.WARNING:
+                messagebox.showwarning("Advertencia", message.content)
+            elif message.dialog_type == DialogType.ERROR:
+                messagebox.showerror("Error", message.content)
 
-# 4. Sujeto Observable (Subject)
+
+class StatusLabelObserver(GUIObserver):
+    """
+    @param: status_var tipo tk.StringVar; variable de control para la etiqueta de estado
+    @modules: tkinter
+    
+    - Observador especializado en actualizar etiquetas de estado
+    - Actualiza el texto de la etiqueta mediante una variable de control
+    - Permite mostrar mensajes de estado en tiempo real
+    """
+    def __init__(self, status_var: tk.StringVar):
+        super().__init__(MessageType.STATUS)
+        self.status_var = status_var
+
+    def update(self, message: GUIMessage) -> None:
+        if message.type == self.message_type:
+            self.status_var.set(message.content)
+
+
 class GUINotifier:
-    """Gestiona las notificaciones de la GUI"""
+    """
+    @modules: None
+    
+    - Implementa el patrón Observer para notificar cambios en la GUI
+    - Mantiene una lista de observadores registrados
+    - Permite adjuntar y desadjuntar observadores dinámicamente
+    - Distribuye los mensajes a todos los observadores registrados
+    """
     def __init__(self):
-        self._observers: Dict[MessageType, List[GUIObserver]] = {
-            message_type: [] for message_type in MessageType
-        }
+        self._observers = []
 
-    def attach(self, observer: GUIObserver, message_types: List[MessageType] = None):
-        """Registra un observador para tipos específicos de mensajes"""
-        types_to_attach = message_types if message_types else list(MessageType)
-        for message_type in types_to_attach:
-            if observer not in self._observers[message_type]:
-                self._observers[message_type].append(observer)
+    def attach(self, observer: GUIObserver):
+        """
+        @param: observer tipo GUIObserver; observador a registrar
+        """
+        if observer not in self._observers:
+            self._observers.append(observer)
 
-    def detach(self, observer: GUIObserver, message_types: List[MessageType] = None):
-        """Elimina un observador de tipos específicos de mensajes"""
-        types_to_detach = message_types if message_types else list(MessageType)
-        for message_type in types_to_detach:
-            if observer in self._observers[message_type]:
-                self._observers[message_type].remove(observer)
+    def detach(self, observer: GUIObserver):
+        """
+        @param: observer tipo GUIObserver; observador a eliminar
+        """
+        if observer in self._observers:
+            self._observers.remove(observer)
 
     def notify(self, message: GUIMessage):
-        """Notifica a los observadores registrados para el tipo de mensaje"""
-        for observer in self._observers[message.type]:
+        """
+        @param: message tipo GUIMessage; mensaje a distribuir a los observadores
+        """
+        for observer in self._observers:
             observer.update(message)

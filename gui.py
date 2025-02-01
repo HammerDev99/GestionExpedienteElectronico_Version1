@@ -18,7 +18,15 @@ import asyncio
 import csv
 import send2trash
 from processing_context import ProcessingContext
-from observer import GUINotifier, TextWidgetObserver, ProgressBarObserver, DialogObserver, GUIMessage, MessageType
+from observer import (
+    GUINotifier,
+    TextWidgetObserver,
+    ProgressBarObserver,
+    DialogObserver,
+    StatusLabelObserver,
+    GUIMessage,
+    MessageType,
+)
 
 
 class Application(ttk.Frame):
@@ -50,7 +58,7 @@ class Application(ttk.Frame):
             # root.geometry("350x300")
             root.protocol("WM_DELETE_WINDOW", self._on_closing)
             self.pack(padx=20, pady=20)  # Añadir padding aquí
-            
+
             # Configurar el sistema de notificación
             self.gui_notifier = GUINotifier()
             self.create_oneProcessWidgets()
@@ -59,14 +67,18 @@ class Application(ttk.Frame):
             text_observer = TextWidgetObserver(self.text_widget)
             progress_observer = ProgressBarObserver(self.progress)
             dialog_observer = DialogObserver(root)
-            
+            status_label_observer = StatusLabelObserver(self.status_var)
+
             # Registrar observadores para tipos específicos
             self.gui_notifier.attach(text_observer)
-            self.gui_notifier.attach(progress_observer, [MessageType.PROGRESS])
+            self.gui_notifier.attach(progress_observer)
             self.gui_notifier.attach(dialog_observer)
+            self.gui_notifier.attach(status_label_observer)
 
             # Crear ProcessingContext con el notificador y el logger
-            self.processing_context = ProcessingContext(self, self.gui_notifier, self.logger)
+            self.processing_context = ProcessingContext(
+                self, self.gui_notifier, self.logger
+            )
         except Exception as e:
             self.logger.error(f"Error en inicialización GUI: {str(e)}", exc_info=True)
             raise
@@ -254,7 +266,7 @@ class Application(ttk.Frame):
         self.label03 = tk.Label(
             self.frame_label03, text="Radicado", font=("Helvetica", 12), padx=5
         )
-        
+
         self.entry03 = tk.Entry(self.frame_label03, width=25, justify="center")
 
         # Crear un Frame para los Radiobuttons
@@ -334,12 +346,12 @@ class Application(ttk.Frame):
         self.progress.pack(fill=tk.BOTH, expand=True)
 
         # Variable de control para el estado
-        self.status_message = tk.StringVar(value="")
+        self.status_var = tk.StringVar(value="")
 
         # Label de estado superpuesto a la barra de progreso
         self.status_label = ttk.Label(
             self.progress_frame,  # Usar el mismo contenedor que la barra de progreso
-            textvariable=self.status_message,
+            textvariable=self.status_var,
             font=("Helvetica", 9),
             background="",  # Fondo transparente
         )
@@ -371,7 +383,7 @@ class Application(ttk.Frame):
 
     def update_progressbar_status(self, message):
         """Actualiza el mensaje de estado."""
-        self.status_message.set(message)
+        self.status_var.set(message)
 
     def mostrar_guia_rapida(self):
         # Crear una ventana emergente
@@ -553,9 +565,11 @@ class Application(ttk.Frame):
             processor = FileProcessor(
                 folder_selected, "", despacho, subserie, radicado, logger=self.logger
             )
-            self.processing_context.process_folder(folder_selected, self.selected_value, processor)
+            self.processing_context.process_folder(
+                folder_selected, self.selected_value, processor
+            )
             return
-        
+
         # Crear una instancia del analizador de carpetas
         analyzer = FolderAnalyzer({}, None, logger=self.logger)
 
@@ -573,7 +587,9 @@ class Application(ttk.Frame):
             return
 
         profundidad_maxima = analyzer.obtener_profundidad_maxima(estructura_directorios)
-        analyzer = FolderAnalyzer(estructura_directorios, profundidad_maxima, logger=self.logger)
+        analyzer = FolderAnalyzer(
+            estructura_directorios, profundidad_maxima, logger=self.logger
+        )
 
         if self.selected_value == "2" and profundidad_maxima == 4:
             self.profundidad = 4

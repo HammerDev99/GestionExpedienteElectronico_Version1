@@ -9,7 +9,7 @@ from process_strategy import (
 import logging
 from typing import List, Set
 import os
-from observer import GUINotifier, GUIMessage, MessageType
+from observer import MessageType, DialogType, GUIMessage, GUINotifier
 
 
 class ProcessingContext:
@@ -36,42 +36,31 @@ class ProcessingContext:
             f"Procesando carpeta con estrategia {strategy.__class__.__name__}"
         )
 
-        # Procesar archivo
-        folder_selected = self.gui._get_bundled_path(
-            os.path.normpath(
-                os.path.join(folder_selected, os.path.normpath(folder_selected))
+        # Agregar texto al widget
+        self.notifier.notify(
+            GUIMessage(
+                f"Iniciando procesamiento de: {folder_selected}", MessageType.TEXT
             )
         )
 
-        # Se ejecuta la estrategia según el valor seleccionado
-        strategy.process(processor)
+        # Actualizar estado
+        self.notifier.notify(GUIMessage("Procesando...", MessageType.STATUS))
 
-        self.notify_process_success()
+        # Inicializar barra de progreso
+        self.notifier.notify(GUIMessage((1, 1), MessageType.PROGRESS))
 
-        # self.analyzer = FolderAnalyzer({})
-        # structure_valid = strategy.validate_structure(folder_selected)
+        # Ejecutar estrategia
+        # strategy.process(processor)
 
-        # if not structure_valid:
-        #    return self.handle_invalid_structure(strategy)
+        # Mostrar diálogo de éxito
+        self.notifier.notify(
+            GUIMessage(
+                "Proceso completado exitosamente", MessageType.DIALOG, DialogType.INFO
+            )
+        )
 
-    def notify_process_start(self, folder_selected: str):
-        """Notifica el inicio del procesamiento"""
-        self.notifier.notify(GUIMessage(
-            f"Iniciando procesamiento de: {folder_selected}",
-            MessageType.INFO
-        ))
-        self.notifier.notify(GUIMessage(
-            "Procesando...",
-            MessageType.PROGRESS
-        ))
-
-    def notify_process_success(self):
-        """Notifica el éxito del procesamiento"""
-        self.notifier.notify(GUIMessage(
-            "Proceso completado exitosamente",
-            MessageType.SUCCESS,
-            show_dialog=True
-        ))
+        # Actualizar barra de progreso al completar
+        self.notifier.notify(GUIMessage((1, 1), MessageType.PROGRESS))
 
     """ # Nuevos métodos trasladados desde Application
     def handle_directory_analysis(self):

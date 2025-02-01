@@ -21,8 +21,6 @@ class SingleCuadernoStrategy(ProcessStrategy):
     def process(self, processor: FileProcessor):
         """Procesa una subcarpeta"""
 
-        # Procesar de forma asíncrona
-        print("Procesando de forma asíncrona")
         asyncio.run(processor.process())
 
     def gestionar_indices_existentes(self, folder_selected, analyzer):
