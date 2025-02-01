@@ -1,3 +1,5 @@
+# Aplica el patron Observer para notificar cambios en la GUI.
+
 from abc import ABC, abstractmethod
 from enum import Enum
 import tkinter as tk

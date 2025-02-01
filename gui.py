@@ -18,7 +18,7 @@ import asyncio
 import csv
 import send2trash
 from processing_context import ProcessingContext
-from observer import (
+from gui_notifier import (
     GUINotifier,
     TextWidgetObserver,
     ProgressBarObserver,
@@ -77,7 +77,7 @@ class Application(ttk.Frame):
 
             # Crear ProcessingContext con el notificador y el logger
             self.processing_context = ProcessingContext(
-                self, self.gui_notifier, self.logger
+                self.gui_notifier, self.logger
             )
         except Exception as e:
             self.logger.error(f"Error en inicialización GUI: {str(e)}", exc_info=True)

@@ -1,13 +1,20 @@
+# Contiene las clases de estrategias de procesamiento de carpetas.
+
 from abc import ABC, abstractmethod
 from typing import Tuple, List, Set
 import os
 from folder_analyzer import FolderAnalyzer
 from file_processor import FileProcessor
 import asyncio
+import gui_notifier
+from gui_notifier import MessageType, DialogType, GUIMessage, GUINotifier
 
 
 class ProcessStrategy(ABC):
     """Define la interfaz común para todas las estrategias de procesamiento."""
+
+    def __init__(self, notifier: gui_notifier):
+        self.notifier = notifier
 
     @abstractmethod
     def process(self, processor: FileProcessor):
@@ -21,7 +28,18 @@ class SingleCuadernoStrategy(ProcessStrategy):
     def process(self, processor: FileProcessor):
         """Procesa una subcarpeta"""
 
-        asyncio.run(processor.process())
+        # Notificar inicio
+        self.notifier.notify(
+            GUIMessage(
+                "Proceso completado exitosamente", MessageType.DIALOG, DialogType.INFO
+            )
+        )
+        
+        # Procesar
+        #asyncio.run(processor.process())
+        
+        # Notificar éxito
+        self.notifier.notify(GUIMessage("Proceso completado", MessageType.STATUS))
 
     def gestionar_indices_existentes(self, folder_selected, analyzer):
         """
