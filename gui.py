@@ -18,6 +18,7 @@ import asyncio
 import csv
 import send2trash
 from processing_context import ProcessingContext
+from observer import GUINotifier, TextWidgetObserver, ProgressBarObserver, DialogObserver, GUIMessage, MessageType
 
 
 class Application(ttk.Frame):
@@ -49,8 +50,23 @@ class Application(ttk.Frame):
             # root.geometry("350x300")
             root.protocol("WM_DELETE_WINDOW", self._on_closing)
             self.pack(padx=20, pady=20)  # Añadir padding aquí
+            
+            # Configurar el sistema de notificación
+            self.gui_notifier = GUINotifier()
             self.create_oneProcessWidgets()
-            self.processing_context = ProcessingContext(self, logger=self.logger)
+
+            # Crear y registrar observadores
+            text_observer = TextWidgetObserver(self.text_widget)
+            progress_observer = ProgressBarObserver(self.progress)
+            dialog_observer = DialogObserver(root)
+            
+            # Registrar observadores para tipos específicos
+            self.gui_notifier.attach(text_observer)
+            self.gui_notifier.attach(progress_observer, [MessageType.PROGRESS])
+            self.gui_notifier.attach(dialog_observer)
+
+            # Crear ProcessingContext con el notificador y el logger
+            self.processing_context = ProcessingContext(self, self.gui_notifier, self.logger)
         except Exception as e:
             self.logger.error(f"Error en inicialización GUI: {str(e)}", exc_info=True)
             raise

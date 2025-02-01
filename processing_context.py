@@ -9,13 +9,15 @@ from process_strategy import (
 import logging
 from typing import List, Set
 import os
+from observer import GUINotifier, GUIMessage, MessageType
 
 
 class ProcessingContext:
     """Gestiona el procesamiento de carpetas usando la estrategia apropiada."""
 
-    def __init__(self, gui_instance, logger=None):
+    def __init__(self, gui_instance, gui_notifier: GUINotifier, logger=None):
         self.gui = gui_instance
+        self.notifier = gui_notifier
         self.logger = logger or logging.getLogger("ProcessingContext")
         self._strategies = {
             "1": SingleCuadernoStrategy(),
@@ -44,11 +46,32 @@ class ProcessingContext:
         # Se ejecuta la estrategia según el valor seleccionado
         strategy.process(processor)
 
+        self.notify_process_success()
+
         # self.analyzer = FolderAnalyzer({})
         # structure_valid = strategy.validate_structure(folder_selected)
 
         # if not structure_valid:
         #    return self.handle_invalid_structure(strategy)
+
+    def notify_process_start(self, folder_selected: str):
+        """Notifica el inicio del procesamiento"""
+        self.notifier.notify(GUIMessage(
+            f"Iniciando procesamiento de: {folder_selected}",
+            MessageType.INFO
+        ))
+        self.notifier.notify(GUIMessage(
+            "Procesando...",
+            MessageType.PROGRESS
+        ))
+
+    def notify_process_success(self):
+        """Notifica el éxito del procesamiento"""
+        self.notifier.notify(GUIMessage(
+            "Proceso completado exitosamente",
+            MessageType.SUCCESS,
+            show_dialog=True
+        ))
 
     """ # Nuevos métodos trasladados desde Application
     def handle_directory_analysis(self):
