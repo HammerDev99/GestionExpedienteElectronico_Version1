@@ -451,7 +451,7 @@ class FolderAnalyzer:
                 for subdirectorio in directorio.values()
             )
 
-    def buscar_indices_electronicos(self, ruta):
+    def old_buscar_indices_electronicos(self, ruta):
         """
         Busca archivos .xlsm en la ruta especificada.
 
@@ -467,6 +467,41 @@ class FolderAnalyzer:
                 for file in files:
                     if file.endswith(".xlsm"):
                         indices.append(os.path.join(root, file))
+            return indices
+        except Exception as e:
+            self.logger.error(f"Error buscando índices: {str(e)}")
+            return []
+
+    def buscar_indices_electronicos(self, ruta):
+        """
+        Busca archivos .xlsm en la ruta especificada.
+        Funciona tanto para estructura simple como jerárquica.
+
+        Args:
+            ruta (str): Ruta del expediente
+
+        Returns:
+            list: Lista de rutas de archivos .xlsm encontrados
+        """
+        indices = []
+        try:
+            # Detectar si es una estructura simple verificando si hay subdirectorios
+            tiene_subdirectorios = any(
+                os.path.isdir(os.path.join(ruta, item)) 
+                for item in os.listdir(ruta)
+            )
+            
+            if not tiene_subdirectorios:
+                # Para estructura simple (un solo nivel)
+                for file in os.listdir(ruta):
+                    if file.endswith(".xlsm"):
+                        indices.append(os.path.join(ruta, file))
+            else:
+                # Para estructura jerárquica (múltiples niveles)
+                for root, _, files in os.walk(ruta):
+                    for file in files:
+                        if file.endswith(".xlsm"):
+                            indices.append(os.path.join(root, file))
             return indices
         except Exception as e:
             self.logger.error(f"Error buscando índices: {str(e)}")

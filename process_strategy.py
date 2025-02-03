@@ -2,6 +2,11 @@
 
 import asyncio
 from abc import ABC, abstractmethod
+import logging
+import os
+
+import send2trash
+import file_processor
 from folder_analyzer import FolderAnalyzer
 from file_processor import FileProcessor
 import gui_notifier
@@ -11,8 +16,9 @@ from gui_notifier import MessageType, DialogType, GUIMessage, GUINotifier
 class ProcessStrategy(ABC):
     """Define la interfaz común para todas las estrategias de procesamiento."""
 
-    def __init__(self, notifier: gui_notifier):
+    def __init__(self, notifier: gui_notifier, logger=None):
         self.notifier = notifier
+        self.logger = logger or logging.getLogger(self.__class__.__name__)
 
     @abstractmethod
     def add_folder(self, processor: FileProcessor):
@@ -20,6 +26,27 @@ class ProcessStrategy(ABC):
 
     @abstractmethod
     def process(self, processor: FileProcessor):
+        pass
+
+    @abstractmethod
+    def gestionar_indices_existentes(self, folder_selected, analyzer):
+        """
+        Busca y gestiona índices existentes.
+
+        Args:
+            folder_selected (str): Ruta de la carpeta seleccionada.
+            analyzer (FolderAnalyzer): Instancia del analizador de carpetas.
+
+        Returns:
+            bool: True si se deben continuar las operaciones, False si se deben detener.
+        """
+        pass
+
+    @abstractmethod
+    def confirmar_eliminar_indices(self, indices):
+        """
+        Confirma con el usuario si desea eliminar los índices encontrados.
+        """
         pass
 
     """ # Nuevos métodos que serán trasladados desde Application
@@ -54,15 +81,23 @@ class ProcessStrategy(ABC):
 class SingleCuadernoStrategy(ProcessStrategy):
     """Estrategia para procesar un solo cuaderno sin estructura jerárquica."""
 
+    def __init__(self, notifier: gui_notifier, logger=None):
+        super().__init__(notifier, logger)
+
     def add_folder(self, processor: FileProcessor):
         """Validaciones previas al procesamiento de carpetas."""
         
-        # Validar carpeta con obtener rutas
+        #******************* Obtener rutas
 
-        # Validaciones 
 
-        # Procesamiento de carpetas LUEGO DEBE SER LLAMADO DIRECTAMENTE EN EL MÉTODO process
-        self.process(processor)
+        # Crear una instancia del analizador de carpetas
+        analyzer = FolderAnalyzer({}, None, logger=self.logger)
+        # Llamar al nuevo método para gestionar índices existentes
+        continuar = self.gestionar_indices_existentes(processor.get_ruta(), analyzer)
+        if not continuar:
+            return  # Detiene ejecución si se encontraron índices y no se eliminaron
+
+        # ******************* Validaciones 
 
     def process(self, processor: FileProcessor):
         """Procesa un cuaderno sin estructura jerárquica."""
@@ -79,6 +114,67 @@ class SingleCuadernoStrategy(ProcessStrategy):
         )
         self.notifier.notify(GUIMessage((0, 1), MessageType.PROGRESS))
 
+    def gestionar_indices_existentes(self, folder_selected, analyzer):
+        """
+        Busca y gestiona índices existentes.
+
+        Args:
+            folder_selected (str): Ruta de la carpeta seleccionada.
+            analyzer (FolderAnalyzer): Instancia del analizador de carpetas.
+
+        Returns:
+            bool: True si se deben continuar las operaciones, False si se deben detener.
+        """
+        # Buscar y gestionar índices existentes
+        indices = analyzer.buscar_indices_electronicos(folder_selected)
+        if indices:
+            indices_eliminados = self.confirmar_eliminar_indices(indices)
+            if not indices_eliminados:
+                
+                # PENDIENTE REVISAR SU NECESIDAD PARA LA OPCION CONCRETA
+                #self._restablecer_variables_clase()
+                
+                self.notifier.notify(GUIMessage("", MessageType.STATUS))
+                return False  # Detiene ejecución si se encontraron índices y no se eliminaron
+        return (
+            True  # Continúa ejecución si no se encontraron índices o si se eliminaron
+        )
+
+    def confirmar_eliminar_indices(self, indices):
+        """
+        Confirma con el usuario si desea eliminar los índices encontrados.
+        """
+
+        cantidad = len(indices)
+        mensaje = f"Se encontraron {cantidad} índice{'s' if cantidad > 1 else ''} electrónico{'s' if cantidad > 1 else ''} que impide el procesamiento"
+        confirm = self.notifier.notify(GUIMessage(
+            f"{mensaje}. ¿Desea eliminarlos?",
+            MessageType.DIALOG,
+            DialogType.CONFIRM
+        ))
+        
+        # AQUI VOY
+
+        if confirm:
+            self.notifier.notify(GUIMessage("\n*******************\n✅ Índices eliminados:\n", MessageType.TEXT))
+            for indice in indices:
+                try:
+                    componentes = indice.split(os.sep)[-4:]
+                    ruta_relativa = os.path.join(*componentes)
+                    send2trash.send2trash(indice)
+                    self.notifier.notify(GUIMessage(f"   🔹 {ruta_relativa}\n", MessageType.TEXT))
+                except Exception as e:
+                    self.logger.error(f"Error eliminando índice {indice}: {str(e)}")
+            return True
+        else:
+            self.notifier.notify(GUIMessage(f"\n*******************\n❕ {mensaje}:\n", MessageType.TEXT))
+            for indice in indices:
+                # Obtener los últimos 4 componentes de la ruta
+                componentes = indice.split(os.sep)[-4:]
+                ruta_relativa = os.path.join(*componentes)
+                self.notifier.notify(GUIMessage(f"   🔹 {ruta_relativa}\n", MessageType.TEXT))
+            return False
+
 class SingleExpedienteStrategy(ProcessStrategy):
     """Estrategia para procesar un expediente con estructura de 4 niveles."""
 
@@ -88,6 +184,12 @@ class SingleExpedienteStrategy(ProcessStrategy):
 
     def process(self, processor: FileProcessor):
         """Procesa un expediente con estructura de 4 niveles."""
+        pass
+
+    def confirmar_eliminar_indices(self, indices):
+        pass
+
+    def gestionar_indices_existentes(self, folder_selected, analyzer):
         pass
 
 
@@ -100,4 +202,10 @@ class MultiExpedienteStrategy(ProcessStrategy):
 
     def process(self, processor: FileProcessor):
         """Procesa expedientes con estructura de 5 niveles."""
+        pass
+
+    def confirmar_eliminar_indices(self, indices):
+        pass
+
+    def gestionar_indices_existentes(self, folder_selected, analyzer):
         pass

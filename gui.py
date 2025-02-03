@@ -562,9 +562,8 @@ class Application(ttk.Frame):
             processor = FileProcessor(
                 folder_selected, "", despacho, subserie, radicado, logger=self.logger
             )
-            self.processing_context.process_folder(
-                self.selected_value, processor
-            )
+            self.processing_context.add_folder(self.selected_value, processor)
+            #self.processing_context.process_folder(self.selected_value, processor)
             return
         #**********************************
 

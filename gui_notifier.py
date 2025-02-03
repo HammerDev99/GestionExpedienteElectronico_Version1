@@ -4,7 +4,7 @@ from abc import ABC, abstractmethod
 from enum import Enum
 import tkinter as tk
 from tkinter import ttk, messagebox
-from typing import List, Union, Tuple
+from typing import Union, Tuple
 
 
 class MessageType(Enum):
@@ -33,6 +33,7 @@ class DialogType(Enum):
     INFO = "info"
     WARNING = "warning"
     ERROR = "error"
+    CONFIRM = "confirm"
 
 
 class GUIMessage:
@@ -55,6 +56,7 @@ class GUIMessage:
         self.content = content
         self.type = message_type
         self.dialog_type = dialog_type
+        self.dialog_response = None
 
 
 class GUIObserver(ABC):
@@ -70,7 +72,7 @@ class GUIObserver(ABC):
         self.message_type = message_type
 
     @abstractmethod
-    def update(self, message: GUIMessage) -> None:
+    def update(self, message: GUIMessage):
         pass
 
 
@@ -87,7 +89,7 @@ class TextWidgetObserver(GUIObserver):
         super().__init__(MessageType.TEXT)
         self.text_widget = text_widget
 
-    def update(self, message: GUIMessage) -> None:
+    def update(self, message: GUIMessage):
         if message.type == self.message_type:
             self.text_widget.insert(tk.END, f"\n{message.content}")
             self.text_widget.see(tk.END)
@@ -106,7 +108,7 @@ class ProgressBarObserver(GUIObserver):
         super().__init__(MessageType.PROGRESS)
         self.progress_bar = progress_bar
 
-    def update(self, message: GUIMessage) -> None:
+    def update(self, message: GUIMessage):
         if message.type == self.message_type:
             try:
                 value, maximum = message.content
@@ -129,7 +131,7 @@ class DialogObserver(GUIObserver):
         super().__init__(MessageType.DIALOG)
         self.parent = parent_window
 
-    def update(self, message: GUIMessage) -> None:
+    def update(self, message: GUIMessage):
         if message.type == self.message_type:
             if message.dialog_type == DialogType.INFO:
                 messagebox.showinfo("Información", message.content)
@@ -137,6 +139,11 @@ class DialogObserver(GUIObserver):
                 messagebox.showwarning("Advertencia", message.content)
             elif message.dialog_type == DialogType.ERROR:
                 messagebox.showerror("Error", message.content)
+            elif message.dialog_type == DialogType.CONFIRM:
+                # Mostrar diálogo de confirmación y almacenar respuesta
+                response = messagebox.askyesno("Confirmar", message.content)
+                message.dialog_response = response
+                return message
 
 
 class StatusLabelObserver(GUIObserver):
@@ -152,7 +159,7 @@ class StatusLabelObserver(GUIObserver):
         super().__init__(MessageType.STATUS)
         self.status_var = status_var
 
-    def update(self, message: GUIMessage) -> None:
+    def update(self, message: GUIMessage):
         if message.type == self.message_type:
             self.status_var.set(message.content)
 
@@ -188,4 +195,11 @@ class GUINotifier:
         @param: message tipo GUIMessage; mensaje a distribuir a los observadores
         """
         for observer in self._observers:
-            observer.update(message)
+            if isinstance(observer, DialogObserver) and message.type == MessageType.DIALOG:
+                # Si es un diálogo de confirmación, propagamos la respuesta
+                if message.dialog_type == DialogType.CONFIRM:
+                    result = observer.update(message)
+                    if result and result.dialog_response is not None:
+                        return result.dialog_response
+            else:
+                observer.update(message)

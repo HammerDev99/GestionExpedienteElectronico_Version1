@@ -23,15 +23,15 @@ class FileProcessor:
 
     obj1 = None
 
-    def __init__(self, input: str, indice, despacho, subserie, rdo, logger=None):
+    def __init__(self, folder_selected: str, indice, despacho, subserie, rdo, logger=None):
         # @param: input tipo str; Obtiene ruta de la carpeta a procesar
         self.logger = logger or logging.getLogger("file_processor")
-        self.logger.info(f"Iniciando procesamiento para expediente: {input}")
+        self.logger.info(f"Iniciando procesamiento para expediente: {folder_selected}")
 
         self.obj1 = MetadataExtractor(logger=self.logger)
 
         try:
-            self.ruta = input
+            self.ruta = folder_selected
             self.files = os.listdir(self.ruta)
             self.logger.info(f"Archivos encontrados: {len(self.files)}")
 
@@ -50,6 +50,37 @@ class FileProcessor:
                 f"Error en inicializació de FileProcessor¨: {str(e)}", exc_info=True
             )
             raise
+
+    # setters y getters
+    def set_ruta(self, ruta):
+        self.ruta = ruta
+
+    def get_ruta(self):
+        return self.ruta
+    
+    def set_indice(self, indice):
+        self.indice = indice
+
+    def get_indice(self):
+        return self.indice
+    
+    def set_files(self, files):
+        self.files = files
+
+    def get_files(self):
+        return self.files
+    
+    def set_pids_creados(self, pids_creados):
+        self.pids_creados = pids_creados
+
+    def get_pids_creados(self):
+        return self.pids_creados
+    
+    def set_obj1(self, obj1):
+        self.obj1 = obj1
+
+    def get_obj1(self):
+        return self.obj1
 
     def rename_files(self, files, nombres_extensiones, ruta):
         """

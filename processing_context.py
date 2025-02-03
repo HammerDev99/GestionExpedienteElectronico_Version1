@@ -17,15 +17,25 @@ class ProcessingContext:
         self.notifier = gui_notifier
         self.logger = logger or logging.getLogger("ProcessingContext")
         self._strategies = {
-            "1": SingleCuadernoStrategy(self.notifier),
-            "2": SingleExpedienteStrategy(self.notifier),
-            "3": MultiExpedienteStrategy(self.notifier),
+            "1": SingleCuadernoStrategy(self.notifier, self.logger),
+            "2": SingleExpedienteStrategy(self.notifier, self.logger),
+            "3": MultiExpedienteStrategy(self.notifier, self.logger),
         }
         self.analyzer = None
 
+    def add_folder(self, selected_value: str, processor: FileProcessor):
+        # Agrega una carpeta usando la estrategia correspondiente al valor seleccionado.
+        strategy = self._strategies.get(selected_value)
+        self.logger.info(
+            f"Agregando carpeta con estrategia {strategy.__class__.__name__}"
+        )
+
+        # Ejecutar estrategia
+        strategy.add_folder(processor)
+
     # Procesa una carpeta usando la estrategia correspondiente al valor seleccionado.
     def process_folder(self, selected_value: str, processor: FileProcessor):
-        """Procesa una carpeta usando la estrategia correspondiente al valor seleccionado."""
+        # Procesa una carpeta usando la estrategia correspondiente al valor seleccionado.
         strategy = self._strategies.get(selected_value)
         self.logger.info(
             f"Procesando carpeta con estrategia {strategy.__class__.__name__}"
@@ -34,6 +44,7 @@ class ProcessingContext:
         # Ejecutar estrategia
         strategy.process(processor)
 
+    # ********************************************
     # Recursos para hacer notificaciones de la GUI
 
     # Agregar texto al widget
