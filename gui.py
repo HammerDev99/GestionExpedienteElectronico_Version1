@@ -35,6 +35,7 @@ class Application(ttk.Frame):
     analyzer = None
     profundidad = None
     carpetas_omitidas = list()
+    processor = None
 
     def __init__(self, root, logger=None):
         """
@@ -218,9 +219,12 @@ class Application(ttk.Frame):
             text="Ingrese el nombre exacto del juzgado según el sistema validador/migrador",
         )
 
-        self.entry01 = tk.Entry(self, width=90, justify="center")
+        # Crear el Combobox para entry01
+        self.entry01 = ttk.Combobox(self, width=90, state="normal", justify="center")
         self.entry01.pack(pady=5)
-        self.entry01.insert(0, "CENTRO DE SERVICIOS JUDICIALES DE BELLO")
+
+        # Leer el archivo CSV y obtener los valores para el Combobox
+        self.load_csv_values(self.entry01, "assets/JUZGADOS.csv")
 
         # Crear un Frame para contener el label01 y el icono de ayuda
         self.frame_label02 = tk.Frame(self)
@@ -253,7 +257,7 @@ class Application(ttk.Frame):
         self.entry02.pack(pady=5)
 
         # Leer el archivo CSV y obtener los valores para el Combobox
-        self.load_csv_values()
+        self.load_csv_values(self.entry02, "assets/TRD.csv")
 
         # Crear un Frame para contener el label03 y el icono de ayuda
         self.frame_label03 = tk.Frame(self)
@@ -513,11 +517,11 @@ class Application(ttk.Frame):
         except Exception as e:
             self.logger.error(f"Error en limpieza de recursos: {str(e)}", exc_info=True)
 
-    def load_csv_values(self):
+    def load_csv_values(self, entry: ttk.Combobox, ruta: str):
         """
         Carga los valores del archivo CSV en el combobox.
         """
-        csv_file_path = self._get_bundled_path("assets/TRD.csv")
+        csv_file_path = self._get_bundled_path(ruta)
         values = []
 
         with open(csv_file_path, newline="", encoding="utf-8") as csvfile:
@@ -525,9 +529,9 @@ class Application(ttk.Frame):
             for row in reader:
                 values.append(row["nombre"].upper())
 
-        self.entry02["values"] = values
+        entry["values"] = values
         if values:
-            self.entry02.set(values[0])
+            entry.set(values[0])
 
     # Funcion para el caso de varias carpetas (4 y 5 niveles: carpeta/subcarpetas/archivos)
     def obtener_rutas(self):
@@ -562,6 +566,7 @@ class Application(ttk.Frame):
             processor = FileProcessor(
                 folder_selected, "", despacho, subserie, radicado, logger=self.logger
             )
+            self.processor = processor
             self.processing_context.add_folder(self.selected_value, processor)
             #self.processing_context.process_folder(self.selected_value, processor)
             return
@@ -993,7 +998,7 @@ class Application(ttk.Frame):
 
     async def procesa_expedientes(self):
         """Versión asíncrona simplificada del procesamiento de expedientes"""
-        if not self.lista_subcarpetas:
+        if not self.lista_subcarpetas and self.selected_value != "1":
             self._mensaje(3)
             return
 
@@ -1017,6 +1022,11 @@ class Application(ttk.Frame):
         self.text_widget.insert(tk.END, "\n🔄 Proceso iniciado...\n")
         self.update_progressbar_status("")
         self.update_idletasks()
+
+        if self.selected_value == "1":
+            self.processing_context.process_folder(self.selected_value, self.processor)
+            self.processor = None
+            return
 
         try:
             processed = 0

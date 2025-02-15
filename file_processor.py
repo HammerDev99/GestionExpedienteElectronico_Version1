@@ -36,10 +36,10 @@ class FileProcessor:
             self.logger.info(f"Archivos encontrados: {len(self.files)}")
 
             # if len(self.files) > 0:
-            if indice == "":
+            """ if indice == "":
                 self.copy_xlsm(self.ruta)
             else:
-                self.indice = indice
+                self.indice = indice """
 
             self.despacho = despacho
             self.subserie = subserie
@@ -226,6 +226,9 @@ class FileProcessor:
 
     def _process_excel(self):
         """Método que contiene todas las operaciones síncronas de Excel"""
+        if self.indice == "":
+                self.copy_xlsm(self.ruta)
+        
         aux_files, _ = MetadataExtractor.separate_path(self.files)
         list_aux = [os.path.basename(self.indice)]
         index_name, _ = MetadataExtractor.separate_path(list_aux)

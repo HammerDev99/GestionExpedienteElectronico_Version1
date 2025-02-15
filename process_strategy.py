@@ -90,18 +90,28 @@ class SingleCuadernoStrategy(ProcessStrategy):
         #******************* Obtener rutas
 
 
+
         # Crear una instancia del analizador de carpetas
         analyzer = FolderAnalyzer({}, None, logger=self.logger)
         # Llamar al nuevo método para gestionar índices existentes
         continuar = self.gestionar_indices_existentes(processor.get_ruta(), analyzer)
-        if not continuar:
-            return  # Detiene ejecución si se encontraron índices y no se eliminaron
+
+        # PENDIENTE INDICAR LA CARPETA SELECCIONADA EN TEXVIEW Y DEMÁS INTERACCIONES DE LA GUI
+
+        # ACTUALIZAR LISTADO DE ARCHIVOS EN PROCESSOR
+
+        # MODIFICAR MENSAJE DE INICIO DE PROCESAMIENTO EN EL SENTIDO DE INDICAR NO UNA CANTIDAD DE CARPETAS SINO DE ARCHIVOS O EL NOMBRE DE LA SUBCARPETA A PROCESAR (Se procesarán 0 carpetas)
+
+        #if not continuar:
+        #    return  # Detiene ejecución si se encontraron índices y no se eliminaron
+
+        
 
         # ******************* Validaciones 
 
     def process(self, processor: FileProcessor):
         """Procesa un cuaderno sin estructura jerárquica."""
-        asyncio.run(processor.process())
+        processor._process_excel()
 
         # Notificar finalización
         self.notifier.notify(GUIMessage("✅ Proceso completado.\n*******************\n\n", MessageType.TEXT))
@@ -131,7 +141,6 @@ class SingleCuadernoStrategy(ProcessStrategy):
             indices_eliminados = self.confirmar_eliminar_indices(indices)
             if not indices_eliminados:
                 
-                # PENDIENTE REVISAR SU NECESIDAD PARA LA OPCION CONCRETA
                 #self._restablecer_variables_clase()
                 
                 self.notifier.notify(GUIMessage("", MessageType.STATUS))
@@ -146,13 +155,13 @@ class SingleCuadernoStrategy(ProcessStrategy):
         """
 
         cantidad = len(indices)
-        mensaje = f"Se encontraron {cantidad} índice{'s' if cantidad > 1 else ''} electrónico{'s' if cantidad > 1 else ''} que impide el procesamiento"
+        mensaje = f"Se encontr{'aron' if cantidad > 1 else 'ó'} {cantidad} índice{'s' if cantidad > 1 else ''} electrónico{'s' if cantidad > 1 else ''} que impide el procesamiento"
         confirm = self.notifier.notify(GUIMessage(
             f"{mensaje}. ¿Desea eliminarlos?",
             MessageType.DIALOG,
             DialogType.CONFIRM
         ))
-        
+
         # AQUI VOY
 
         if confirm:

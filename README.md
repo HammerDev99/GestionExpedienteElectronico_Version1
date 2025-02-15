@@ -122,8 +122,10 @@ python main.py
 
 ## Registro de cambios
 
-- ## Registro de cambios
-
+- 2025-02-15 Nuevo Release 🚀 GestionExpedienteElectronico v1.4.3
+  - Refactorización de la interfaz de usuario en gui.py para mejorar legibilidad y actualización de textos de Radiobuttons
+  - Implementación del patrón Observer para la gestión de notificaciones en la GUI
+  - Eliminación de importaciones no utilizadas y optimización de estrategias de archivo.
 - 2024-12-31 Nuevo Release 🚀 GestionExpedienteElectronico v1.4.2
   - 2024-12-30 Implementación de gestión segura de índices existentes utilizando send2trash y mejoras en la validación del CUI
   - 2024-12-27 Optimización del procesamiento de carpetas con validación mejorada para estructuras vacías y manejo de errores
