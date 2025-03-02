@@ -65,7 +65,10 @@ class FileProcessor:
         return self.indice
     
     def set_files(self, files):
-        self.files = files
+        if files is None:
+            self.files = os.listdir(self.ruta)
+        else:
+            self.files = files
 
     def get_files(self):
         return self.files

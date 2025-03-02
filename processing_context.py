@@ -7,7 +7,7 @@ from process_strategy import (
     MultiExpedienteStrategy,
 )
 import logging
-from gui_notifier import MessageType, DialogType, GUIMessage, GUINotifier
+from gui_notifier import GUINotifier
 
 
 class ProcessingContext:
@@ -40,35 +40,6 @@ class ProcessingContext:
         self.logger.info(
             f"Procesando carpeta con estrategia {strategy.__class__.__name__}"
         )
-        
+
         # Ejecutar estrategia
         strategy.process(processor)
-
-    # ********************************************
-    # Recursos para hacer notificaciones de la GUI
-
-    # Agregar texto al widget
-    """ self.notifier.notify(
-        GUIMessage(
-            f"Iniciando procesamiento de: {folder_selected}", MessageType.TEXT
-        )
-    ) """
-
-    # Actualizar estado
-    # self.notifier.notify(GUIMessage("Procesando...", MessageType.STATUS))
-
-    # Inicializar barra de progreso
-    # self.notifier.notify(GUIMessage((1, 1), MessageType.PROGRESS))
-
-    # Ejecutar estrategia
-    # strategy.process(processor)
-
-    # Mostrar diálogo de éxito
-    """ self.notifier.notify(
-        GUIMessage(
-            "Proceso completado exitosamente", MessageType.DIALOG, DialogType.INFO
-        )
-    ) """
-
-    # Actualizar barra de progreso al completar
-    # self.notifier.notify(GUIMessage((1, 1), MessageType.PROGRESS))

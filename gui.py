@@ -1,5 +1,6 @@
 # coding=utf-8
 
+from multiprocessing import process
 import tkinter as tk
 from tkinter import ttk
 from tkinter import filedialog
@@ -73,9 +74,7 @@ class Application(ttk.Frame):
             self.gui_notifier.attach(status_label_observer)
 
             # Crear ProcessingContext con el notificador y el logger
-            self.processing_context = ProcessingContext(
-                self.gui_notifier, self.logger
-            )
+            self.processing_context = ProcessingContext(self.gui_notifier, self.logger)
         except Exception as e:
             self.logger.error(f"Error en inicialización GUI: {str(e)}", exc_info=True)
             raise
@@ -553,9 +552,9 @@ class Application(ttk.Frame):
             )
             return
 
-        #**********************************
+        # **********************************
         # Implementación del patron strategy
-        # Procesar la carpeta seleccionada utilizando el contexto para el caso de la opcion subcarpetas
+        # Agrega la carpeta seleccionada utilizando el contexto para el caso de la opcion subcarpetas
         if self.selected_value == "1":
 
             # Procesar archivo
@@ -563,14 +562,34 @@ class Application(ttk.Frame):
             subserie = self.entry02.get()
             radicado = self.entry03.get()
 
+            # validar que existan archivos en la carpeta seleccionada
+            estructura_directorios = os.listdir(folder_selected)
+            if not estructura_directorios:
+                tk.messagebox.showwarning(
+                    "Advertencia",
+                    "La carpeta seleccionada está vacía o no es accesible.",
+                )
+                return
+            # Validar con el usuario a través de un mensaje de confirmación solo en el caso en que dentro de la carpeta seleccionada existan más carpetas adentro
+            carpetas = []
+            for carpeta in estructura_directorios:
+                if os.path.isdir(os.path.join(folder_selected, carpeta)):
+                    carpetas.append(carpeta)
+            if len(carpetas) > 1:
+                if not tk.messagebox.askyesno(
+                    "Advertencia",
+                    f"La carpeta seleccionada contiene más de una subcarpeta.\n\n{carpetas}\n\n¿Desea continuar?",
+                ):
+                    return
+
             processor = FileProcessor(
                 folder_selected, "", despacho, subserie, radicado, logger=self.logger
             )
             self.processor = processor
             self.processing_context.add_folder(self.selected_value, processor)
-            #self.processing_context.process_folder(self.selected_value, processor)
+
             return
-        #**********************************
+        # **********************************
 
         # Crear una instancia del analizador de carpetas
         analyzer = FolderAnalyzer({}, None, logger=self.logger)
@@ -998,7 +1017,12 @@ class Application(ttk.Frame):
 
     async def procesa_expedientes(self):
         """Versión asíncrona simplificada del procesamiento de expedientes"""
-        if not self.lista_subcarpetas and self.selected_value != "1":
+        despacho = self.entry01.get()
+        subserie = self.entry02.get()
+
+        if not self.lista_subcarpetas and (
+            self.selected_value != "1" or self.processor is None
+        ):
             self._mensaje(3)
             return
 
@@ -1006,9 +1030,15 @@ class Application(ttk.Frame):
         total_carpetas = sum(len(sublista) for sublista in self.lista_subcarpetas)
         self.progress["maximum"] = 1  # La barra de progreso va de 0 a 1
 
-        # Confirmar procesamiento
+        # Se realiza conteo de archivos lo cual debería de estar en la estrategia pero por el momento se realiza en este punto
+        if self.selected_value == "1":
+            total_archivos = len(os.listdir(self.processor.get_ruta()))
+
         if not tk.messagebox.askyesno(
-            message=f'Se procesarán {total_carpetas} cuadernos que contiene la carpeta {os.path.basename(self.expediente)}". \n¿Desea continuar?.',
+            message=f'Se procesarán {total_carpetas if self.selected_value != "1" else total_archivos} '
+            f'{"cuadernos" if self.selected_value != "1" else "archivos"} que contiene la carpeta '
+            f'"{os.path.basename(self.expediente) if self.selected_value != "1" else os.path.basename(self.processor.get_ruta())}". '
+            f"¿Desea continuar?.",
             title=os.path.basename(self.expediente),
         ):
             self._restablecer_variables_clase()
@@ -1016,24 +1046,34 @@ class Application(ttk.Frame):
             self._mensaje(6)
             return
 
-        # Iniciar procesamiento
-        self.update_progressbar_status("")
-        self.progress["value"] = 0.1
-        self.text_widget.insert(tk.END, "\n🔄 Proceso iniciado...\n")
-        self.update_progressbar_status("")
-        self.update_idletasks()
-
+        # **********************************
+        # Implementación del patron strategy
+        # Procesar la carpeta seleccionada utilizando el contexto para el caso de la opcion subcarpetas
         if self.selected_value == "1":
+            processor = FileProcessor(
+                self.processor.get_ruta(),
+                "",
+                despacho,
+                subserie,
+                self.entry03.get(),
+                logger=self.logger,
+            )
             self.processing_context.process_folder(self.selected_value, self.processor)
             self.processor = None
+            self._restablecer_variables_clase()
             return
+        # **********************************
+
+        # Iniciar procesamiento
+        if self.selected_value != "1":
+            self.update_progressbar_status("")
+            self.progress["value"] = 0.1
+            self.text_widget.insert(tk.END, "\n🔄 Proceso iniciado...\n")
+            self.update_idletasks()
 
         try:
             processed = 0
             for sublista in self.lista_subcarpetas:
-                despacho = self.entry01.get()
-                subserie = self.entry02.get()
-
                 for ruta in sublista:
                     # Obtener RDO
                     if self.selected_value == "2":
