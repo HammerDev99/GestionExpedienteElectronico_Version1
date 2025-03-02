@@ -13,6 +13,7 @@ class FolderAnalyzer:
         self.todas_las_carpetas = set()
         self.carpetas_procesadas = set()
         self.problemas = []
+        self.XLSM_EXTENSION = ".xlsm"
 
     def obtener_todas_carpetas(
         self, directorio, nivel_deseado, nivel_actual=1, ruta_actual=""
@@ -465,7 +466,7 @@ class FolderAnalyzer:
         try:
             for root, _, files in os.walk(ruta):
                 for file in files:
-                    if file.endswith(".xlsm"):
+                    if file.endswith(self.XLSM_EXTENSION):
                         indices.append(os.path.join(root, file))
             return indices
         except Exception as e:
@@ -494,13 +495,13 @@ class FolderAnalyzer:
             if not tiene_subdirectorios:
                 # Para estructura simple (un solo nivel)
                 for file in os.listdir(ruta):
-                    if file.endswith(".xlsm"):
+                    if file.endswith(self.XLSM_EXTENSION):
                         indices.append(os.path.join(ruta, file))
             else:
                 # Para estructura jerárquica (múltiples niveles)
                 for root, _, files in os.walk(ruta):
                     for file in files:
-                        if file.endswith(".xlsm"):
+                        if file.endswith(self.XLSM_EXTENSION):
                             indices.append(os.path.join(root, file))
             return indices
         except Exception as e:

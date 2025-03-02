@@ -533,6 +533,7 @@ class Application(ttk.Frame):
             entry.set(values[0])
 
     # Funcion para el caso de varias carpetas (4 y 5 niveles: carpeta/subcarpetas/archivos)
+    # Pendiente refactorizar para implementar el patrón strategy con opción 1 y 2
     def obtener_rutas(self):
         """
         - Obtiene la ruta seleccionada por el usuario
@@ -553,7 +554,7 @@ class Application(ttk.Frame):
             return
 
         # **********************************
-        # Implementación del patron strategy
+        # Implementación del patron strategy opción subcarpetas
         # Agrega la carpeta seleccionada utilizando el contexto para el caso de la opcion subcarpetas
         if self.selected_value == "1":
 
@@ -575,12 +576,11 @@ class Application(ttk.Frame):
             for carpeta in estructura_directorios:
                 if os.path.isdir(os.path.join(folder_selected, carpeta)):
                     carpetas.append(carpeta)
-            if len(carpetas) > 1:
-                if not tk.messagebox.askyesno(
-                    "Advertencia",
-                    f"La carpeta seleccionada contiene más de una subcarpeta.\n\n{carpetas}\n\n¿Desea continuar?",
-                ):
-                    return
+            if len(carpetas) > 1 and not tk.messagebox.askyesno(
+                "Advertencia",
+                f"La carpeta seleccionada contiene más de una subcarpeta.\n\n{carpetas}\n\n¿Desea continuar?",
+            ):
+                return
 
             processor = FileProcessor(
                 folder_selected, "", despacho, subserie, radicado, logger=self.logger
@@ -1015,6 +1015,7 @@ class Application(ttk.Frame):
         """Inicia el procesamiento asíncrono"""
         asyncio.run(app.procesa_expedientes())
 
+    # Pendiente refactorizar para implementar el patrón strategy con opción 1 y 2
     async def procesa_expedientes(self):
         """Versión asíncrona simplificada del procesamiento de expedientes"""
         despacho = self.entry01.get()
@@ -1047,7 +1048,7 @@ class Application(ttk.Frame):
             return
 
         # **********************************
-        # Implementación del patron strategy
+        # Implementación del patron strategy opción subcarpetas
         # Procesar la carpeta seleccionada utilizando el contexto para el caso de la opcion subcarpetas
         if self.selected_value == "1":
             processor = FileProcessor(

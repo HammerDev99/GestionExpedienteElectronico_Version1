@@ -34,13 +34,6 @@ class FileProcessor:
             self.ruta = folder_selected
             self.files = os.listdir(self.ruta)
             self.logger.info(f"Archivos encontrados: {len(self.files)}")
-
-            # if len(self.files) > 0:
-            """ if indice == "":
-                self.copy_xlsm(self.ruta)
-            else:
-                self.indice = indice """
-
             self.despacho = despacho
             self.subserie = subserie
             self.rdo = rdo
