@@ -488,10 +488,9 @@ class FolderAnalyzer:
         try:
             # Detectar si es una estructura simple verificando si hay subdirectorios
             tiene_subdirectorios = any(
-                os.path.isdir(os.path.join(ruta, item)) 
-                for item in os.listdir(ruta)
+                os.path.isdir(os.path.join(ruta, item)) for item in os.listdir(ruta)
             )
-            
+
             if not tiene_subdirectorios:
                 # Para estructura simple (un solo nivel)
                 for file in os.listdir(ruta):

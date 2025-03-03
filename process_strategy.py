@@ -3,12 +3,11 @@
 from abc import ABC, abstractmethod
 import logging
 import os
-
 import send2trash
 from folder_analyzer import FolderAnalyzer
 from file_processor import FileProcessor
 import gui_notifier
-from gui_notifier import MessageType, DialogType, GUIMessage, GUINotifier
+from gui_notifier import MessageType, DialogType, GUIMessage
 
 
 class ProcessStrategy(ABC):
@@ -17,40 +16,6 @@ class ProcessStrategy(ABC):
     def __init__(self, notifier: gui_notifier, logger=None):
         self.notifier = notifier
         self.logger = logger or logging.getLogger(self.__class__.__name__)
-
-    @abstractmethod
-    def add_folder(self, processor: FileProcessor):
-        pass
-
-    @abstractmethod
-    def process(self, processor: FileProcessor):
-        pass
-
-    @abstractmethod
-    def gestionar_indices_existentes(self, folder_selected, analyzer):
-        """
-        Busca y gestiona índices existentes.
-
-        Args:
-            folder_selected (str): Ruta de la carpeta seleccionada.
-            analyzer (FolderAnalyzer): Instancia del analizador de carpetas.
-
-        Returns:
-            bool: True si se deben continuar las operaciones, False si se deben detener.
-        """
-        pass
-
-    @abstractmethod
-    def confirmar_eliminar_indices(self, indices):
-        """
-        Confirma con el usuario si desea eliminar los índices encontrados.
-        """
-        pass
-
-    @abstractmethod
-    def handle_directory_analysis(self):
-        # Analiza y procesa la estructura de directorios seleccionada.
-        pass
 
     def _validar_cui(self, cui):
         """
@@ -82,37 +47,34 @@ class ProcessStrategy(ABC):
             return False, cui
 
     @abstractmethod
+    def add_folder(self, processor: FileProcessor):
+        # Validaciones previas al procesamiento de carpetas.
+        pass
+
+    @abstractmethod
+    def process(self, processor: FileProcessor):
+        # Procesa las carpetas seleccionadas.
+        pass
+
+    @abstractmethod
+    def gestionar_indices_existentes(self, folder_selected, analyzer):
+        # Busca y gestiona índices existentes.
+        pass
+
+    @abstractmethod
+    def confirmar_eliminar_indices(self, indices):
+        # Confirma con el usuario si desea eliminar los índices encontrados.
+        pass
+
+    @abstractmethod
+    def handle_directory_analysis(self):
+        # Analiza y procesa la estructura de directorios seleccionada.
+        pass
+
+    @abstractmethod
     def _mostrar_cuis_invalidos(self, cuis_invalidos, lista_cui=None):
-        """
-        Muestra información sobre los CUIs que no cumplen con el formato requerido.
-
-        Args:
-            cuis_invalidos (set): Conjunto de CUIs inválidos
-            lista_cui (list): Lista original de CUIs
-        """
+        # Muestra información sobre los CUIs que no cumplen con el formato requerido.
         pass
-
-    """ # Nuevos métodos que serán trasladados desde Application
-
-    @abstractmethod
-    def gestionar_indices_existentes(self):
-        pass
-
-    @abstractmethod
-    def confirmar_eliminar_indices(self):
-        pass
-
-    @abstractmethod
-    def procesar_expedientes(self):
-        pass
-
-    @abstractmethod
-    def _validar_estructura_expediente(self):
-        pass
-
-    @abstractmethod
-    def _procesar_cuis(self):
-        pass """
 
 
 class SingleCuadernoStrategy(ProcessStrategy):
@@ -124,13 +86,14 @@ class SingleCuadernoStrategy(ProcessStrategy):
     def add_folder(self, processor: FileProcessor):
         """Validaciones previas al procesamiento de carpetas."""
 
-        # ******************* Obtener rutas
-
         # Crear una instancia del analizador de carpetas
         analyzer = FolderAnalyzer({}, None, logger=self.logger)
 
         # Llamar al nuevo método para gestionar índices existentes
         continuar = self.gestionar_indices_existentes(processor.get_ruta(), analyzer)
+        # Detiene ejecución si se encontraron índices y no se eliminaron
+        if not continuar:
+            return
 
         # Actualizar archivos en processor
         processor.set_files(None)
@@ -146,13 +109,10 @@ class SingleCuadernoStrategy(ProcessStrategy):
             # Actualizar CUI en processor
             processor.set_cui(cui)
 
-        if not continuar:
-            return  # Detiene ejecución si se encontraron índices y no se eliminaron
-
     def process(self, processor: FileProcessor):
         """Procesa un cuaderno sin estructura jerárquica."""
 
-        # MODIFICAR MENSAJE DE INICIO DE PROCESAMIENTO EN EL SENTIDO DE INDICAR NO UNA CANTIDAD DE CARPETAS SINO DE ARCHIVOS O EL NOMBRE DE LA SUBCARPETA A PROCESAR (Se procesarán 0 carpetas)
+        # Notifica el inicio del procesamiento
         self.notifier.notify(GUIMessage("", MessageType.STATUS))
         self.notifier.notify(GUIMessage((0.1, 1), MessageType.PROGRESS))
         self.notifier.notify(GUIMessage("\n🔄 Proceso iniciado...\n", MessageType.TEXT))
@@ -170,7 +130,7 @@ class SingleCuadernoStrategy(ProcessStrategy):
 
         processor._process_excel()
 
-        # Notificar finalización
+        # Notifica finalización
         self.notifier.notify(
             GUIMessage(
                 "✅ Proceso completado.\n*******************\n\n", MessageType.TEXT
@@ -259,7 +219,7 @@ class SingleCuadernoStrategy(ProcessStrategy):
 
     def handle_directory_analysis(
         self,
-        folder_selected,
+        folder_selected=None,
         estructura_directorios=None,
         lista_cui=None,
         lista_subcarpetas=None,
@@ -294,11 +254,11 @@ class SingleCuadernoStrategy(ProcessStrategy):
             cuis_invalidos (set): Conjunto de CUIs inválidos
             lista_cui (list): Lista original de CUIs
         """
-        text_aux = ".\n   🔹"
+
         if cuis_invalidos or cuis_invalidos == "":
             # self._mensaje(None, "Algunas carpetas no cumplen con el formato requerido de 23 dígitos numéricos.")
 
-            mensaje = f"❕ Se encontr{'aron' if len(cuis_invalidos) > 1 else 'ó'} radicado{'s' if len(cuis_invalidos) > 1 else ''} (CUI) que no {'cumplen' if len(cuis_invalidos) > 1 else 'cumple'} con los 23 dígitos: "
+            mensaje = f"❕ Se encontr{'aron' if len(cuis_invalidos) > 1 else 'ó'} radicado{'s' if len(cuis_invalidos) > 1 else ''} (CUI) que no {'cumplen' if len(cuis_invalidos) > 1 else 'cumple'} con los 23 dígitos."
 
             mensaje += cuis_invalidos
 
@@ -318,19 +278,23 @@ class SingleExpedienteStrategy(ProcessStrategy):
         pass
 
     def process(self, processor: FileProcessor):
-        """Procesa un expediente con estructura de 4 niveles."""
+        # Procesa un expediente con estructura de 4 niveles.
         pass
 
     def confirmar_eliminar_indices(self, indices):
+        # Confirma con el usuario si desea eliminar los índices encontrados
         pass
 
     def gestionar_indices_existentes(self, folder_selected, analyzer):
+        # Busca y gestiona índices existentes
         pass
 
     def handle_directory_analysis(self):
+        # Analiza y procesa la estructura de directorios seleccionada
         pass
 
     def _mostrar_cuis_invalidos(self, cuis_invalidos, lista_cui=None):
+        # Muestra información sobre los CUIs que no cumplen con el formato requerido
         pass
 
 
@@ -338,21 +302,25 @@ class MultiExpedienteStrategy(ProcessStrategy):
     """Estrategia para procesar múltiples expedientes con estructura de 5 niveles."""
 
     def add_folder(self, processor: FileProcessor):
-        """Validaciones previas al procesamiento de carpetas."""
+        # Validaciones previas al procesamiento de carpetas.
         pass
 
     def process(self, processor: FileProcessor):
-        """Procesa expedientes con estructura de 5 niveles."""
+        # Procesa expedientes con estructura de 5 niveles.
         pass
 
     def confirmar_eliminar_indices(self, indices):
+        # Confirma con el usuario si desea eliminar los índices encontrados
         pass
 
     def gestionar_indices_existentes(self, folder_selected, analyzer):
+        # Busca y gestiona índices existentes
         pass
 
     def handle_directory_analysis(self):
+        # Analiza y procesa la estructura de directorios seleccionada
         pass
 
     def _mostrar_cuis_invalidos(self, cuis_invalidos, lista_cui=None):
+        # Muestra información sobre los CUIs que no cumplen con el formato requerido
         pass

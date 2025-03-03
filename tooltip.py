@@ -1,6 +1,7 @@
 import tkinter as tk
 from PIL import Image, ImageTk
 
+
 class Tooltip:
     def __init__(self, widget, image_path=None, text=None, y_offset=18):
         self.widget = widget
@@ -29,7 +30,14 @@ class Tooltip:
             label.image = photo  # Mantener una referencia para evitar que la imagen sea recolectada por el garbage collector
         elif self.text:
             tw.wm_geometry(f"+{x}+{y-45}")
-            label = tk.Label(tw, text=self.text, background="white", relief="solid", borderwidth=1, font=("Helvetica", 10))
+            label = tk.Label(
+                tw,
+                text=self.text,
+                background="white",
+                relief="solid",
+                borderwidth=1,
+                font=("Helvetica", 10),
+            )
         label.pack()
 
     def hide_tooltip(self, event):

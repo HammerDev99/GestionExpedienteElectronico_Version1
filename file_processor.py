@@ -23,7 +23,9 @@ class FileProcessor:
 
     obj1 = None
 
-    def __init__(self, folder_selected: str, indice, despacho, subserie, rdo, logger=None):
+    def __init__(
+        self, folder_selected: str, indice, despacho, subserie, rdo, logger=None
+    ):
         # @param: input tipo str; Obtiene ruta de la carpeta a procesar
         self.logger = logger or logging.getLogger("file_processor")
         self.logger.info(f"Iniciando procesamiento para expediente: {folder_selected}")
@@ -32,7 +34,14 @@ class FileProcessor:
 
         try:
             self.ruta = folder_selected
-            self.files = os.listdir(self.ruta)
+            # Filtrar archivos del sistema y archivos ocultos
+            self.files = [f for f in os.listdir(self.ruta) if not (
+                f.startswith('.') or  # Archivos ocultos en Unix/Linux/Mac
+                f.endswith('.ini') or # Archivos de configuración
+                f.endswith('.tmp') or # Archivos temporales
+                f.endswith('.db') or  # Archivos de base de datos del sistema
+                f in ['Thumbs.db', 'desktop.ini', '.DS_Store'] # Archivos específicos del sistema
+            )]
             self.logger.info(f"Archivos encontrados: {len(self.files)}")
             self.despacho = despacho
             self.subserie = subserie
@@ -50,28 +59,34 @@ class FileProcessor:
 
     def get_ruta(self):
         return self.ruta
-    
+
     def set_indice(self, indice):
         self.indice = indice
 
     def get_indice(self):
         return self.indice
-    
+
     def set_files(self, files):
         if files is None:
-            self.files = os.listdir(self.ruta)
+            self.files = [f for f in os.listdir(self.ruta) if not (
+                f.startswith('.') or  # Archivos ocultos en Unix/Linux/Mac
+                f.endswith('.ini') or # Archivos de configuración
+                f.endswith('.tmp') or # Archivos temporales
+                f.endswith('.db') or  # Archivos de base de datos del sistema
+                f in ['Thumbs.db', 'desktop.ini', '.DS_Store'] # Archivos específicos del sistema
+            )]
         else:
             self.files = files
 
     def get_files(self):
         return self.files
-    
+
     def set_pids_creados(self, pids_creados):
         self.pids_creados = pids_creados
 
     def get_pids_creados(self):
         return self.pids_creados
-    
+
     def set_obj1(self, obj1):
         self.obj1 = obj1
 
@@ -223,8 +238,8 @@ class FileProcessor:
     def _process_excel(self):
         """Método que contiene todas las operaciones síncronas de Excel"""
         if self.indice == "":
-                self.copy_xlsm(self.ruta)
-        
+            self.copy_xlsm(self.ruta)
+
         aux_files, _ = MetadataExtractor.separate_path(self.files)
         list_aux = [os.path.basename(self.indice)]
         index_name, _ = MetadataExtractor.separate_path(list_aux)

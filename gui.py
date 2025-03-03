@@ -1,6 +1,5 @@
 # coding=utf-8
 
-from multiprocessing import process
 import tkinter as tk
 from tkinter import ttk
 from tkinter import filedialog
@@ -51,7 +50,7 @@ class Application(ttk.Frame):
         self.profundidad = None
         try:
             super().__init__(root)
-            root.title("GestionExpedienteElectronico" + "_Version1" + ".4.3")
+            root.title("AgilEx by Marduk " + self._obtener_version_actual())
             root.resizable(False, False)
             # root.geometry("350x300")
             root.protocol("WM_DELETE_WINDOW", self._on_closing)
@@ -532,8 +531,7 @@ class Application(ttk.Frame):
         if values:
             entry.set(values[0])
 
-    # Funcion para el caso de varias carpetas (4 y 5 niveles: carpeta/subcarpetas/archivos)
-    # Pendiente refactorizar para implementar el patrón strategy con opción 1 y 2
+    # Pendiente refactorizar para implementar el patrón strategy con opción subcarpeta, opción 1 y opción 2
     def obtener_rutas(self):
         """
         - Obtiene la ruta seleccionada por el usuario
@@ -1015,7 +1013,7 @@ class Application(ttk.Frame):
         """Inicia el procesamiento asíncrono"""
         asyncio.run(app.procesa_expedientes())
 
-    # Pendiente refactorizar para implementar el patrón strategy con opción 1 y 2
+    # Pendiente refactorizar para implementar el patrón strategy con opción subcarpeta, opción 1 y opción 2
     async def procesa_expedientes(self):
         """Versión asíncrona simplificada del procesamiento de expedientes"""
         despacho = self.entry01.get()
@@ -1049,7 +1047,7 @@ class Application(ttk.Frame):
 
         # **********************************
         # Implementación del patron strategy opción subcarpetas
-        # Procesar la carpeta seleccionada utilizando el contexto para el caso de la opcion subcarpetas
+        # Procesa la carpeta seleccionada utilizando el contexto para el caso de la opcion subcarpetas
         if self.selected_value == "1":
             processor = FileProcessor(
                 self.processor.get_ruta(),
@@ -1169,7 +1167,7 @@ class Application(ttk.Frame):
         return os.path.normpath(os.path.join(bundle_dir, ruta))
 
     def _obtener_version_actual(self):
-        # Determinar la ruta del archivo xlsm
+        # Determinar la versión del programa
         ruta_json = self._get_bundled_path("assets/last_version.json")
         with open(ruta_json, "r", encoding="utf-8") as file:
             data = json.load(file)
