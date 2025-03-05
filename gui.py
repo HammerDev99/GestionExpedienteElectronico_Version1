@@ -113,9 +113,7 @@ class Application(ttk.Frame):
         )
         self.help_menu.add_command(
             label="Video tutorial (link 1)",
-            command=lambda: self._callback(
-                "https://enki.care/Ultimate"
-            ),
+            command=lambda: self._callback("https://enki.care/Ultimate"),
         )
         self.help_menu.add_command(
             label="Video tutorial (link 2)",
@@ -483,6 +481,22 @@ class Application(ttk.Frame):
             # Forzar cierre en caso de error
             self.root.destroy()
 
+    def load_csv_values(self, entry: ttk.Combobox, ruta: str):
+        """
+        Carga los valores del archivo CSV en el combobox.
+        """
+        csv_file_path = self._get_bundled_path(ruta)
+        values = []
+
+        with open(csv_file_path, newline="", encoding="utf-8") as csvfile:
+            reader = csv.DictReader(csvfile)
+            for row in reader:
+                values.append(row["nombre"].upper())
+
+        entry["values"] = values
+        if values:
+            entry.set(values[0])
+
     def _cleanup(self):
         """
         Limpia recursos antes de cerrar.
@@ -515,21 +529,31 @@ class Application(ttk.Frame):
         except Exception as e:
             self.logger.error(f"Error en limpieza de recursos: {str(e)}", exc_info=True)
 
-    def load_csv_values(self, entry: ttk.Combobox, ruta: str):
-        """
-        Carga los valores del archivo CSV en el combobox.
-        """
-        csv_file_path = self._get_bundled_path(ruta)
-        values = []
+    def _obtener_version_actual(self):
+        # Determinar la versión del programa
+        ruta_json = self._get_bundled_path("assets/last_version.json")
+        with open(ruta_json, "r", encoding="utf-8") as file:
+            data = json.load(file)
+            version = data.get("version")
+        return version
 
-        with open(csv_file_path, newline="", encoding="utf-8") as csvfile:
-            reader = csv.DictReader(csvfile)
-            for row in reader:
-                values.append(row["nombre"].upper())
+    def _comprobar_actualizaciones(self):
+        url = "https://raw.githubusercontent.com/HammerDev99/GestionExpedienteElectronico_Version1/refs/heads/master/assets/last_version.json"  # O usa la URL de raw.githubusercontent.com
+        try:
+            response = requests.get(url)
+            response.raise_for_status()
+            datos = response.json()
 
-        entry["values"] = values
-        if values:
-            entry.set(values[0])
+            version_actual = list(map(int, self._obtener_version_actual().split(".")))
+            ultima_version = list(map(int, datos.get("version").split(".")))
+
+            if version_actual < ultima_version:
+                # Actualizar variable para mostrar notificación en un label de la GUI
+                return False  # la variable is_updated se actualiza a False
+            else:
+                return True  # la variable is_updated se mantiene en True
+        except requests.RequestException as e:
+            self.logger.error(f"Error al comprobar actualizaciones: {e}", exc_info=True)
 
     # Pendiente refactorizar para implementar el patrón strategy con opción subcarpeta, opción 1 y opción 2
     def obtener_rutas(self):
@@ -1165,29 +1189,3 @@ class Application(ttk.Frame):
             else os.path.abspath(os.path.dirname(__file__))
         )
         return os.path.normpath(os.path.join(bundle_dir, ruta))
-
-    def _obtener_version_actual(self):
-        # Determinar la versión del programa
-        ruta_json = self._get_bundled_path("assets/last_version.json")
-        with open(ruta_json, "r", encoding="utf-8") as file:
-            data = json.load(file)
-            version = data.get("version")
-        return version
-
-    def _comprobar_actualizaciones(self):
-        url = "https://raw.githubusercontent.com/HammerDev99/GestionExpedienteElectronico_Version1/refs/heads/master/assets/last_version.json"  # O usa la URL de raw.githubusercontent.com
-        try:
-            response = requests.get(url)
-            response.raise_for_status()
-            datos = response.json()
-
-            version_actual = list(map(int, self._obtener_version_actual().split(".")))
-            ultima_version = list(map(int, datos.get("version").split(".")))
-
-            if version_actual < ultima_version:
-                # Actualizar variable para mostrar notificación en un label de la GUI
-                return False  # la variable is_updated se actualiza a False
-            else:
-                return True  # la variable is_updated se mantiene en True
-        except requests.RequestException as e:
-            self.logger.error(f"Error al comprobar actualizaciones: {e}", exc_info=True)

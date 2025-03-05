@@ -332,9 +332,9 @@ class MetadataExtractor:
         if size >= kb:
             return "%.1f KB" % float(size / kb)
         if size < kb:
-            return "%.0f file_size_bytes" % float(size / file_size_bytes)
+            return "%.0f BYTES" % float(size / file_size_bytes)
         if size == 0:
-            return "0 file_size_bytes"
+            return "0 BYTES"
 
     def page_counter(self, file):
         """
@@ -411,7 +411,7 @@ def count_pages_in_pdf(self, pdf_path):
         - Imprime un mensaje de error si falla el conteo de páginas en cualquiera de los métodos.
     """
 
-    """ # Primer método: PyPDF2.PdfFileReader
+    """ # Primer método: PyPDF2.PdfFileReader (NO FUNCIONÓ CON ARCHIVOS PDF PROTEGIDOS)
     try:
         with open(pdf_path, "rb") as f:
             pdf = PyPDF2.PdfFileReader(f)

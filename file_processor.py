@@ -180,7 +180,8 @@ class FileProcessor:
             nueva_fila = pd.DataFrame(
                 [
                     [
-                        str(nombres_indice[y]),
+                        #str(nombres_indice[y]), # Se comenta la linea para que el nombre en el índice no se modifique
+                        str(nombres[y]), # Se agrega la linea para que el nombre en el índice quede tal cual el de la carpeta
                         str(fechamod[y]),
                         str(numeraciones[y]),
                         str(cantidadpag[y]),

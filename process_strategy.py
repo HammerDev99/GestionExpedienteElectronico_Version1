@@ -128,6 +128,7 @@ class SingleCuadernoStrategy(ProcessStrategy):
         )
         self.notifier.force_update()
 
+        # Procesa el cuaderno
         processor._process_excel()
 
         # Notifica finalización
