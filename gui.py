@@ -114,18 +114,18 @@ class Application(ttk.Frame):
         self.help_menu.add_command(
             label="Video tutorial (link 1)",
             command=lambda: self._callback(
-                "https://etbcsj-my.sharepoint.com/:v:/g/personal/darbelaal_cendoj_ramajudicial_gov_co/Eew3MvwgllNMiNaLn_qSFtwB9hkcfo6-O9SrD-muRvL_cg?nav=eyJyZWZlcnJhbEluZm8iOnsicmVmZXJyYWxBcHAiOiJPbmVEcml2ZUZvckJ1c2luZXNzIiwicmVmZXJyYWxBcHBQbGF0Zm9ybSI6IldlYiIsInJlZmVycmFsTW9kZSI6InZpZXciLCJyZWZlcnJhbFZpZXciOiJNeUZpbGVzTGlua0NvcHkifX0&e=ecwr1m"
+                "https://enki.care/Ultimate"
             ),
         )
         self.help_menu.add_command(
             label="Video tutorial (link 2)",
-            command=lambda: self._callback("https://youtu.be/6adDdMvoC3g"),
+            command=lambda: self._callback("https://enki.care/UltimateY"),
         )
         self.help_menu.add_separator()
         self.help_menu.add_command(
             label="Experto en expediente electrónico (agente IA)",
             command=lambda: self._callback(
-                "https://gestionexpedienteelectronico.streamlit.app/Experto_en_Expediente_Electronico"
+                "https://enki.care/Experto_en_Expediente_Electronico"
             ),
         )
         self.help_menu.add_separator()
