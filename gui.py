@@ -1,5 +1,6 @@
 # coding=utf-8
 
+import select
 import tkinter as tk
 from tkinter import ttk
 from tkinter import filedialog
@@ -276,21 +277,21 @@ class Application(ttk.Frame):
         # Crear los Radiobuttons
         self.radio1 = ttk.Radiobutton(
             self.radio_frame,
-            text="Opción subcarpeta: Índice\nde un solo cuaderno",
+            text="Cuaderno: Selecciona\nun solo cuaderno",
             variable=self.radio_var,
             value="1",
         )
         self.radio1.pack(side=tk.LEFT, padx=10)
         self.radio2 = ttk.Radiobutton(
             self.radio_frame,
-            text="Opción 1: Un expediente → Índice\npara todos sus cuadernos",
+            text="Proceso: Selecciona la\ncarpeta de un proceso",
             variable=self.radio_var,
             value="2",
         )
         self.radio2.pack(side=tk.LEFT, padx=10)
         self.radio3 = ttk.Radiobutton(
             self.radio_frame,
-            text="Opción 2: Una serie documental →\nÍndices para varios expedientes",
+            text="Subserie: Selecciona la \ncarpeta de la subserie",
             variable=self.radio_var,
             value="3",
         )
@@ -419,8 +420,6 @@ class Application(ttk.Frame):
     def _on_radio_change(self, *args):
         self.selected_value = self.radio_var.get()
         self.logger.info(f"Opción seleccionada: {self.selected_value}")
-
-        print(f"Opción seleccionada: {self.selected_value}")
 
         if self.selected_value == "1":
             self.label03.pack(side=tk.LEFT)
@@ -568,6 +567,7 @@ class Application(ttk.Frame):
         self.carpetas_omitidas = set()
         self.estructura_directorios = {}
 
+        #**********************************
         folder_selected = os.path.normpath(filedialog.askdirectory())
         if folder_selected in [".", ""]:
             tk.messagebox.showwarning(
@@ -594,15 +594,20 @@ class Application(ttk.Frame):
                 )
                 return
             # Validar con el usuario a través de un mensaje de confirmación solo en el caso en que dentro de la carpeta seleccionada existan más carpetas adentro
+            #********************************** Funcion repetida integrar en varias funciones adicionales
             carpetas = []
             for carpeta in estructura_directorios:
                 if os.path.isdir(os.path.join(folder_selected, carpeta)):
                     carpetas.append(carpeta)
+            cadena_rutas_invalidas = ""
+            for i in carpetas:
+                cadena_rutas_invalidas += "- "+i + "\n"
             if len(carpetas) > 1 and not tk.messagebox.askyesno(
                 "Advertencia",
-                f"La carpeta seleccionada contiene más de una subcarpeta.\n\n{carpetas}\n\n¿Desea continuar?",
+                f"Confirme si las siguientes carpetas son anexos anexos masivos:\n\n{cadena_rutas_invalidas}\n¿Desea continuar?",
             ):
                 return
+            #**********************************
 
             processor = FileProcessor(
                 folder_selected, "", despacho, subserie, radicado, logger=self.logger
@@ -616,11 +621,6 @@ class Application(ttk.Frame):
         # Crear una instancia del analizador de carpetas
         analyzer = FolderAnalyzer({}, None, logger=self.logger)
 
-        # Llamar al nuevo método para gestionar índices existentes
-        continuar = self.gestionar_indices_existentes(folder_selected, analyzer)
-        if not continuar:
-            return  # Detiene ejecución si se encontraron índices y no se eliminaron
-
         self.expediente = folder_selected
         estructura_directorios = analyzer.construir_estructura(folder_selected)
         if not estructura_directorios:
@@ -630,54 +630,131 @@ class Application(ttk.Frame):
             return
 
         profundidad_maxima = analyzer.obtener_profundidad_maxima(estructura_directorios)
+        # Para poder incorporarla generación de lista de rutas donde se encuentran archivos sueltos donde Solo deberían de ir carpetas se pretende estructurar el objeto folder analizer enviando igualmente el valor seleccionado para que inmediatamente si haga el análisis se genere las rutas de esas carpetas y se vuelva en una variable
         analyzer = FolderAnalyzer(
             estructura_directorios, profundidad_maxima, logger=self.logger
         )
 
-        if self.selected_value == "2" and profundidad_maxima == 4:
-            self.profundidad = 4
-            lista_cui, lista_subcarpetas, self.carpetas_omitidas = (
-                analyzer.obtener_lista_rutas_subcarpetas(
-                    estructura_directorios, 4, folder_selected
+        if self.selected_value == "2": # and profundidad_maxima == 4:
+            # Implementación del manejo de anexos masivos para opcion profundidad 4
+            rutas_invalidas = self.validar_estructura_carpetas(
+                estructura_directorios, self.selected_value
+            )
+            # Confirmación de carpetas de anexos masivos
+            cadena_rutas_invalidas = ""
+            for i in rutas_invalidas:
+                cadena_rutas_invalidas += "- "+i + "\n"
+            
+            if cadena_rutas_invalidas == "" or tk.messagebox.askyesno(
+                "Se encontraron anexos masivos", 
+                f"Confirme si las siguientes carpetas son anexos anexos masivos:\n\n{cadena_rutas_invalidas}\n¿Desea continuar?"
+            ):
+                #**********************************
+                #**********************************
+                lista_cui, lista_subcarpetas, self.carpetas_omitidas = (
+                    analyzer.obtener_lista_rutas_subcarpetas(
+                        estructura_directorios, 4, folder_selected
+                    )
                 )
-            )
-            self.handle_directory_analysis(
-                folder_selected,
-                estructura_directorios,
-                lista_cui,
-                lista_subcarpetas,
-                self.carpetas_omitidas,
-                None,
-            )
-            self.lista_subcarpetas = lista_subcarpetas
-            self.analyzer = analyzer
-            if not self.lista_subcarpetas:
-                self.update_progressbar_status("")
-            else:
-                self.update_progressbar_status("Listo para procesar")
-        elif self.selected_value == "3" and profundidad_maxima == 5:
-            self.profundidad = 5
+                #**********************************
+                # Verificar si las listas están vacías o tienen valores por defecto de error
+                # Analizar si se debe hacer la validación en este método o en obtener_rutas
+                if not self._validar_estructura_expediente( # refactorizar esta función completamente
+                    lista_cui, lista_subcarpetas, self.carpetas_omitidas
+                ):
 
-            lista_cui, lista_subcarpetas, self.carpetas_omitidas = (
-                analyzer.obtener_lista_rutas_subcarpetas(
-                    estructura_directorios, 5, None
+                    # Habilitar el envío de un mensaje con las carpetas que no cumplen con la estructura
+                    # usar variable selected value y el diccionario folder_selected
+                    #self.mostrar_lista_elementos_conflictivos(self.selected_value, estructura_directorios)
+
+                    self.update_progressbar_status("")
+                    self._restablecer_variables_clase()
+                    return
+                    #**********************************
+
+                # Llamar al nuevo método para gestionar índices existentes
+                continuar = self.gestionar_indices_existentes(folder_selected, analyzer)
+                if not continuar:
+                    return  # Detiene ejecución si se encontraron índices y no se eliminaron
+                self.profundidad = 4
+
+                #**********************************
+
+                self.handle_directory_analysis(
+                    folder_selected,
+                    estructura_directorios,
+                    lista_cui,
+                    lista_subcarpetas,
+                    self.carpetas_omitidas,
+                    None,
                 )
-            )
-            self.handle_directory_analysis(
-                folder_selected,
-                estructura_directorios,
-                lista_cui,
-                lista_subcarpetas,
-                self.carpetas_omitidas,
-                analyzer,
-            )
-            self.lista_subcarpetas = lista_subcarpetas
-            self.analyzer = analyzer
-            if not self.lista_subcarpetas:
-                self.update_progressbar_status("")
+                self.lista_subcarpetas = lista_subcarpetas
+                self.analyzer = analyzer
+                if not self.lista_subcarpetas:
+                    self.update_progressbar_status("")
+                else:
+                    self.update_progressbar_status("Listo para procesar")
             else:
-                self.update_progressbar_status("Listo para procesar")
+                self._mostrar_rutas_invalidas(rutas_invalidas)
+        elif self.selected_value == "3": # and profundidad_maxima == 5:
+            # Implementación del manejo de anexos masivos para opcion profundidad 4
+            rutas_invalidas = self.validar_estructura_carpetas(
+                estructura_directorios, self.selected_value
+            )
+            # Confirmación de carpetas de anexos masivos
+            cadena_rutas_invalidas = ""
+            for i in rutas_invalidas:
+                cadena_rutas_invalidas += "- "+i + "\n"
+            if cadena_rutas_invalidas == "" or tk.messagebox.askyesno(
+                "Se encontraron anexos masivos", 
+                f"Confirme si las siguientes carpetas son anexos anexos masivos:\n\n{cadena_rutas_invalidas}"
+            ):
+                #**********************************
+                #**********************************
+                lista_cui, lista_subcarpetas, self.carpetas_omitidas = (
+                    analyzer.obtener_lista_rutas_subcarpetas(
+                        estructura_directorios, 5, None
+                    )
+                )
+                #**********************************
+                # Verificar si las listas están vacías o tienen valores por defecto de error
+                # Analizar si se debe hacer la validación en este método o en obtener_rutas
+                if not self._validar_estructura_expediente(
+                    lista_cui, lista_subcarpetas, self.carpetas_omitidas
+                ):
+
+                    # Habilitar el envío de un mensaje con las carpetas que no cumplen con la estructura
+                    # usar variable selected value y el diccionario folder_selected
+
+                    self.update_progressbar_status("")
+                    self._restablecer_variables_clase()
+                    return
+                    #**********************************
+                # Llamar al nuevo método para gestionar índices existentes
+                continuar = self.gestionar_indices_existentes(folder_selected, analyzer)
+                if not continuar:
+                    return  # Detiene ejecución si se encontraron índices y no se eliminaron
+                self.profundidad = 5
+                #**********************************
+
+                self.handle_directory_analysis(
+                    folder_selected,
+                    estructura_directorios,
+                    lista_cui,
+                    lista_subcarpetas,
+                    self.carpetas_omitidas,
+                    analyzer,
+                )
+                self.lista_subcarpetas = lista_subcarpetas
+                self.analyzer = analyzer
+                if not self.lista_subcarpetas:
+                    self.update_progressbar_status("")
+                else:
+                    self.update_progressbar_status("Listo para procesar")
+            else:
+                self._mostrar_rutas_invalidas(rutas_invalidas)
         else:
+            # Adecuar esta parte para el caso de las carpetas que no cumplen con la estructura de niveles cuando sale el aviso "guia rápida" o advertencia
             tk.messagebox.showwarning(
                 "Advertencia",
                 "La estructura de directorios no coincide con la OPCIÓN seleccionada.\n\n"
@@ -763,7 +840,6 @@ class Application(ttk.Frame):
         self._analizar_estructura(
             estructura_directorios, "", 0, nivel_maximo, rutas_invalidas
         )
-        self._mostrar_rutas_invalidas(rutas_invalidas)
 
         return rutas_invalidas
 
@@ -964,21 +1040,7 @@ class Application(ttk.Frame):
             carpetas_omitidas (set, opcional): Conjunto de carpetas omitidas
             analyzer (FolderAnalyzer, opcional): Instancia del analizador de carpetas
         """
-        # Verificar si las listas están vacías o tienen valores por defecto de error
-        # Analizar si se debe hacer la validación en este método o en obtener_rutas
-        if not self._validar_estructura_expediente(
-            lista_cui, lista_subcarpetas, carpetas_omitidas
-        ):
-
-            # Habilitar el envío de un mensaje con las carpetas que no cumplen con la estructura
-            # usar variable selected value y el diccionario folder_selected
-
-            # mostrar_lista_elementos_conflictivos(self.selected_value, estructura_directorios)
-
-            self.update_progressbar_status("")
-            self._restablecer_variables_clase()
-            return
-
+        
         # Este mensaje se esta viendo cada vez que se muestra en pantalla el mensaje de error de la guia rapida
         self._mostrar_carpeta_seleccionada(folder_selected)
 

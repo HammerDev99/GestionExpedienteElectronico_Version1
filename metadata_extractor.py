@@ -55,6 +55,12 @@ class MetadataExtractor:
                 cantidadpag.append("1")
                 list_files = os.listdir(x)
                 _, extensiones = self.separate_path(list_files)
+                
+                # Reemplazar extensiones vacías con "carpeta" para subcarpetas
+                for i, file in enumerate(list_files):
+                    if os.path.isdir(os.path.join(x, file)) and extensiones[i] == "":
+                        extensiones[i] = "carpeta"
+                
                 comments = dict(
                     zip(extensiones, map(lambda x: extensiones.count(x), extensiones))
                 )

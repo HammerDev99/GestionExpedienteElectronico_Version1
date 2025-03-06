@@ -14,7 +14,7 @@ VSVersionInfo(
       StringTable(
         u'040904B0', [
           StringStruct(u'CompanyName', u'Daniel Arbelaez Alvarez - HammerDev99'),
-          StringStruct(u'FileDescription', u'Este proyecto fue desarrollado para automatizar una función administrativa, asistiendo las operaciones manuales que haría un empleado en la conformación del expediente electrónico.'),
+          StringStruct(u'FileDescription', u'AgilEx by Marduk - Automatización para el expediente electrónico, sustituyendo tareas manuales'),
           StringStruct(u'FileVersion', u'1.4.3.0'),
           StringStruct(u'InternalName', u'AgilEx by Marduk'),
           StringStruct(u'LegalCopyright', u'Daniel Arbelaez - Copyright © 2024. Licensed under the MIT License.'),
