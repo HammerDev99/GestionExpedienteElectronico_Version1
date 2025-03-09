@@ -191,7 +191,7 @@ class SingleCuadernoStrategy(ProcessStrategy):
         if confirm:
             self.notifier.notify(
                 GUIMessage(
-                    "\n*******************\n✅ Índices eliminados:\n", MessageType.TEXT
+                    "\n-------------------\n✅ Índices eliminados:\n", MessageType.TEXT
                 )
             )
             for indice in indices:
@@ -207,7 +207,7 @@ class SingleCuadernoStrategy(ProcessStrategy):
             return True
         else:
             self.notifier.notify(
-                GUIMessage(f"\n*******************\n❕ {mensaje}:\n", MessageType.TEXT)
+                GUIMessage(f"\n-------------------\n❕ {mensaje}:\n", MessageType.TEXT)
             )
             for indice in indices:
                 # Obtener los últimos 4 componentes de la ruta
@@ -241,10 +241,11 @@ class SingleCuadernoStrategy(ProcessStrategy):
 
         self.notifier.notify(
             GUIMessage(
-                f"\n*******************\n❕ Carpeta seleccionada: {folder_selected}\n",
+                f"\n-------------------\n❕ Carpeta seleccionada: {folder_selected}\n",
                 MessageType.TEXT,
             )
         )
+        self.notifier.notify(GUIMessage((1, 1), MessageType.PROGRESS))
         self.notifier.notify(GUIMessage("Listo para procesar", MessageType.STATUS))
 
     def _mostrar_cuis_invalidos(self, cuis_invalidos, lista_cui=None):
@@ -259,7 +260,7 @@ class SingleCuadernoStrategy(ProcessStrategy):
         if cuis_invalidos or cuis_invalidos == "":
             # self._mensaje(None, "Algunas carpetas no cumplen con el formato requerido de 23 dígitos numéricos.")
 
-            mensaje = f"❕ Se encontr{'aron' if len(cuis_invalidos) > 1 else 'ó'} radicado{'s' if len(cuis_invalidos) > 1 else ''} (CUI) que no {'cumplen' if len(cuis_invalidos) > 1 else 'cumple'} con los 23 dígitos."
+            mensaje = f"\n-------------------\n❕ Se encontr{'aron' if len(cuis_invalidos) > 1 else 'ó'} radicado{'s' if len(cuis_invalidos) > 1 else ''} (CUI) que no {'cumplen' if len(cuis_invalidos) > 1 else 'cumple'} con los 23 dígitos."
 
             mensaje += cuis_invalidos
 

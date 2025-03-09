@@ -1,6 +1,5 @@
 # coding=utf-8
 
-import select
 import tkinter as tk
 from tkinter import ttk
 from tkinter import filedialog
@@ -11,6 +10,7 @@ import requests
 import json
 from file_processor import FileProcessor
 from folder_analyzer import FolderAnalyzer
+import tools_window
 from tooltip import Tooltip
 import logging
 import asyncio
@@ -24,6 +24,7 @@ from gui_notifier import (
     DialogObserver,
     StatusLabelObserver,
 )
+from tools_window import ToolsLauncher
 
 
 class Application(ttk.Frame):
@@ -75,23 +76,12 @@ class Application(ttk.Frame):
 
             # Crear ProcessingContext con el notificador y el logger
             self.processing_context = ProcessingContext(self.gui_notifier, self.logger)
+            
+            # Programa el mensaje después de la inicialización
+            self.root.after(300, self.initial_message)
         except Exception as e:
             self.logger.error(f"Error en inicialización GUI: {str(e)}", exc_info=True)
             raise
-
-    def _restablecer_variables_clase(self):
-        """
-        Restablece las variables de la clase a su estado inicial.
-        """
-        self.expediente = ""
-        self.carpetas = []
-        self.lista_subcarpetas = []
-        self.analyzer = None
-        self.profundidad = None
-        self.carpetas_omitidas = list()
-
-        self.lista_cui = []
-        self.estructura_directorios = {}
 
     def create_oneProcessWidgets(self):
         """
@@ -111,6 +101,9 @@ class Application(ttk.Frame):
         self.menu_bar.add_cascade(label="Ayuda", menu=self.help_menu)
         self.help_menu.add_command(
             label="📋 Guía Rápida del Programa", command=self.mostrar_guia_rapida
+        )
+        self.help_menu.add_command(
+            label="Banco de Herramientas Complementarias", command=self.open_tools_window
         )
         self.help_menu.add_command(
             label="Video tutorial (link 1)",
@@ -194,11 +187,6 @@ class Application(ttk.Frame):
         self.frame_label01 = tk.Frame(self)
         self.frame_label01.pack(pady=5, anchor="center")
 
-        self.label01 = tk.Label(
-            self.frame_label01, text="Juzgado", font=("Helvetica", 12)
-        )
-        self.label01.pack(side=tk.LEFT)
-
         # Crear icono de ayuda
         self.icono_ayuda = tk.Label(
             self.frame_label01,
@@ -209,11 +197,16 @@ class Application(ttk.Frame):
         )
         self.icono_ayuda.pack(side=tk.LEFT, padx=(5, 0))
 
+        self.label01 = tk.Label(
+            self.frame_label01, text="Despacho Judicial:", font=("Helvetica", 12)
+        )
+        self.label01.pack(side=tk.LEFT)
+
         # Añadir tooltip al icono de ayuda
         Tooltip(
             self.icono_ayuda,
             image_path=None,
-            text="Ingrese el nombre exacto del juzgado según el sistema validador/migrador",
+            text="Ingrese el nombre exacto del Despacho Judicial según el sistema validador/migrador",
         )
 
         # Crear el Combobox para entry01
@@ -227,11 +220,6 @@ class Application(ttk.Frame):
         self.frame_label02 = tk.Frame(self)
         self.frame_label02.pack(pady=5, anchor="center")
 
-        self.label02 = tk.Label(
-            self.frame_label02, text="Serie o Subserie", font=("Helvetica", 12)
-        )
-        self.label02.pack(side=tk.LEFT)
-
         # Crear icono de ayuda
         self.icono_ayuda = tk.Label(
             self.frame_label02,
@@ -241,6 +229,11 @@ class Application(ttk.Frame):
             cursor="hand2",
         )
         self.icono_ayuda.pack(side=tk.LEFT, padx=(5, 0))
+
+        self.label02 = tk.Label(
+            self.frame_label02, text="Serie o Subserie:", font=("Helvetica", 12)
+        )
+        self.label02.pack(side=tk.LEFT)
 
         # Añadir tooltip al icono de ayuda
         Tooltip(
@@ -256,7 +249,7 @@ class Application(ttk.Frame):
         # Leer el archivo CSV y obtener los valores para el Combobox
         self.load_csv_values(self.entry02, "assets/TRD.csv")
 
-        # Crear un Frame para contener el label03 y el icono de ayuda
+        """ # Crear un Frame para contener el label03 y el icono de ayuda
         self.frame_label03 = tk.Frame(self)
         self.frame_label03.pack(pady=5, padx=5, anchor="center")
 
@@ -264,7 +257,33 @@ class Application(ttk.Frame):
             self.frame_label03, text="Radicado", font=("Helvetica", 12), padx=5
         )
 
-        self.entry03 = tk.Entry(self.frame_label03, width=25, justify="center")
+        self.entry03 = tk.Entry(self.frame_label03, width=25, justify="center") """
+
+        # Crea un Frame para el label de tipo de gestión
+        self.frame_label_tipo_gestion = tk.Frame(self)
+        self.frame_label_tipo_gestion.pack(pady=5, anchor="center")
+
+        # Crear icono de ayuda
+        self.icono_ayuda = tk.Label(
+            self.frame_label_tipo_gestion,
+            text="ℹ️",
+            font=("Helvetica", 12),
+            fg="blue",
+            cursor="hand2",
+        )
+        self.icono_ayuda.pack(side=tk.LEFT, padx=(5, 0))
+
+        self.label_tipo_gestion = tk.Label(
+            self.frame_label_tipo_gestion, text="Tipo de Gestión:", font=("Helvetica", 12)
+        )
+        self.label_tipo_gestion.pack(side=tk.LEFT)
+
+        # Añadir tooltip al icono de ayuda
+        Tooltip(
+            self.icono_ayuda,
+            image_path=None,
+            text="Cuaderno: Sólo el cuaderno de un expediente\nExpediente: Todos los cuadernos del expediente de un solo proceso.\nMúltiples Expedientes: varios expedientes de procesos de una misma serie o subserie",
+        )
 
         # Crear un Frame para los Radiobuttons
         self.radio_frame = tk.Frame(self)
@@ -277,25 +296,41 @@ class Application(ttk.Frame):
         # Crear los Radiobuttons
         self.radio1 = ttk.Radiobutton(
             self.radio_frame,
-            text="Cuaderno: Selecciona\nun solo cuaderno",
+            text="Cuaderno", #: Selecciona\nun solo cuaderno",
             variable=self.radio_var,
-            value="1",
+            value="1"
         )
         self.radio1.pack(side=tk.LEFT, padx=10)
         self.radio2 = ttk.Radiobutton(
             self.radio_frame,
-            text="Proceso: Selecciona la\ncarpeta de un proceso",
+            text="Expediente", #: Selecciona la\ncarpeta de un proceso",
             variable=self.radio_var,
-            value="2",
+            value="2"
         )
         self.radio2.pack(side=tk.LEFT, padx=10)
         self.radio3 = ttk.Radiobutton(
             self.radio_frame,
-            text="Subserie: Selecciona la \ncarpeta de la subserie",
+            text="Múltiples Expedientes", #: Selecciona la \ncarpeta de la subserie",
             variable=self.radio_var,
-            value="3",
+            value="3"
         )
         self.radio3.pack(side=tk.LEFT, padx=10)
+
+        # Crear el frame para label03 y entry03 desde el inicio
+        self.frame_label03 = tk.Frame(self)
+        self.frame_label03.pack(pady=5, padx=5, anchor="center")
+        
+        self.label03 = tk.Label(
+            self.frame_label03, text="Radicado", font=("Helvetica", 12), padx=5
+        )
+        self.label03.pack(side=tk.LEFT)
+        
+        self.entry03 = tk.Entry(self.frame_label03, width=75, justify="center")
+        self.entry03.pack(pady=5)
+        
+        # Inicialmente deshabilitar el entry si no es la opción 1
+        if self.radio_var.get() != "1":
+            self.entry03.configure(state="disabled")
 
         # Crear tooltips con imágenes para los Radiobuttons
         self._create_tooltips()
@@ -304,21 +339,11 @@ class Application(ttk.Frame):
         self.scrollbar = tk.Scrollbar(self, orient=tk.VERTICAL)
         self.scrollbar.pack(side=tk.RIGHT, fill=tk.Y, padx=5)
 
-        # Crear un Text widget para mostrar los RDOs procesados
+        # Crear un Text widget para mostrar los procesos realizados
         self.text_widget = tk.Text(
             self, width=50, height=20, yscrollcommand=self.scrollbar.set
         )
         self.text_widget.pack(fill="both", expand=True, padx=5, pady=5)
-
-        # Mensaje inicial en el text widget
-        initial_message = (
-            "\n   Pasos:\n"
-            "   1. Ingrese los datos de Juzgado y Serie/Subserie\n"
-            "   2. Seleccione una opción según su necesidad\n"
-            "   3. Agregue la carpeta a procesar\n"
-            "   4. Presione Aceptar para iniciar\n"
-        )
-        self.text_widget.insert(tk.END, initial_message)
 
         # Configurar la barra de desplazamiento para el Text widget
         self.scrollbar.config(command=self.text_widget.yview)
@@ -362,21 +387,49 @@ class Application(ttk.Frame):
             text="Aceptar",
             command=lambda: self.run_async_process(self),
             height=1,
-            width=7,
+            width=10,
         )
         self.aceptar.pack(side=tk.LEFT, padx=5)
-
-        # Botón Cancelar
-        self.cancelar = tk.Button(
-            self, text="Cancelar", fg="red", command=self._on_closing, height=1, width=7
-        )
-        self.cancelar.pack(side=tk.LEFT, padx=5)
 
         # Otros widgets...
         self.label5 = tk.Label(self, text="")
         self.label5.pack(side=tk.LEFT)
-
+        #self.initial_message()
         self.pack()
+
+    def open_tools_window(self):
+        """Abre la ventana del banco de herramientas"""
+        try:
+            tools_window = ToolsLauncher(self.root, logger=self.logger)
+        except Exception as e:
+            self.logger.error(f"Error al abrir el banco de herramientas: {str(e)}", exc_info=True)
+            tk.messagebox.showerror(
+                "Error", 
+                f"No se pudo abrir el banco de herramientas:\n{str(e)}"
+            )
+
+    def _restablecer_variables_clase(self):
+        """
+        Restablece las variables de la clase a su estado inicial.
+        """
+        self.expediente = ""
+        self.carpetas = []
+        self.lista_subcarpetas = []
+        self.analyzer = None
+        self.profundidad = None
+        self.carpetas_omitidas = list()
+
+        self.lista_cui = []
+        self.estructura_directorios = {}
+    
+    def initial_message(self):
+        initial_message = (
+            "1. Ingrese los datos de 'Despacho Judicial' y 'Serie o Subserie'\n\n"
+            "2. Seleccione una el 'Tipo de Gestión' según su necesidad\n\n"
+            "3. Agregue la carpeta a procesar\n\n"
+            "4. Presione Aceptar para iniciar\n\n"
+        )
+        tk.messagebox.showinfo("Guía rápida", initial_message)
 
     def update_progressbar_status(self, message):
         """Actualiza el mensaje de estado."""
@@ -386,7 +439,7 @@ class Application(ttk.Frame):
         # Crear una ventana emergente
         guia_rapida_window = tk.Toplevel(self.root)
         guia_rapida_window.title("Guía Rápida del Programa")
-        guia_rapida_window.geometry("565x320")
+        guia_rapida_window.geometry("600x400")
         guia_rapida_window.resizable(False, False)
 
         # Crear un Text widget para mostrar el mensaje de la guía rápida
@@ -396,19 +449,18 @@ class Application(ttk.Frame):
         # Mensaje de la guía rápida
         mensaje_guia_rapida = (
             "📋 Guía Rápida del Programa\n\n"
-            "1. Preparación de Carpetas\n"
-            "• Carpetas limpias: Sin índice ni carpetas de anexos masivos\n"
+            "1. Datos del SGDE\n\n"
+            "• Use exactamente los mismos datos de 'Despacho Judicial' y 'Serie o Subserie' registrados en migrador/validador y/o la TRD\n\n"
+            "2. Preparación de Carpetas\n\n"
             "• Nombres de archivos: Organizados mínimo secuencialmente\n"
             "• Radicado: Debe contener 23 dígitos\n\n"
-            "2. Estructura de Carpetas\n"
-            "🔹 Opción subcarpeta:\n"
-            "   C01Principal/Archivos\n"
-            "🔹 Opción 1 (Un expediente):\n"
-            "   RADICADO/01PrimeraInstancia/C01Principal/Archivos\n"
-            "🔹 Opción 2 (Varios expedientes):\n"
+            "3. Estructura de Carpetas\n\n"
+            "🔹 Cuaderno:\n"
+            "   C01Principal/Archivos\n\n"
+            "🔹 Proceso:\n"
+            "   RADICADO/01PrimeraInstancia/C01Principal/Archivos\n\n"
+            "🔹 Subserie:\n"
             "   SERIE_SUBSERIE/RADICADO/01PrimeraInstancia/C01Principal/Archivos\n\n"
-            "3. Datos del SGDE\n"
-            "• Use exactamente los mismos datos de 'Juzgado' y 'Serie/Subserie' registrados en migrador/validador y/o la TRD\n\n"
         )
 
         # Insertar el mensaje en el Text widget
@@ -421,12 +473,15 @@ class Application(ttk.Frame):
         self.selected_value = self.radio_var.get()
         self.logger.info(f"Opción seleccionada: {self.selected_value}")
 
+        # En lugar de ocultar/mostrar, habilitar/deshabilitar
         if self.selected_value == "1":
-            self.label03.pack(side=tk.LEFT)
-            self.entry03.pack(pady=5)
+            self.entry03.configure(state="normal")
         else:
-            self.label03.pack_forget()
-            self.entry03.pack_forget()
+            self.entry03.configure(state="disabled")
+            
+        self.progress['maximum'] = 1
+        self.progress["value"] = 0
+        self.update_progressbar_status("")
 
     def _create_tooltips(self):
         """
@@ -562,6 +617,8 @@ class Application(ttk.Frame):
         - Valida la estructura de las carpetas
         - Obtiene los CUIs y subcarpetas internas
         """
+        self.text_widget.insert(tk.END, "\n*******************")
+        self.text_widget.see(tk.END)
         self.lista_cui = []
         self.lista_subcarpetas = []
         self.carpetas_omitidas = set()
@@ -599,14 +656,12 @@ class Application(ttk.Frame):
             for carpeta in estructura_directorios:
                 if os.path.isdir(os.path.join(folder_selected, carpeta)):
                     carpetas.append(carpeta)
-            cadena_rutas_invalidas = ""
+            cadena_rutas_anexos = ""
             for i in carpetas:
-                cadena_rutas_invalidas += "- "+i + "\n"
-            if len(carpetas) > 1 and not tk.messagebox.askyesno(
-                "Advertencia",
-                f"Confirme si las siguientes carpetas son anexos anexos masivos:\n\n{cadena_rutas_invalidas}\n¿Desea continuar?",
-            ):
-                return
+                cadena_rutas_anexos += "   🔹"+i + "\n"
+            if len(carpetas) > 1:
+                self.text_widget.insert(tk.END, f"\n-------------------\n❕ Se encontraron anexos masivos en:\n\n{cadena_rutas_anexos}")
+                self.text_widget.see(tk.END)
             #**********************************
 
             processor = FileProcessor(
@@ -641,14 +696,12 @@ class Application(ttk.Frame):
                 estructura_directorios, self.selected_value
             )
             # Confirmación de carpetas de anexos masivos
-            cadena_rutas_invalidas = ""
+            cadena_rutas_anexos = ""
             for i in rutas_invalidas:
-                cadena_rutas_invalidas += "- "+i + "\n"
-            
-            if cadena_rutas_invalidas == "" or tk.messagebox.askyesno(
-                "Se encontraron anexos masivos", 
-                f"Confirme si las siguientes carpetas son anexos anexos masivos:\n\n{cadena_rutas_invalidas}\n¿Desea continuar?"
-            ):
+                cadena_rutas_anexos += "   🔹"+i + "\n"
+            if cadena_rutas_anexos != "":
+                self.text_widget.insert(tk.END, f"\n-------------------\n❕ Se encontraron anexos masivos en:\n\n{cadena_rutas_anexos}")
+                self.text_widget.see(tk.END)
                 #**********************************
                 #**********************************
                 lista_cui, lista_subcarpetas, self.carpetas_omitidas = (
@@ -693,6 +746,8 @@ class Application(ttk.Frame):
                 if not self.lista_subcarpetas:
                     self.update_progressbar_status("")
                 else:
+                    self.progress['maximum'] = 1
+                    self.progress["value"] = 1
                     self.update_progressbar_status("Listo para procesar")
             else:
                 self._mostrar_rutas_invalidas(rutas_invalidas)
@@ -702,13 +757,12 @@ class Application(ttk.Frame):
                 estructura_directorios, self.selected_value
             )
             # Confirmación de carpetas de anexos masivos
-            cadena_rutas_invalidas = ""
+            cadena_rutas_anexos = ""
             for i in rutas_invalidas:
-                cadena_rutas_invalidas += "- "+i + "\n"
-            if cadena_rutas_invalidas == "" or tk.messagebox.askyesno(
-                "Se encontraron anexos masivos", 
-                f"Confirme si las siguientes carpetas son anexos anexos masivos:\n\n{cadena_rutas_invalidas}"
-            ):
+                cadena_rutas_anexos += "   🔹"+i + "\n"
+            if cadena_rutas_anexos != "":
+                self.text_widget.insert(tk.END, f"\n-------------------\n❕ Se encontraron anexos masivos en:\n\n{cadena_rutas_anexos}")
+                self.text_widget.see(tk.END)
                 #**********************************
                 #**********************************
                 lista_cui, lista_subcarpetas, self.carpetas_omitidas = (
@@ -718,7 +772,6 @@ class Application(ttk.Frame):
                 )
                 #**********************************
                 # Verificar si las listas están vacías o tienen valores por defecto de error
-                # Analizar si se debe hacer la validación en este método o en obtener_rutas
                 if not self._validar_estructura_expediente(
                     lista_cui, lista_subcarpetas, self.carpetas_omitidas
                 ):
@@ -750,10 +803,13 @@ class Application(ttk.Frame):
                 if not self.lista_subcarpetas:
                     self.update_progressbar_status("")
                 else:
+                    self.progress['maximum'] = 1
+                    self.progress["value"] = 1
                     self.update_progressbar_status("Listo para procesar")
             else:
                 self._mostrar_rutas_invalidas(rutas_invalidas)
         else:
+            # Posiblemente ya no entrará jamás en esta parte
             # Adecuar esta parte para el caso de las carpetas que no cumplen con la estructura de niveles cuando sale el aviso "guia rápida" o advertencia
             tk.messagebox.showwarning(
                 "Advertencia",
@@ -801,7 +857,7 @@ class Application(ttk.Frame):
             "Índices Encontrados", f"{mensaje}. ¿Desea eliminarlos?"
         ):
             self.text_widget.insert(
-                tk.END, "\n*******************\n✅ Índices eliminados:\n"
+                tk.END, "\n-------------------\n✅ Índices eliminados:\n"
             )
             for indice in indices:
                 try:
@@ -814,7 +870,7 @@ class Application(ttk.Frame):
             self.text_widget.see(tk.END)
             return True
         else:
-            self.text_widget.insert(tk.END, f"\n*******************\n❕ {mensaje}:\n")
+            self.text_widget.insert(tk.END, f"\n-------------------\n❕ {mensaje}:\n")
             for indice in indices:
                 # Obtener los últimos 4 componentes de la ruta
                 componentes = indice.split(os.sep)[-4:]
@@ -873,7 +929,7 @@ class Application(ttk.Frame):
     def _mostrar_rutas_invalidas(self, rutas_invalidas):
         """Muestra las rutas inválidas en el widget de texto."""
         if rutas_invalidas:
-            mensaje = "\n*******************\n⚠️ Las siguientes carpetas no cumplen con la estructura de niveles:\n"
+            mensaje = "\n-------------------\n⚠️ Las siguientes carpetas no cumplen con la estructura de niveles:\n\n"
             for ruta in rutas_invalidas:
                 mensaje += f"- {ruta}\n"
             self.text_widget.insert(tk.END, mensaje)
@@ -918,7 +974,7 @@ class Application(ttk.Frame):
         """
         self.text_widget.insert(
             tk.END,
-            f"\n*******************\n❕ Carpeta seleccionada: {folder_selected}\n",
+            f"\n-------------------\n❕ Carpeta seleccionada: {folder_selected}\n",
         )
         self.text_widget.see(tk.END)
 
@@ -972,7 +1028,7 @@ class Application(ttk.Frame):
 
                 text_aux = ".\n   🔹"
                 mensaje_detalle = (
-                    "❕ Las siguientes carpetas están vacías y no serán incluidas en el procesamiento:"
+                    "\n-------------------\n❕ Las siguientes carpetas están vacías y no serán incluidas en el procesamiento:\n"
                     + text_aux[1:]
                 )
                 carpetas_omitidas_ordenadas = sorted(self.carpetas_omitidas)
@@ -1000,9 +1056,9 @@ class Application(ttk.Frame):
         """
         text_aux = ".\n   🔹"
         if cuis_invalidos:
-            # self._mensaje(None, "Algunas carpetas no cumplen con el formato requerido de 23 dígitos numéricos.")
+            self._mensaje(None, "Algunas carpetas no cumplen con el formato requerido de 23 dígitos numéricos.")
 
-            mensaje = "❕ Se encontraron radicados (CUI) que no tienen los 23 dígitos: "
+            mensaje = "\n-------------------\n❕ Se encontraron radicados (CUI) que no tienen los 23 dígitos:\n\n   🔹"
             if self.selected_value == "3":
                 cuis_invalidos_ordenados = sorted(cuis_invalidos)
                 if cuis_invalidos_ordenados:
@@ -1081,15 +1137,11 @@ class Application(ttk.Frame):
                 None,
                 "❌ Error en la estructura de carpetas\n\n"
                 "La estructura elegida no cumple con el formato requerido. Se detectaron archivos sueltos donde debería haber carpetas organizadas.\n\n"
-                "Estructura esperada según la opción seleccionada:\n"
-                "Opción 1: RADICADO/01PrimeraInstancia/C01Principal/Archivos\n"
-                "Opción 2: SERIE_SUBSERIE/RADICADO/01PrimeraInstancia/C01Principal/Archivos\n\n"
-                "📝 Recomendaciones:\n"
-                "1. Verifique que seleccionó la opción correcta según su estructura de carpetas\n"
-                "2. Asegúrese de que sus carpetas siguen exactamente la jerarquía mostrada arriba\n"
-                "3. No incluya archivos sueltos en niveles donde debe haber carpetas\n"
-                "4. No incluya carpetas de anexos masivos en el nivel de los archivos\n\n"
-                "¿Necesita revisar el protocolo? Consulte la ayuda del sistema.",
+                
+                "📝 Recomendaciones:\n\n"
+                "1. Verifique que seleccionó la opción correcta\n"
+                "2. Asegúrese de que sus carpetas siguen exactamente la estructura del protocolo\n"
+                "3. No incluya archivos en niveles donde debe haber carpetas",
             )
             return False
 
@@ -1170,7 +1222,7 @@ class Application(ttk.Frame):
                     # Actualizar GUI
                     self.text_widget.insert(
                         tk.END,
-                        "- "
+                        "   🔹"
                         + os.path.normpath(
                             os.path.basename(self.expediente) + "/" + ruta
                         )
@@ -1227,6 +1279,7 @@ class Application(ttk.Frame):
                 message=switcher.get(result), title=os.path.basename(self.expediente)
             )
             self.text_widget.insert(tk.END, "\n")
+            self.text_widget.see(tk.END)
             self.logger.info(switcher.get(result), exc_info=True)
 
         if mensaje != None:
