@@ -102,9 +102,11 @@ class Application(ttk.Frame):
         self.help_menu.add_command(
             label="📋 Guía Rápida del Programa", command=self.mostrar_guia_rapida
         )
+        self.help_menu.add_separator()
         self.help_menu.add_command(
-            label="Banco de Herramientas Complementarias", command=self.open_tools_window
+            label="Banco de Herramientas Complementarias", command=self.open_tools_window, state="disabled"
         )
+        self.help_menu.add_separator()
         self.help_menu.add_command(
             label="Video tutorial (link 1)",
             command=lambda: self._callback("https://enki.care/Ultimate"),
@@ -124,19 +126,19 @@ class Application(ttk.Frame):
         self.help_menu.add_command(
             label="Tablas de retención documental",
             command=lambda: self._callback(
-                "https://www.ramajudicial.gov.co/web/centro-de-documentacion-judicial/tablas-de-retencion-documental"
+                "https://enki.care/Tablas_Retencion_Documental"
             ),
         )
         self.help_menu.add_command(
             label="Protocolo de gestión de expedientes electrónicos v2",
             command=lambda: self._callback(
-                "https://www.ramajudicial.gov.co/documents/3196516/46103054/Protocolo+para+la+gesti%C3%B3n+de+documentos+electronicos.pdf/cb0d98ef-2844-4570-b12a-5907d76bc1a3"
+                "https://enki.care/Protocolo_Gestion_Expedientes_Electrónicos_v2"
             ),
         )
         self.help_menu.add_command(
             label="Condiciones archivísticas mínimas para migrar a Alfresco",
             command=lambda: self._callback(
-                "https://etbcsj-my.sharepoint.com/:b:/g/personal/darbelaal_cendoj_ramajudicial_gov_co/EarfmwGQYoFEtXQRCsVmPIABMoZI4TRuIEq58mnOC0-Qyw?e=v6Tk1m"
+                "https://enki.care/Condiciones_Archivisticas_Minimas_Alfresco"
             ),
         )
 
@@ -179,7 +181,7 @@ class Application(ttk.Frame):
             self.update_label.bind(
                 "<Button-1>",
                 lambda e: self._callback(
-                    "https://github.com/HammerDev99/GestionExpedienteElectronico_Version1/releases/tag/latest"
+                    "https://enki.care/Latest_Agilex_By_Marduk"
                 ),
             )
 
@@ -400,7 +402,7 @@ class Application(ttk.Frame):
     def open_tools_window(self):
         """Abre la ventana del banco de herramientas"""
         try:
-            tools_window = ToolsLauncher(self.root, logger=self.logger)
+            ToolsLauncher(self.root, logger=self.logger)
         except Exception as e:
             self.logger.error(f"Error al abrir el banco de herramientas: {str(e)}", exc_info=True)
             tk.messagebox.showerror(
@@ -475,12 +477,15 @@ class Application(ttk.Frame):
 
         # En lugar de ocultar/mostrar, habilitar/deshabilitar
         if self.selected_value == "1":
+            self.entry03.delete(0, tk.END)
             self.entry03.configure(state="normal")
         else:
+            self.entry03.delete(0, tk.END)
             self.entry03.configure(state="disabled")
             
         self.progress['maximum'] = 1
         self.progress["value"] = 0
+        self.entry03.delete(0, tk.END)
         self.update_progressbar_status("")
 
     def _create_tooltips(self):
@@ -617,7 +622,6 @@ class Application(ttk.Frame):
         - Valida la estructura de las carpetas
         - Obtiene los CUIs y subcarpetas internas
         """
-        self.text_widget.insert(tk.END, "\n*******************")
         self.text_widget.see(tk.END)
         self.lista_cui = []
         self.lista_subcarpetas = []
@@ -631,6 +635,7 @@ class Application(ttk.Frame):
                 "Advertencia", "No se ha seleccionado ninguna carpeta."
             )
             return
+        self.text_widget.insert(tk.END, "\n*******************")
 
         # **********************************
         # Implementación del patron strategy opción subcarpetas
@@ -702,55 +707,56 @@ class Application(ttk.Frame):
             if cadena_rutas_anexos != "":
                 self.text_widget.insert(tk.END, f"\n-------------------\n❕ Se encontraron anexos masivos en:\n\n{cadena_rutas_anexos}")
                 self.text_widget.see(tk.END)
-                #**********************************
-                #**********************************
-                lista_cui, lista_subcarpetas, self.carpetas_omitidas = (
-                    analyzer.obtener_lista_rutas_subcarpetas(
-                        estructura_directorios, 4, folder_selected
-                    )
+            #**********************************
+            #**********************************
+            lista_cui, lista_subcarpetas, self.carpetas_omitidas, directorios_excluidos = (
+                analyzer.obtener_lista_rutas_subcarpetas(
+                    estructura_directorios, 4, self.selected_value, folder_selected
                 )
-                #**********************************
-                # Verificar si las listas están vacías o tienen valores por defecto de error
-                # Analizar si se debe hacer la validación en este método o en obtener_rutas
-                if not self._validar_estructura_expediente( # refactorizar esta función completamente
-                    lista_cui, lista_subcarpetas, self.carpetas_omitidas
-                ):
+            )
+            #**********************************
+            # Verificar si las listas están vacías o tienen valores por defecto de error
+            # Analizar si se debe hacer la validación en este método o en obtener_rutas
+            if not self._validar_estructura_expediente( # refactorizar esta función completamente
+                lista_cui, lista_subcarpetas, self.carpetas_omitidas
+            ):
 
-                    # Habilitar el envío de un mensaje con las carpetas que no cumplen con la estructura
-                    # usar variable selected value y el diccionario folder_selected
-                    #self.mostrar_lista_elementos_conflictivos(self.selected_value, estructura_directorios)
+                # Habilitar el envío de un mensaje con las carpetas que no cumplen con la estructura
+                # usar variable selected value y el diccionario folder_selected
+                #self.mostrar_lista_elementos_conflictivos(self.selected_value, estructura_directorios)
 
-                    self.update_progressbar_status("")
-                    self._restablecer_variables_clase()
-                    return
-                    #**********************************
-
-                # Llamar al nuevo método para gestionar índices existentes
-                continuar = self.gestionar_indices_existentes(folder_selected, analyzer)
-                if not continuar:
-                    return  # Detiene ejecución si se encontraron índices y no se eliminaron
-                self.profundidad = 4
-
+                self.update_progressbar_status("")
+                self._restablecer_variables_clase()
+                return
                 #**********************************
 
-                self.handle_directory_analysis(
-                    folder_selected,
-                    estructura_directorios,
-                    lista_cui,
-                    lista_subcarpetas,
-                    self.carpetas_omitidas,
-                    None,
-                )
-                self.lista_subcarpetas = lista_subcarpetas
-                self.analyzer = analyzer
-                if not self.lista_subcarpetas:
-                    self.update_progressbar_status("")
-                else:
-                    self.progress['maximum'] = 1
-                    self.progress["value"] = 1
-                    self.update_progressbar_status("Listo para procesar")
+            # Llamar al nuevo método para gestionar índices existentes
+            continuar = self.gestionar_indices_existentes(folder_selected, analyzer)
+            if not continuar:
+                return  # Detiene ejecución si se encontraron índices y no se eliminaron
+            self.profundidad = 4
+
+            #**********************************
+
+            self.handle_directory_analysis(
+                folder_selected,
+                estructura_directorios,
+                lista_cui,
+                lista_subcarpetas,
+                self.carpetas_omitidas,
+                None,
+                directorios_excluidos
+            )
+            self.lista_subcarpetas = lista_subcarpetas
+            self.analyzer = analyzer
+            if not self.lista_subcarpetas:
+                self.update_progressbar_status("")
             else:
-                self._mostrar_rutas_invalidas(rutas_invalidas)
+                self.progress['maximum'] = 1
+                self.progress["value"] = 1
+                self.update_progressbar_status("Listo para procesar")
+            """ else:
+                self._mostrar_rutas_invalidas(rutas_invalidas) """
         elif self.selected_value == "3": # and profundidad_maxima == 5:
             # Implementación del manejo de anexos masivos para opcion profundidad 4
             rutas_invalidas = self.validar_estructura_carpetas(
@@ -763,51 +769,52 @@ class Application(ttk.Frame):
             if cadena_rutas_anexos != "":
                 self.text_widget.insert(tk.END, f"\n-------------------\n❕ Se encontraron anexos masivos en:\n\n{cadena_rutas_anexos}")
                 self.text_widget.see(tk.END)
-                #**********************************
-                #**********************************
-                lista_cui, lista_subcarpetas, self.carpetas_omitidas = (
-                    analyzer.obtener_lista_rutas_subcarpetas(
-                        estructura_directorios, 5, None
-                    )
+            #**********************************
+            #**********************************
+            lista_cui, lista_subcarpetas, self.carpetas_omitidas, directorios_excluidos = (
+                analyzer.obtener_lista_rutas_subcarpetas(
+                    estructura_directorios, 5, self.selected_value, None
                 )
+            )
+            #**********************************
+            # Verificar si las listas están vacías o tienen valores por defecto de error
+            if not self._validar_estructura_expediente(
+                lista_cui, lista_subcarpetas, self.carpetas_omitidas
+            ):
+
+                # Habilitar el envío de un mensaje con las carpetas que no cumplen con la estructura
+                # usar variable selected value y el diccionario folder_selected
+
+                self.update_progressbar_status("")
+                self._restablecer_variables_clase()
+                return
                 #**********************************
-                # Verificar si las listas están vacías o tienen valores por defecto de error
-                if not self._validar_estructura_expediente(
-                    lista_cui, lista_subcarpetas, self.carpetas_omitidas
-                ):
+            # Llamar al nuevo método para gestionar índices existentes
+            continuar = self.gestionar_indices_existentes(folder_selected, analyzer)
+            if not continuar:
+                return  # Detiene ejecución si se encontraron índices y no se eliminaron
+            self.profundidad = 5
+            #**********************************
 
-                    # Habilitar el envío de un mensaje con las carpetas que no cumplen con la estructura
-                    # usar variable selected value y el diccionario folder_selected
-
-                    self.update_progressbar_status("")
-                    self._restablecer_variables_clase()
-                    return
-                    #**********************************
-                # Llamar al nuevo método para gestionar índices existentes
-                continuar = self.gestionar_indices_existentes(folder_selected, analyzer)
-                if not continuar:
-                    return  # Detiene ejecución si se encontraron índices y no se eliminaron
-                self.profundidad = 5
-                #**********************************
-
-                self.handle_directory_analysis(
-                    folder_selected,
-                    estructura_directorios,
-                    lista_cui,
-                    lista_subcarpetas,
-                    self.carpetas_omitidas,
-                    analyzer,
-                )
-                self.lista_subcarpetas = lista_subcarpetas
-                self.analyzer = analyzer
-                if not self.lista_subcarpetas:
-                    self.update_progressbar_status("")
-                else:
-                    self.progress['maximum'] = 1
-                    self.progress["value"] = 1
-                    self.update_progressbar_status("Listo para procesar")
+            self.handle_directory_analysis(
+                folder_selected,
+                estructura_directorios,
+                lista_cui,
+                lista_subcarpetas,
+                self.carpetas_omitidas,
+                analyzer,
+                directorios_excluidos
+            )
+            self.lista_subcarpetas = lista_subcarpetas
+            self.analyzer = analyzer
+            if not self.lista_subcarpetas:
+                self.update_progressbar_status("")
             else:
-                self._mostrar_rutas_invalidas(rutas_invalidas)
+                self.progress['maximum'] = 1
+                self.progress["value"] = 1
+                self.update_progressbar_status("Listo para procesar")
+            """ else:
+                self._mostrar_rutas_invalidas(rutas_invalidas) """
         else:
             # Posiblemente ya no entrará jamás en esta parte
             # Adecuar esta parte para el caso de las carpetas que no cumplen con la estructura de niveles cuando sale el aviso "guia rápida" o advertencia
@@ -1018,7 +1025,7 @@ class Application(ttk.Frame):
         else:
             cuis_invalidos.add(cui)
 
-    def _mostrar_carpetas_omitidas(self):
+    def _mostrar_carpetas_omitidas(self, directorios_excluidos):
         """
         Muestra información sobre las carpetas que fueron omitidas por no cumplir con la estructura.
         """
@@ -1028,15 +1035,24 @@ class Application(ttk.Frame):
 
                 text_aux = ".\n   🔹"
                 mensaje_detalle = (
-                    "\n-------------------\n❕ Las siguientes carpetas están vacías y no serán incluidas en el procesamiento:\n"
+                    "\n-------------------\n⚠️ Los siguientes elementos no se procesarán debido a problemas en su estructura. Por favor, revise la organización de estas carpetas y archivos:\n"
                     + text_aux[1:]
                 )
-                carpetas_omitidas_ordenadas = sorted(self.carpetas_omitidas)
-                if carpetas_omitidas_ordenadas:
-                    mensaje_detalle += text_aux.join(carpetas_omitidas_ordenadas[:-1])
-                    if len(carpetas_omitidas_ordenadas) > 1:
+                
+                listas_unidas = self.carpetas_omitidas + directorios_excluidos
+                listas_unidas = sorted(set(listas_unidas))
+                # eliminar valores repetidos en la lista
+
+                # **********************************
+
+                print(listas_unidas)
+
+                # **********************************
+                if listas_unidas:
+                    mensaje_detalle += text_aux.join(listas_unidas[:-1])
+                    if len(listas_unidas) > 1:
                         mensaje_detalle += text_aux
-                    mensaje_detalle += carpetas_omitidas_ordenadas[-1]  # + "."
+                    mensaje_detalle += listas_unidas[-1]  # + "."
 
                 self.text_widget.insert(tk.END, mensaje_detalle + "\n")
                 self.text_widget.see(tk.END)
@@ -1084,6 +1100,7 @@ class Application(ttk.Frame):
         lista_subcarpetas,
         carpetas_omitidas=None,
         analyzer=None,
+        directorios_excluidos=None,
     ):
         """
         Analiza y procesa la estructura de directorios seleccionada.
@@ -1108,7 +1125,7 @@ class Application(ttk.Frame):
         # Actualizar atributos lista_subcarpetas de la clase
         self.lista_subcarpetas = lista_subcarpetas
 
-        self._mostrar_carpetas_omitidas()
+        self._mostrar_carpetas_omitidas(directorios_excluidos)
 
         self._mostrar_cuis_invalidos(cuis_invalidos, lista_cui)
 
@@ -1136,12 +1153,11 @@ class Application(ttk.Frame):
             self._mensaje(
                 None,
                 "❌ Error en la estructura de carpetas\n\n"
-                "La estructura elegida no cumple con el formato requerido. Se detectaron archivos sueltos donde debería haber carpetas organizadas.\n\n"
+                "Se detectaron archivos sueltos donde debería haber unicamente carpetas.\n\n"
                 
                 "📝 Recomendaciones:\n\n"
-                "1. Verifique que seleccionó la opción correcta\n"
-                "2. Asegúrese de que sus carpetas siguen exactamente la estructura del protocolo\n"
-                "3. No incluya archivos en niveles donde debe haber carpetas",
+                "1. Asegúrese de que sus carpetas siguen exactamente la estructura del protocolo y la opción elegida\n"
+                "2. No incluya archivos en niveles donde debe haber carpetas",
             )
             return False
 

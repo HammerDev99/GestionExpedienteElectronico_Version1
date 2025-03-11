@@ -2,11 +2,10 @@ import tkinter as tk
 from tkinter import ttk
 import os
 import sys
+from turtle import color
 import webbrowser
 from PIL import Image, ImageTk
 import logging
-import requests
-from io import BytesIO
 
 import os
 from PIL import Image, ImageDraw, ImageFont
@@ -23,7 +22,7 @@ def create_tool_images(output_dir="assets/tools"):
     
     # Configuración de herramientas
     tools = [
-        {"name": "Crear Estructura de Carpetas", "color": "#4a7aaf", "filename": "folder_structure.png"},
+        {"name": "Crear Estructura de Carpetas", "color": "#4a7aaf", "filename": "Banco1.png"},
         {"name": "Renombrador de Archivos", "color": "#5c9657", "filename": "file_renamer.png"},
         {"name": "Validador de Índices", "color": "#d17a47", "filename": "index_validator.png"},
         {"name": "Conversor de Documentos", "color": "#7b539c", "filename": "document_converter.png"},
@@ -82,11 +81,12 @@ class ToolsLauncher:
         self.tools = [
             {
                 "name": "Crear Estructura de Carpetas",
-                "description": "Genera automáticamente la estructura de carpetas requerida para expedientes según el protocolo.",
-                "image": "folder_structure.png",
-                "url": "https://github.com/HammerDev99/GestionExpedienteElectronico_Tools/releases/download/folder-structure/crear_estructura_carpetas.exe",
+                "description": "Organiza expedientes judiciales generando automáticamente la estructura estándar (01PrimeraInstancia/C01Principal) y transfiere los documentos desde la carpeta única original hacia C01Principal, cumpliendo con el protocolo de organización documental establecido.",
+                "image": "Banco1.png",
+                "url": "https://enki.care/Banco_Crear_Estructura_Carpetas",
                 "color": "#4a7aaf"
-            },
+            }]
+        """ ,
             {
                 "name": "Renombrador de Archivos",
                 "description": "Renombra archivos masivamente siguiendo el formato requerido para expedientes electrónicos.",
@@ -122,18 +122,20 @@ class ToolsLauncher:
                 "url": "https://github.com/HammerDev99/GestionExpedienteElectronico_Tools/releases/download/migration-tool/asistente_migracion.exe",
                 "color": "#35a2b5"
             }
-        ]
+        ] """
         
         # Crear interfaz
         self.create_widgets()
         
+    TOOL_BUTTON_STYLE = "ToolButton.TButton"
+
     def configure_styles(self):
         # Configura los estilos personalizados para la interfaz
         style = ttk.Style()
         style.configure("Card.TFrame", background="white", relief="solid", borderwidth=1)
         style.configure("CardTitle.TLabel", background="white", font=("Helvetica", 12, "bold"))
         style.configure("CardDesc.TLabel", background="white", font=("Helvetica", 10))
-        style.configure("ToolButton.TButton", font=("Helvetica", 10, "bold"))
+        style.configure(self.TOOL_BUTTON_STYLE, font=("Helvetica", 10, "bold"))
         
     def create_widgets(self):
         #Crea todos los widgets de la interfaz
@@ -182,18 +184,20 @@ class ToolsLauncher:
             if col > 1:  # 2 tarjetas por fila
                 col = 0
                 row += 1
-                
-        # Botón para cerrar
         close_button = ttk.Button(
             self.root, 
             text="Cerrar", 
             command=self.close_window,
-            style="ToolButton.TButton"
+            style=self.TOOL_BUTTON_STYLE
         )
         close_button.pack(side=tk.BOTTOM, pady=10)
         
         # Vincular scroll con rueda del ratón
-        canvas.bind_all("<MouseWheel>", lambda event: canvas.yview_scroll(int(-1*(event.delta/120)), "units"))
+        def _on_mousewheel(event):
+            canvas.yview_scroll(int(-1*(event.delta/120)), "units")
+
+        canvas.bind("<Enter>", lambda e: canvas.bind_all("<MouseWheel>", _on_mousewheel))
+        canvas.bind("<Leave>", lambda e: canvas.unbind_all("<MouseWheel>"))
         
         # Etiqueta de copyright
         #copyright_label = ttk.Label(
@@ -269,13 +273,11 @@ class ToolsLauncher:
             wraplength=330
         )
         desc_label.pack(anchor=tk.W, pady=(0, 10))
-        
-        # Botón de descarga
         download_button = ttk.Button(
             info_frame,
             text="Descargar",
             command=lambda t=tool: self.open_url(t['url']),
-            style="ToolButton.TButton"
+            style=self.TOOL_BUTTON_STYLE
         )
         download_button.pack(anchor=tk.E)
     

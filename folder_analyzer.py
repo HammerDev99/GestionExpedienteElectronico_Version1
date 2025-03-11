@@ -180,7 +180,7 @@ class FolderAnalyzer:
 
         return todas_nivel_dos, rutas_nivel_dos, rutas_nivel_cuatro
 
-    def _procesar_directorio_profundidad_4(self, directorio):
+    def _procesar_directorio_profundidad_4(self, directorio, selected_value):
         """
         Procesa un directorio con profundidad de 4 niveles, extrayendo los subdirectorios y sus nombres correspondientes.
 
@@ -194,6 +194,9 @@ class FolderAnalyzer:
                 - El nombre del directorio (segundo elemento)
         """
         resultado_procesamiento = []
+        directorios_excluidos = []
+
+        directorios_excluidos = self._obtener_directorios_excluidos(directorio, selected_value)
 
         # Iterar sobre cada entrada en el directorio
         for nombre_directorio, contenido_subdirectorio in directorio.items():
@@ -205,10 +208,10 @@ class FolderAnalyzer:
                 # Agregar la tupla a la lista de resultados
                 resultado_procesamiento.append(tupla_directorio)
 
-        return resultado_procesamiento
+        return resultado_procesamiento, directorios_excluidos
 
     def _procesar_directorio_profundidad_5(
-        self, directorio: Dict[str, Dict[str, Any]]
+        self, directorio: Dict[str, Dict[str, Any]], selected_value
     ) -> List[Tuple[Any, str]]:
         """
         Procesa un directorio con profundidad de 5 niveles, procesando la estructura jerárquica
@@ -232,6 +235,9 @@ class FolderAnalyzer:
                 - La ruta combinada (año/expediente)
         """
         resultado_procesamiento: List[Tuple[Any, str]] = []
+        directorios_excluidos = []
+
+        directorios_excluidos = self._obtener_directorios_excluidos(directorio, selected_value)
 
         # Iterar sobre el primer nivel (años)
         for nombre_primer_nivel, contenido_primer_nivel in directorio.items():
@@ -258,10 +264,64 @@ class FolderAnalyzer:
                         # Agregar la tupla al resultado
                         resultado_procesamiento.append(tupla_directorio)
 
-        return resultado_procesamiento
+        return resultado_procesamiento, directorios_excluidos
+    
+    def _obtener_directorios_excluidos(self, directorio: Dict[str, Any], selected_value) -> List[str]:
+        """
+        Identifica archivos que se encuentran en niveles incorrectos de la estructura de directorios.
+        
+        Args:
+            directorio (Dict[str, Any]): Diccionario que representa la estructura del directorio
+            selected_value (str): Valor que determina la estructura esperada ('2' o '3')
+        
+        Returns:
+            List[str]: Lista de rutas completas a archivos ubicados en niveles incorrectos
+        """
+        directorios_excluidos: List[str] = []
+        
+        # Para selected_value = 2, verificar archivos en el nivel principal y nivel de instancia
+        if selected_value == '2':
+            # Revisar el nivel principal
+            for nombre, contenido in directorio.items():
+                # Si el contenido es None, es un archivo en el nivel incorrecto
+                if contenido is None:
+                    directorios_excluidos.append(f"{nombre}")
+                elif isinstance(contenido, dict):
+                    # Revisar archivos dentro de las carpetas de instancia (01PrimeraInstancia, etc.)
+                    for nombre_instancia, contenido_instancia in contenido.items():
+                        if contenido_instancia is None:
+                            # Archivo encontrado en nivel de instancia
+                            ruta = f"{nombre}\\{nombre_instancia}"
+                            directorios_excluidos.append(ruta)
+        
+        # Para selected_value = 3, verificar niveles adicionales
+        elif selected_value == '3':
+            # Revisar cada expediente
+            for nombre_expediente, contenido_expediente in directorio.items():
+                # Caso 1: Archivos directamente en nivel de expediente (deben estar en nivel de instancia > cuaderno)
+                if contenido_expediente is None:
+                    ruta = f"{nombre_expediente}"
+                    directorios_excluidos.append(ruta)
+                elif isinstance(contenido_expediente, dict):
+                    # Revisar elementos dentro del expediente
+                    for nombre_elemento, contenido_elemento in contenido_expediente.items():
+                        # Caso 2: Archivo dentro del expediente (no instancia)
+                        if contenido_elemento is None:
+                            ruta = f"{nombre_expediente}\\{nombre_elemento}"
+                            directorios_excluidos.append(ruta)
+                        elif isinstance(contenido_elemento, dict):
+                            # Si es una instancia (como 01PrimeraInstancia), verificar sus elementos
+                            for nombre_sub, contenido_sub in contenido_elemento.items():
+                                # Caso 3: Archivo dentro de instancia (debe estar dentro de cuaderno C01, C02)
+                                if contenido_sub is None:
+                                    ruta = f"{nombre_expediente}\\{nombre_elemento}\\{nombre_sub}"
+                                    directorios_excluidos.append(ruta)
 
+        return directorios_excluidos
+
+    # Refactorizar reduciendo la complejidad cognitiva
     def obtener_lista_rutas_subcarpetas(
-        self, directorio, profundidad_maxima, folder_selected=None
+        self, directorio, profundidad_maxima, selected_value, folder_selected=None
     ):
         """
         Obtiene las listas de CUIs, subcarpetas y carpetas omitidas según la profundidad.
@@ -280,22 +340,26 @@ class FolderAnalyzer:
             lista_cui = []
             todas_las_carpetas = set()
             carpetas_procesadas = set()
-
-            # Seleccionar procesamiento según profundidad
             directorios_a_procesar = None
+            directorios_excluidos = None
+
             if profundidad_maxima == 4:
-                directorios_a_procesar = self._procesar_directorio_profundidad_4(
-                    directorio
+                directorios_a_procesar, directorios_excluidos = self._procesar_directorio_profundidad_4(
+                    directorio, selected_value
                 )
             else:
-                directorios_a_procesar = self._procesar_directorio_profundidad_5(
-                    directorio
+                directorios_a_procesar, directorios_excluidos = self._procesar_directorio_profundidad_5(
+                    directorio, selected_value
                 )
-
-            # Validar la estructura usando los datos procesados
+            # ************* Obtener datos sobre archivos conflictivos 
+            # Validar la estructura usando los datos a procesar
             if directorios_a_procesar:
-                # Verificar si hay elementos que son archivos (None)
-                hay_archivos = any(
+                # Verifica si hay archivos en una estructura de directorios.
+                # Esta función recorre una estructura de directorios donde:
+                # - Los directorios están representados como diccionarios
+                # - Los archivos están representados como valores None
+    
+                """ hay_archivos = any(
                     contenido is None
                     for dir_actual, _ in directorios_a_procesar
                     for contenido in (
@@ -303,15 +367,40 @@ class FolderAnalyzer:
                         if isinstance(dir_actual, dict)
                         else [dir_actual]
                     )
-                )
-
+                ) """
+                # Inicializamos la variable que indicará si existen archivos
+                hay_archivos = False
+                
+                # Recorremos cada directorio en la estructura
+                for directorio_actual, informacion_adicional in directorios_a_procesar:
+                    # Determinamos los contenidos a evaluar según el tipo de datos
+                    if isinstance(directorio_actual, dict):
+                        # Si es un diccionario, obtenemos todos sus valores
+                        contenidos_a_evaluar = directorio_actual.values()
+                    else:
+                        # Si no es un diccionario, creamos una lista con el elemento único
+                        contenidos_a_evaluar = [directorio_actual]
+                    
+                    # Verificamos cada contenido
+                    for contenido_individual in contenidos_a_evaluar:
+                        # Un valor None representa un archivo en esta estructura
+                        if contenido_individual is None:
+                            hay_archivos = True
+                            #break
+                    
+                    # Si ya encontramos un archivo, no necesitamos seguir buscando
+                    if hay_archivos:
+                        break
+                # ************* Modificar mensaje incluyendo lista de directorios excluidos
                 if hay_archivos:
                     self.logger.error(
                         "Error en la estructura: Se encontraron archivos o carpetas vacías donde debería haber carpetas con contenido"
                     )
-                    return [], [], set()
+                    #return [], [], set()
 
-            # Procesar cada directorio
+            # ************* 
+
+            # Procesar cada directorio omitiendo los excluidos
             for dir_actual, ruta_base in directorios_a_procesar:
                 todas_nivel_dos, rutas_nivel_dos, _rutas_nivel_cuatro = (
                     self._procesar_nivel_dos(dir_actual, ruta_base)
@@ -345,7 +434,7 @@ class FolderAnalyzer:
                 lista_rutas_subcarpetas, carpetas_omitidas
             )
 
-            return lista_cui, lista_rutas_subcarpetas, list(carpetas_omitidas)
+            return lista_cui, lista_rutas_subcarpetas, list(carpetas_omitidas), directorios_excluidos
 
         except Exception as e:
             self.logger.error(
@@ -451,27 +540,6 @@ class FolderAnalyzer:
                 self.obtener_profundidad_maxima(subdirectorio, nivel_actual + 1)
                 for subdirectorio in directorio.values()
             )
-
-    def old_buscar_indices_electronicos(self, ruta):
-        """
-        Busca archivos .xlsm en la ruta especificada.
-
-        Args:
-            ruta (str): Ruta del expediente
-
-        Returns:
-            list: Lista de rutas de archivos .xlsm encontrados
-        """
-        indices = []
-        try:
-            for root, _, files in os.walk(ruta):
-                for file in files:
-                    if file.endswith(self.XLSM_EXTENSION):
-                        indices.append(os.path.join(root, file))
-            return indices
-        except Exception as e:
-            self.logger.error(f"Error buscando índices: {str(e)}")
-            return []
 
     def buscar_indices_electronicos(self, ruta):
         """
