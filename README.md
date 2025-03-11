@@ -122,6 +122,13 @@ python main.py
 
 ## Registro de cambios
 
+- 2025-03-10 Nuevo Release 🚀 GestionExpedienteElectronico v1.4.4
+  - Refactorización de la interfaz de usuario para optimizar la gestión de carpetas: Mejoras significativas en la organización y procesamiento de expedientes en diversas condiciones, omitiendo automáticamente elementos no procesables.
+  - Mejora en la comunicación con el usuario: Rediseño del formato de notificaciones para aumentar la legibilidad e incorporación de indicadores de progreso durante el procesamiento de carpetas seleccionadas.
+  - Actualización de parámetros de indexación: Ajustes técnicos conforme a los requisitos establecidos por la Unidad de Transformación Digital durante la mesa funcional.
+  - Gestión avanzada de subcarpetas: Implementación de manejo de anexos en el tipo de gestión "Expediente" y "Múltiples Expedientes" y mejora en la identificación de subcarpetas vacías.
+  - Optimización del procesamiento de archivos: Eliminación de restricciones técnicas previas e implementación de filtros inteligentes para archivos del sistema.
+  - Incorporación de banco de herramientas: Nueva ventana que proporciona recursos adicionales para los usuarios.
 - 2025-02-15 Nuevo Release 🚀 GestionExpedienteElectronico v1.4.3
   - Procesamiento avanzado de subcarpetas: La característica más destacada de esta versión, que permite gestionar estructuras jerárquicas de carpetas con validaciones automáticas y notificaciones claras.
   - Interfaz de usuario mejorada: Refinamientos en la GUI para proporcionar una experiencia más intuitiva, con mejor retroalimentación y nuevos controles.
