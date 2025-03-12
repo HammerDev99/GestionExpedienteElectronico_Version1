@@ -1060,7 +1060,7 @@ class Application(ttk.Frame):
                         mensaje_detalle += text_aux
                     mensaje_detalle += listas_unidas[-1]  # + "."
 
-                self.logger.warning("⚠️ Los siguientes elementos no se procesarán debido a problemas en su estructura. Por favor, revise la organización de estas carpetas y archivos:\n{mensaje_detalle}")
+                self.logger.warning(f"⚠️ Los siguientes elementos no se procesarán debido a problemas en su estructura. Por favor, revise la organización de estas carpetas y archivos:\n{mensaje_detalle}")
                 self.text_widget.insert(tk.END, mensaje_detalle + "\n")
                 self.text_widget.see(tk.END)
         except Exception as e:
