@@ -25,7 +25,7 @@ Se trata de una solución RDA (Robotic Desktop Automation versión Beta) que per
 
 ## Demo
 
-![alt](assets/Demo.gif)
+![alt](src/assets/Demo.gif)
 
 ## Características de GestionExpedienteElectronico_Version1
 

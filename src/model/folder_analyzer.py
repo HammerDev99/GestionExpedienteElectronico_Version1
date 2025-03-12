@@ -355,19 +355,10 @@ class FolderAnalyzer:
             # Validar la estructura usando los datos a procesar
             if directorios_a_procesar:
                 # Verifica si hay archivos en una estructura de directorios.
-                # Esta función recorre una estructura de directorios donde:
+                # Esta parte recorre una estructura de directorios donde:
                 # - Los directorios están representados como diccionarios
                 # - Los archivos están representados como valores None
     
-                """ hay_archivos = any(
-                    contenido is None
-                    for dir_actual, _ in directorios_a_procesar
-                    for contenido in (
-                        dir_actual.values()
-                        if isinstance(dir_actual, dict)
-                        else [dir_actual]
-                    )
-                ) """
                 # Inicializamos la variable que indicará si existen archivos
                 hay_archivos = False
                 

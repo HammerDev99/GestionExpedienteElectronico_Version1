@@ -8,23 +8,42 @@ import sys
 import webbrowser
 import requests
 import json
-from file_processor import FileProcessor
-from folder_analyzer import FolderAnalyzer
-import tools_window
-from tooltip import Tooltip
 import logging
 import asyncio
 import csv
 import send2trash
-from processing_context import ProcessingContext
-from gui_notifier import (
-    GUINotifier,
-    TextWidgetObserver,
-    ProgressBarObserver,
-    DialogObserver,
-    StatusLabelObserver,
-)
-from tools_window import ToolsLauncher
+
+# Detectar entorno y configurar importaciones
+if getattr(sys, "frozen", False):
+    # Entorno de producción
+    from src.utils.resource_manager import resource_manager
+    from src.view.tooltip import Tooltip
+    from src.view.tools_window import ToolsLauncher
+    from src.model.file_processor import FileProcessor
+    from src.model.folder_analyzer import FolderAnalyzer
+    from src.controller.processing_context import ProcessingContext
+    from src.controller.gui_notifier import (
+        GUINotifier,
+        TextWidgetObserver,
+        ProgressBarObserver,
+        DialogObserver,
+        StatusLabelObserver,
+    )
+else:
+    # Entorno de desarrollo
+    from utils.resource_manager import resource_manager
+    from view.tooltip import Tooltip
+    from view.tools_window import ToolsLauncher
+    from model.file_processor import FileProcessor
+    from model.folder_analyzer import FolderAnalyzer
+    from controller.processing_context import ProcessingContext
+    from controller.gui_notifier import (
+        GUINotifier,
+        TextWidgetObserver,
+        ProgressBarObserver,
+        DialogObserver,
+        StatusLabelObserver,
+    )
 
 
 class Application(ttk.Frame):
@@ -104,7 +123,7 @@ class Application(ttk.Frame):
         )
         self.help_menu.add_separator()
         self.help_menu.add_command(
-            label="Banco de Herramientas Complementarias", command=self.open_tools_window, state="disabled"
+            label="Banco de Herramientas Complementarias", command=self.open_tools_window, state="normal"
         )
         self.help_menu.add_separator()
         self.help_menu.add_command(
@@ -215,9 +234,6 @@ class Application(ttk.Frame):
         self.entry01 = ttk.Combobox(self, width=90, state="normal", justify="center")
         self.entry01.pack(pady=5)
 
-        # Leer el archivo CSV y obtener los valores para el Combobox
-        self.load_csv_values(self.entry01, "assets/JUZGADOS.csv")
-
         # Crear un Frame para contener el label01 y el icono de ayuda
         self.frame_label02 = tk.Frame(self)
         self.frame_label02.pack(pady=5, anchor="center")
@@ -248,18 +264,8 @@ class Application(ttk.Frame):
         self.entry02 = ttk.Combobox(self, width=90, state="normal", justify="center")
         self.entry02.pack(pady=5)
 
-        # Leer el archivo CSV y obtener los valores para el Combobox
-        self.load_csv_values(self.entry02, "assets/TRD.csv")
-
-        """ # Crear un Frame para contener el label03 y el icono de ayuda
-        self.frame_label03 = tk.Frame(self)
-        self.frame_label03.pack(pady=5, padx=5, anchor="center")
-
-        self.label03 = tk.Label(
-            self.frame_label03, text="Radicado", font=("Helvetica", 12), padx=5
-        )
-
-        self.entry03 = tk.Entry(self.frame_label03, width=25, justify="center") """
+        self.load_csv_values(self.entry01, resource_manager.get_path("src/assets/JUZGADOS.csv")) # funciona en producción
+        self.load_csv_values(self.entry02, resource_manager.get_path("src/assets/TRD.csv")) # funciona en producción
 
         # Crea un Frame para el label de tipo de gestión
         self.frame_label_tipo_gestion = tk.Frame(self)
@@ -493,9 +499,9 @@ class Application(ttk.Frame):
         Crea tooltips para los radiobuttons usando imágenes.
         """
         image_paths = [
-            self._get_bundled_path("assets/tooltip1.png"),
-            self._get_bundled_path("assets/tooltip2.png"),
-            self._get_bundled_path("assets/tooltip3.png"),
+            resource_manager.get_path("src/assets/tooltip1.png"),
+            resource_manager.get_path("src/assets/tooltip2.png"),
+            resource_manager.get_path("src/assets/tooltip3.png")
         ]
 
         # Tooltip(self.radio1, image_paths[0])  # Comentado
@@ -544,7 +550,7 @@ class Application(ttk.Frame):
         """
         Carga los valores del archivo CSV en el combobox.
         """
-        csv_file_path = self._get_bundled_path(ruta)
+        csv_file_path = ruta
         values = []
 
         with open(csv_file_path, newline="", encoding="utf-8") as csvfile:
@@ -590,7 +596,7 @@ class Application(ttk.Frame):
 
     def _obtener_version_actual(self):
         # Determinar la versión del programa
-        ruta_json = self._get_bundled_path("assets/last_version.json")
+        ruta_json = resource_manager.get_path("src/assets/last_version.json") 
         with open(ruta_json, "r", encoding="utf-8") as file:
             data = json.load(file)
             version = data.get("version")
@@ -1054,6 +1060,7 @@ class Application(ttk.Frame):
                         mensaje_detalle += text_aux
                     mensaje_detalle += listas_unidas[-1]  # + "."
 
+                self.logger.warning("⚠️ Los siguientes elementos no se procesarán debido a problemas en su estructura. Por favor, revise la organización de estas carpetas y archivos:\n{mensaje_detalle}")
                 self.text_widget.insert(tk.END, mensaje_detalle + "\n")
                 self.text_widget.see(tk.END)
         except Exception as e:
@@ -1247,8 +1254,7 @@ class Application(ttk.Frame):
                     self.text_widget.see(tk.END)
 
                     # Procesar archivo
-                    carpeta = self._get_bundled_path(
-                        os.path.normpath(os.path.join(self.expediente, ruta))
+                    carpeta = resource_manager.get_path(os.path.normpath(os.path.join(self.expediente, ruta))
                     )
                     processor = FileProcessor(
                         carpeta, "", despacho, subserie, rdo, logger=self.logger
@@ -1314,9 +1320,4 @@ class Application(ttk.Frame):
         Returns:
             str: Ruta absoluta normalizada
         """
-        bundle_dir = (
-            sys._MEIPASS
-            if getattr(sys, "frozen", False)
-            else os.path.abspath(os.path.dirname(__file__))
-        )
-        return os.path.normpath(os.path.join(bundle_dir, ruta))
+        return resource_manager.get_path(ruta)

@@ -4,10 +4,20 @@ from abc import ABC, abstractmethod
 import logging
 import os
 import send2trash
-from folder_analyzer import FolderAnalyzer
-from file_processor import FileProcessor
-import gui_notifier
-from gui_notifier import MessageType, DialogType, GUIMessage
+import sys
+
+if getattr(sys, "frozen", False):
+    # Entorno de producción
+    from src.model.folder_analyzer import FolderAnalyzer
+    from src.model.file_processor import FileProcessor
+    from src.controller import gui_notifier
+    from src.controller.gui_notifier import MessageType, DialogType, GUIMessage
+else:
+    # Entorno de desarrollo
+    from model.folder_analyzer import FolderAnalyzer
+    from model.file_processor import FileProcessor
+    from controller import gui_notifier
+    from controller.gui_notifier import MessageType, DialogType, GUIMessage
 
 
 class ProcessStrategy(ABC):

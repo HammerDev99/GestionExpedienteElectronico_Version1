@@ -8,10 +8,18 @@ import shutil
 import xlwings as xw
 import string
 import random
-from metadata_extractor import MetadataExtractor
-import logging
 from concurrent.futures import ThreadPoolExecutor
 import asyncio
+import logging
+
+if getattr(sys, "frozen", False):
+    # Entorno de producción
+    from src.utils.resource_manager import resource_manager
+    from src.model.metadata_extractor import MetadataExtractor
+else:
+    # Entorno de desarrollo
+    from utils.resource_manager import resource_manager
+    from model.metadata_extractor import MetadataExtractor
 
 
 class FileProcessor:
@@ -128,17 +136,8 @@ class FileProcessor:
         @modules: os, shutil
         """
 
-        # Determinar la ruta del archivo xlsm
-        if getattr(sys, "frozen", False):
-            # Si se está ejecutando el archivo empaquetado
-            bundle_dir = sys._MEIPASS
-        else:
-            # Si se está ejecutando desde el script original
-            bundle_dir = os.path.abspath(os.path.dirname(__file__))
-
-        # La ruta del excel se deja en assets por condiciones actuales
-        ruta = os.path.join(bundle_dir, "assets/000IndiceElectronicoC0.xlsm")
-
+        ruta = resource_manager.get_path("src/assets/000IndiceElectronicoC0.xlsm") 
+        
         # Copiar el archivo xlsm
         shutil.copy(ruta, ruta_final)
         self.indice = os.path.join(ruta_final, "000IndiceElectronicoC0.xlsm")
@@ -180,7 +179,7 @@ class FileProcessor:
             nueva_fila = pd.DataFrame(
                 [
                     [
-                        #str(nombres_indice[y]), # Se comenta la linea para que el nombre en el índice no se modifique
+                        #str(nombres_indice[y]), # Se comenta la linea para que el nombre en el índice no se modifique solicitud de la UTD
                         str(nombres[y]), # Se agrega la linea para que el nombre en el índice quede tal cual el de la carpeta
                         str(fechamod[y]),
                         str(numeraciones[y]),

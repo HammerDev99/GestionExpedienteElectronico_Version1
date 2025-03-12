@@ -2,15 +2,18 @@ import tkinter as tk
 from tkinter import ttk
 import os
 import sys
-from turtle import color
 import webbrowser
-from PIL import Image, ImageTk
 import logging
+from PIL import Image, ImageDraw, ImageFont, ImageTk
 
-import os
-from PIL import Image, ImageDraw, ImageFont
+if getattr(sys, "frozen", False):
+    # Entorno de producción
+    from src.utils.resource_manager import resource_manager
+else:
+    # Entorno de desarrollo
+    from utils.resource_manager import resource_manager
 
-def create_tool_images(output_dir="assets/tools"):
+def create_tool_images(output_dir="src/assets/tools"):
     
     #Crea imágenes de placeholder para cada herramienta.
     
@@ -220,11 +223,7 @@ class ToolsLauncher:
         
         # Cargar la imagen (placeholder o desde URL)
         try:
-            # Intentar cargar la imagen desde assets o usar placeholder
-            if hasattr(sys, '_MEIPASS'):
-                img_path = os.path.join(sys._MEIPASS, f"assets/tools/{tool['image']}")
-            else:
-                img_path = os.path.join(os.path.dirname(__file__), f"assets/tools/{tool['image']}")
+            img_path = resource_manager.get_path(f"src/assets/tools/{tool['image']}") 
                 
             if os.path.exists(img_path):
                 img = Image.open(img_path)

@@ -1,13 +1,26 @@
 # Gestiona el procesamiento de carpetas usando la estrategia apropiada.
 
-from file_processor import FileProcessor
-from process_strategy import (
-    SingleCuadernoStrategy,
-    SingleExpedienteStrategy,
-    MultiExpedienteStrategy,
-)
 import logging
-from gui_notifier import GUINotifier
+import sys
+
+if getattr(sys, "frozen", False):
+    # Entorno de producción
+    from src.model.file_processor import FileProcessor
+    from src.controller.gui_notifier import GUINotifier
+    from src.controller.process_strategy import (
+        SingleCuadernoStrategy,
+        SingleExpedienteStrategy,
+        MultiExpedienteStrategy,
+    )
+else:
+    # Entorno de desarrollo
+    from model.file_processor import FileProcessor
+    from controller.gui_notifier import GUINotifier
+    from controller.process_strategy import (
+        SingleCuadernoStrategy,
+        SingleExpedienteStrategy,
+        MultiExpedienteStrategy,
+    )
 
 
 class ProcessingContext:

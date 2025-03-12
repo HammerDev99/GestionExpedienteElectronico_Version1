@@ -1,10 +1,17 @@
 # coding=utf-8
 
-import gui
-from logger_config import setup_logger
 import sys
 import tkinter as tk
-
+# Detectar entorno y configurar importaciones
+if getattr(sys, "frozen", False):
+    # Entorno de producción
+    from src.view import gui
+    from src.model.logger_config import setup_logger
+else:
+    # Entorno de desarrollo
+    from view import gui
+    from model.logger_config import setup_logger
+    
 
 def main():
     # Configurar el logger
