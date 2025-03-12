@@ -603,7 +603,7 @@ class Application(ttk.Frame):
         return version
 
     def _comprobar_actualizaciones(self):
-        url = "https://raw.githubusercontent.com/HammerDev99/GestionExpedienteElectronico_Version1/refs/heads/master/assets/last_version.json"  # O usa la URL de raw.githubusercontent.com
+        url = "https://raw.githubusercontent.com/HammerDev99/GestionExpedienteElectronico_Version1/refs/heads/master/src/assets/last_version.json"  # O usa la URL de raw.githubusercontent.com
         try:
             response = requests.get(url)
             response.raise_for_status()
