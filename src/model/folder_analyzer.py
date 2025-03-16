@@ -1,8 +1,8 @@
 # coding=utf-8
 
-import os
 from typing import Dict, List, Tuple, Any
 import logging
+import os
 
 
 class FolderAnalyzer:

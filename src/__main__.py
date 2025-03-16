@@ -2,14 +2,15 @@
 
 import sys
 import tkinter as tk
+
 # Detectar entorno y configurar importaciones
 if getattr(sys, "frozen", False):
     # Entorno de producción
-    from src.view import gui
+    from src.view import application
     from src.model.logger_config import setup_logger
 else:
     # Entorno de desarrollo
-    from view import gui
+    from view import application
     from model.logger_config import setup_logger
     
 
@@ -23,7 +24,7 @@ def main():
         root = tk.Tk()
 
         # Iniciar GUI pasando el logger como parámetro
-        gui.Application(root, logger=logger)
+        application.Application(root, logger=logger)
 
         # Iniciar el loop principal
         root.mainloop()

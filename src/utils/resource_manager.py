@@ -1,7 +1,8 @@
 # resource_manager.py
+
+import logging
 import os
 import sys
-import logging
 
 class ResourceManager:
     """

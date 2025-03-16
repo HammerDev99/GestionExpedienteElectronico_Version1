@@ -2,9 +2,9 @@
 
 from abc import ABC, abstractmethod
 from enum import Enum
-import tkinter as tk
 from tkinter import ttk, messagebox
 from typing import Union, Tuple
+import tkinter as tk
 
 
 class MessageType(Enum):

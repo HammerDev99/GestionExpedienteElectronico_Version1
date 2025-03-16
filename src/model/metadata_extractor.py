@@ -1,13 +1,13 @@
 # coding=utf-8
 
-import datetime
-import re
-import os
-import string
-import random
-import win32com.client as win32
-import logging
 from PyPDF2 import PdfReader
+import datetime
+import logging
+import os
+import random
+import re
+import string
+import win32com.client as win32
 
 
 class MetadataExtractor:

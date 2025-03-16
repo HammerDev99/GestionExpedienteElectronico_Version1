@@ -1,24 +1,24 @@
 # coding=utf-8
 
-import tkinter as tk
-from tkinter import ttk
 from tkinter import filedialog
-import os.path
-import sys
-import webbrowser
-import requests
-import json
-import logging
+from tkinter import ttk
 import asyncio
 import csv
+import json
+import logging
+import os.path
+import requests
 import send2trash
+import sys
+import tkinter as tk
+import webbrowser
 
 # Detectar entorno y configurar importaciones
 if getattr(sys, "frozen", False):
     # Entorno de producción
     from src.utils.resource_manager import resource_manager
     from src.view.tooltip import Tooltip
-    from src.view.tools_window import ToolsLauncher
+    from src.view.tools_launcher import ToolsLauncher
     from src.model.file_processor import FileProcessor
     from src.model.folder_analyzer import FolderAnalyzer
     from src.controller.processing_context import ProcessingContext
@@ -33,7 +33,7 @@ else:
     # Entorno de desarrollo
     from utils.resource_manager import resource_manager
     from view.tooltip import Tooltip
-    from view.tools_window import ToolsLauncher
+    from view.tools_launcher import ToolsLauncher
     from model.file_processor import FileProcessor
     from model.folder_analyzer import FolderAnalyzer
     from controller.processing_context import ProcessingContext
@@ -351,6 +351,7 @@ class Application(ttk.Frame):
         self.text_widget = tk.Text(
             self, width=50, height=20, yscrollcommand=self.scrollbar.set
         )
+        self.text_widget.configure(wrap="word") # Configurar el modo de ajuste
         self.text_widget.pack(fill="both", expand=True, padx=5, pady=5)
 
         # Configurar la barra de desplazamiento para el Text widget

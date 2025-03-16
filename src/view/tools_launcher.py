@@ -1,10 +1,10 @@
-import tkinter as tk
+from PIL import Image, ImageDraw, ImageFont, ImageTk
 from tkinter import ttk
+import logging
 import os
 import sys
+import tkinter as tk
 import webbrowser
-import logging
-from PIL import Image, ImageDraw, ImageFont, ImageTk
 
 if getattr(sys, "frozen", False):
     # Entorno de producción
@@ -59,8 +59,7 @@ def create_tool_images(output_dir="src/assets/tools"):
 
 class ToolsLauncher:
     
-    #Ventana emergente que muestra un banco de herramientas complementarias para
-    #GestionExpedienteElectronico, con botones e imágenes que redirigen a las descargas.
+    #Ventana emergente que muestra un banco de herramientas complementarias para AgilEx, con botones e imágenes que redirigen a las descargas.
 
     
     def __init__(self, parent=None, logger=None):

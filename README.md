@@ -113,7 +113,7 @@ pip install --upgrade -r requirements.txt
 3. Una vez instalados los modulos, puedes ejecutar el programa:
 
 ```BASH
-python main.py
+python src/__main__.py
 ```
 
 4. Por último, debes comprobar que tengas **Microsoft Excel** instalado en tu computador.
