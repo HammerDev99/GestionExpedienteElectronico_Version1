@@ -36,23 +36,48 @@ class ProcessingContext:
         }
         self.analyzer = None
 
-    def add_folder(self, selected_value: str, processor: FileProcessor):
+    def add_folder(self, selected_value: str, processor: FileProcessor, despacho=None, subserie=None, folder_selected=None):
         # Agrega una carpeta usando la estrategia correspondiente al valor seleccionado.
         strategy = self._strategies.get(selected_value)
         self.logger.info(
             f"Agregando carpeta con estrategia {strategy.__class__.__name__}"
         )
 
+        # Para selected_value "2" y "3", almacenar datos del formulario en la estrategia
+        if selected_value in ["2", "3"]:
+            strategy.despacho = despacho
+            strategy.subserie = subserie
+            # Pasar la carpeta ya seleccionada para evitar duplicación
+            if folder_selected:
+                strategy.folder_selected = folder_selected
+
         # Ejecutar estrategia
-        strategy.add_folder(processor)
+        result = strategy.add_folder(processor)
+        
+        # Para selected_value "2" y "3", retornar los datos de la estrategia
+        if selected_value in ["2", "3"] and hasattr(strategy, 'lista_subcarpetas'):
+            return {
+                'expediente': strategy.expediente,
+                'lista_subcarpetas': strategy.lista_subcarpetas,
+                'carpetas_omitidas': strategy.carpetas_omitidas,
+                'analyzer': strategy.analyzer,
+                'profundidad': 4 if selected_value == "2" else 5
+            }
+        
+        return result
 
     # Procesa una carpeta usando la estrategia correspondiente al valor seleccionado.
-    def process_folder(self, selected_value: str, processor: FileProcessor):
+    async def process_folder(self, selected_value: str, processor: FileProcessor):
         # Procesa una carpeta usando la estrategia correspondiente al valor seleccionado.
         strategy = self._strategies.get(selected_value)
         self.logger.info(
             f"Procesando carpeta con estrategia {strategy.__class__.__name__}"
         )
 
-        # Ejecutar estrategia
-        strategy.process(processor)
+        try:
+            # Ejecutar estrategia
+            await strategy.process(processor)
+        finally:
+            # Limpiar la estrategia después del procesamiento (solo para selected_value "2" y "3")
+            if selected_value in ["2", "3"] and hasattr(strategy, 'cleanup'):
+                strategy.cleanup()

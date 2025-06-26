@@ -62,7 +62,7 @@ class ProcessStrategy(ABC):
         pass
 
     @abstractmethod
-    def process(self, processor: FileProcessor):
+    async def process(self, processor: FileProcessor):
         # Procesa las carpetas seleccionadas.
         pass
 
@@ -103,7 +103,7 @@ class SingleCuadernoStrategy(ProcessStrategy):
         continuar = self.gestionar_indices_existentes(processor.get_ruta(), analyzer)
         # Detiene ejecución si se encontraron índices y no se eliminaron
         if not continuar:
-            return
+            return False
 
         # Actualizar archivos en processor
         processor.set_files(None)
@@ -119,7 +119,7 @@ class SingleCuadernoStrategy(ProcessStrategy):
             # Actualizar CUI en processor
             processor.set_cui(cui)
 
-    def process(self, processor: FileProcessor):
+    async def process(self, processor: FileProcessor):
         """Procesa un cuaderno sin estructura jerárquica."""
 
         # Notifica el inicio del procesamiento
@@ -285,54 +285,858 @@ class SingleCuadernoStrategy(ProcessStrategy):
 class SingleExpedienteStrategy(ProcessStrategy):
     """Estrategia para procesar un expediente con estructura de 4 niveles."""
 
-    def add_folder(self, processor: FileProcessor):
-        # Validaciones previas al procesamiento de carpetas
-        pass
+    def __init__(self, notifier: gui_notifier, logger=None):
+        super().__init__(notifier, logger)
+        self.expediente = None
+        self.lista_subcarpetas = []
+        self.carpetas_omitidas = set()
+        self.analyzer = None
+        self.despacho = ""
+        self.subserie = ""
+        self.folder_selected = None
 
-    def process(self, processor: FileProcessor):
-        # Procesa un expediente con estructura de 4 niveles.
-        pass
+    def add_folder(self, processor: FileProcessor):
+        """Validaciones previas al procesamiento de carpetas para selected_value == '2'"""
+        from tkinter import filedialog, messagebox
+        
+        # Para selected_value 2 y 3, processor puede ser None ya que manejamos la selección internamente
+        
+        # Usar la carpeta ya seleccionada en application.py en lugar de solicitar una nueva
+        if hasattr(self, 'folder_selected') and self.folder_selected:
+            folder_selected = self.folder_selected
+        else:
+            # Fallback: solicitar carpeta solo si no fue proporcionada
+            folder_selected = os.path.normpath(filedialog.askdirectory())
+            if folder_selected in [".", ""]:
+                self.notifier.notify(
+                    GUIMessage(
+                        "No se ha seleccionado ninguna carpeta.",
+                        MessageType.DIALOG,
+                        DialogType.WARNING,
+                    )
+                )
+                return False
+
+        self.notifier.notify(GUIMessage("\n*******************", MessageType.TEXT))
+        
+        # Crear una instancia del analizador de carpetas
+        analyzer = FolderAnalyzer({}, None, logger=self.logger)
+        
+        self.expediente = folder_selected
+        estructura_directorios = analyzer.construir_estructura(folder_selected)
+        if not estructura_directorios:
+            self.notifier.notify(
+                GUIMessage(
+                    "La carpeta seleccionada está vacía o no es accesible.",
+                    MessageType.DIALOG,
+                    DialogType.WARNING,
+                )
+            )
+            return False
+
+        profundidad_maxima = analyzer.obtener_profundidad_maxima(estructura_directorios)
+        analyzer = FolderAnalyzer(
+            estructura_directorios, profundidad_maxima, logger=self.logger
+        )
+
+        # Implementación del manejo de anexos masivos para opcion profundidad 4
+        rutas_invalidas = self._validar_estructura_carpetas(
+            estructura_directorios, "2"
+        )
+        # Confirmación de carpetas de anexos masivos
+        cadena_rutas_anexos = ""
+        for i in rutas_invalidas:
+            cadena_rutas_anexos += "   🔹" + i + "\n"
+        if cadena_rutas_anexos != "":
+            self.notifier.notify(
+                GUIMessage(
+                    f"\n-------------------\n❕ Se encontraron anexos masivos en:\n\n{cadena_rutas_anexos}",
+                    MessageType.TEXT,
+                )
+            )
+
+        lista_cui, lista_subcarpetas, carpetas_omitidas, directorios_excluidos = (
+            analyzer.obtener_lista_rutas_subcarpetas(
+                estructura_directorios, 4, "2", folder_selected
+            )
+        )
+
+        # Verificar si las listas están vacías o tienen valores por defecto de error
+        if not self._validar_estructura_expediente(
+            lista_cui, lista_subcarpetas, carpetas_omitidas
+        ):
+            self.notifier.notify(GUIMessage("", MessageType.STATUS))
+            return False
+
+        # Llamar al nuevo método para gestionar índices existentes
+        continuar = self.gestionar_indices_existentes(folder_selected, analyzer)
+        if not continuar:
+            return False
+
+        # Guardar referencias para el procesamiento
+        self.lista_subcarpetas = lista_subcarpetas
+        self.carpetas_omitidas = carpetas_omitidas
+        self.analyzer = analyzer
+
+        self.handle_directory_analysis(
+            folder_selected,
+            estructura_directorios,
+            lista_cui,
+            lista_subcarpetas,
+            carpetas_omitidas,
+            analyzer,
+            directorios_excluidos
+        )
+
+        if not self.lista_subcarpetas:
+            self.notifier.notify(GUIMessage("", MessageType.STATUS))
+        else:
+            self.notifier.notify(GUIMessage((1, 1), MessageType.PROGRESS))
+            self.notifier.notify(GUIMessage("Listo para procesar", MessageType.STATUS))
+        
+        # Retornar True para indicar éxito
+        return True
+    
+    def cleanup(self):
+        """Limpia las variables de la estrategia después del procesamiento"""
+        self.expediente = None
+        self.lista_subcarpetas = []
+        self.carpetas_omitidas = set()
+        self.analyzer = None
+        self.despacho = ""
+        self.subserie = ""
+
+    def _validar_estructura_carpetas(self, estructura_directorios, selected_value):
+        """Valida la estructura de carpetas y retorna rutas inválidas"""
+        rutas_invalidas = []
+        nivel_maximo = self._obtener_nivel_maximo(selected_value)
+        
+        self._analizar_estructura(
+            estructura_directorios, "", 0, nivel_maximo, rutas_invalidas
+        )
+        
+        return rutas_invalidas
+
+    def _obtener_nivel_maximo(self, selected_value):
+        """Determina nivel máximo según opción seleccionada."""
+        return 2 if selected_value == "2" else 3
+
+    def _analizar_estructura(
+        self, directorio, ruta_actual, nivel, nivel_maximo, rutas_invalidas
+    ):
+        """Analiza recursivamente la estructura buscando carpetas invalidas."""
+        if not isinstance(directorio, dict):
+            return False
+
+        if nivel >= nivel_maximo:
+            self._verificar_subcarpetas(directorio, ruta_actual, rutas_invalidas)
+            return False
+
+        for nombre, contenido in directorio.items():
+            nueva_ruta = os.path.join(ruta_actual, nombre)
+            self._analizar_estructura(
+                contenido, nueva_ruta, nivel + 1, nivel_maximo, rutas_invalidas
+            )
+
+    def _verificar_subcarpetas(self, directorio, ruta_actual, rutas_invalidas):
+        """Verifica si existen subcarpetas en el nivel actual."""
+        for nombre, contenido in directorio.items():
+            if isinstance(contenido, dict):
+                rutas_invalidas.append(os.path.join(ruta_actual, nombre))
+
+    def _validar_estructura_expediente(self, lista_cui, lista_subcarpetas, carpetas_omitidas):
+        """Valida que la estructura del expediente sea correcta"""
+        if (
+            not lista_cui
+            and not lista_subcarpetas
+            and (not carpetas_omitidas or isinstance(carpetas_omitidas, set))
+        ):
+            self.notifier.notify(
+                GUIMessage(
+                    "❌ Error en la estructura de carpetas\n\n"
+                    "Se detectaron archivos sueltos donde debería haber unicamente carpetas.\n\n"
+                    "📝 Recomendaciones:\n\n"
+                    "1. Asegúrese de que sus carpetas siguen exactamente la estructura del protocolo y la opción elegida\n"
+                    "2. No incluya archivos en niveles donde debe haber carpetas",
+                    MessageType.DIALOG,
+                    DialogType.ERROR,
+                )
+            )
+            return False
+        return True
+
+    async def process(self, processor: FileProcessor):
+        """Procesa un expediente con estructura de 4 niveles (selected_value == '2')."""
+        from tkinter import messagebox
+        
+        if not self.lista_subcarpetas:
+            self.notifier.notify(
+                GUIMessage(
+                    "Seleccione una carpeta para procesar",
+                    MessageType.DIALOG,
+                    DialogType.INFO,
+                )
+            )
+            return False
+
+        # Obtener datos de entrada almacenados en la estrategia
+        despacho = self.despacho
+        subserie = self.subserie
+
+        self.logger.info(f"Procesando {len(self.lista_subcarpetas)} expedientes")
+        total_carpetas = sum(len(sublista) for sublista in self.lista_subcarpetas)
+
+        # Confirmación con el usuario
+        confirm = self.notifier.notify(
+            GUIMessage(
+                f'Se procesarán {total_carpetas} cuadernos que contiene la carpeta '
+                f'"{os.path.basename(self.expediente)}". ¿Desea continuar?',
+                MessageType.DIALOG,
+                DialogType.CONFIRM,
+            )
+        )
+
+        if not confirm:
+            self.notifier.notify(GUIMessage("", MessageType.STATUS))
+            self.notifier.notify(
+                GUIMessage(
+                    "Procedimiento detenido",
+                    MessageType.DIALOG,
+                    DialogType.INFO,
+                )
+            )
+            return False
+
+        # Iniciar procesamiento
+        self.notifier.notify(GUIMessage("", MessageType.STATUS))
+        self.notifier.notify(GUIMessage((0.1, 1), MessageType.PROGRESS))
+        self.notifier.notify(GUIMessage("\n🔄 Proceso iniciado...\n", MessageType.TEXT))
+        self.notifier.force_update()
+
+        try:
+            processed = 0
+            for sublista in self.lista_subcarpetas:
+                for ruta in sublista:
+                    # Obtener RDO para selected_value == "2"
+                    rdo = os.path.normpath(os.path.basename(self.expediente))
+                    rdo = self.analyzer._formater_cui(rdo)
+
+                    # Actualizar GUI
+                    self.notifier.notify(
+                        GUIMessage(
+                            "   🔹" + os.path.normpath(
+                                os.path.basename(self.expediente) + "/" + ruta
+                            ) + "\n",
+                            MessageType.TEXT,
+                        )
+                    )
+                    self.notifier.force_update()
+
+                    # Procesar expediente
+                    carpeta = os.path.normpath(os.path.join(self.expediente, ruta))
+                    processor_instance = FileProcessor(
+                        carpeta, "", despacho, subserie, rdo, logger=self.logger
+                    )
+
+                    # Procesar de forma asíncrona
+                    await processor_instance.process()
+
+                    # Actualizar progreso
+                    progress_value = 0.1 + (processed / total_carpetas) * 0.9
+                    self.notifier.notify(GUIMessage((progress_value, 1), MessageType.PROGRESS))
+                    self.notifier.force_update()
+                    processed += 1
+
+            # Finalizar procesamiento
+            self.notifier.notify(GUIMessage((1, 1), MessageType.PROGRESS))
+            self.notifier.notify(GUIMessage("", MessageType.STATUS))
+            self.notifier.notify(
+                GUIMessage("✅ Proceso completado.\n*******************\n\n", MessageType.TEXT)
+            )
+            self.notifier.notify(
+                GUIMessage(
+                    "Proceso completado exitosamente", 
+                    MessageType.DIALOG, 
+                    DialogType.INFO
+                )
+            )
+            self.notifier.notify(GUIMessage((0, 1), MessageType.PROGRESS))
+
+        except Exception as e:
+            self.logger.error(f"Error en procesamiento: {str(e)}", exc_info=True)
+            self.notifier.notify(
+                GUIMessage(
+                    f"Error durante el procesamiento: {str(e)}",
+                    MessageType.DIALOG,
+                    DialogType.ERROR,
+                )
+            )
 
     def confirmar_eliminar_indices(self, indices):
-        # Confirma con el usuario si desea eliminar los índices encontrados
-        pass
+        """Confirma con el usuario si desea eliminar los índices encontrados."""
+        cantidad = len(indices)
+        mensaje = f"Se encontr{'aron' if cantidad > 1 else 'ó'} {cantidad} índice{'s' if cantidad > 1 else ''} electrónico{'s' if cantidad > 1 else ''} que impide el procesamiento"
+        confirm = self.notifier.notify(
+            GUIMessage(
+                f"{mensaje}. ¿Desea eliminarlos?",
+                MessageType.DIALOG,
+                DialogType.CONFIRM,
+            )
+        )
+
+        if confirm:
+            self.notifier.notify(
+                GUIMessage(
+                    "\n-------------------\n✅ Índices eliminados:\n", MessageType.TEXT
+                )
+            )
+            for indice in indices:
+                try:
+                    componentes = indice.split(os.sep)[-4:]
+                    ruta_relativa = os.path.join(*componentes)
+                    send2trash.send2trash(indice)
+                    self.notifier.notify(
+                        GUIMessage(f"   🔹 {ruta_relativa}\n", MessageType.TEXT)
+                    )
+                except Exception as e:
+                    self.logger.error(f"Error eliminando índice {indice}: {str(e)}")
+            return True
+        else:
+            self.notifier.notify(
+                GUIMessage(f"\n-------------------\n❕ {mensaje}:\n", MessageType.TEXT)
+            )
+            for indice in indices:
+                componentes = indice.split(os.sep)[-4:]
+                ruta_relativa = os.path.join(*componentes)
+                self.notifier.notify(
+                    GUIMessage(f"   🔹 {ruta_relativa}\n", MessageType.TEXT)
+                )
+            return False
 
     def gestionar_indices_existentes(self, folder_selected, analyzer):
-        # Busca y gestiona índices existentes
-        pass
+        """Busca y gestiona índices existentes."""
+        indices = analyzer.buscar_indices_electronicos(folder_selected)
+        if indices:
+            indices_eliminados = self.confirmar_eliminar_indices(indices)
+            if not indices_eliminados:
+                self.notifier.notify(GUIMessage("", MessageType.STATUS))
+                return False
+        return True
 
-    def handle_directory_analysis(self):
-        # Analiza y procesa la estructura de directorios seleccionada
-        pass
+    def handle_directory_analysis(
+        self,
+        folder_selected=None,
+        estructura_directorios=None,
+        lista_cui=None,
+        lista_subcarpetas=None,
+        carpetas_omitidas=None,
+        analyzer=None,
+        directorios_excluidos=None,
+    ):
+        """Analiza y procesa la estructura de directorios seleccionada."""
+        self.notifier.notify(
+            GUIMessage(
+                f"\n-------------------\n❕ Carpeta seleccionada: {folder_selected}\n",
+                MessageType.TEXT,
+            )
+        )
+        
+        # Procesar y validar CUIs
+        if lista_cui and lista_subcarpetas:
+            cuis_validos = set()
+            cuis_invalidos = set()
+            
+            for cui in lista_cui:
+                es_valido, cui_limpio = self._validar_cui(cui)
+                if es_valido:
+                    cuis_validos.add(cui_limpio)
+                else:
+                    cuis_invalidos.add(cui)
+            
+            # Mostrar CUIs inválidos si los hay
+            if cuis_invalidos:
+                self._mostrar_cuis_invalidos(cuis_invalidos, lista_cui)
+        
+        # Mostrar carpetas omitidas y directorios excluidos
+        if carpetas_omitidas or directorios_excluidos:
+            self._mostrar_carpetas_omitidas(carpetas_omitidas or [], directorios_excluidos or [])
 
     def _mostrar_cuis_invalidos(self, cuis_invalidos, lista_cui=None):
-        # Muestra información sobre los CUIs que no cumplen con el formato requerido
-        pass
+        """Muestra información sobre los CUIs que no cumplen con el formato requerido."""
+        if cuis_invalidos:
+            mensaje = f"\n-------------------\n❕ Se encontr{'aron' if len(cuis_invalidos) > 1 else 'ó'} radicado{'s' if len(cuis_invalidos) > 1 else ''} (CUI) que no {'cumplen' if len(cuis_invalidos) > 1 else 'cumple'} con los 23 dígitos.\n\n   🔹"
+            
+            cuis_invalidos_ordenados = sorted(cuis_invalidos)
+            if cuis_invalidos_ordenados:
+                mensaje += ".\n   🔹".join(cuis_invalidos_ordenados[:-1])
+                if len(cuis_invalidos_ordenados) > 1:
+                    mensaje += ".\n   🔹"
+                mensaje += cuis_invalidos_ordenados[-1]
+            
+            self.notifier.notify(
+                GUIMessage(
+                    mensaje + "\n",
+                    MessageType.TEXT,
+                )
+            )
+    
+    def _mostrar_carpetas_omitidas(self, carpetas_omitidas, directorios_excluidos):
+        """Muestra información sobre las carpetas que fueron omitidas por no cumplir con la estructura."""
+        try:
+            if carpetas_omitidas or directorios_excluidos:
+                mensaje_detalle = (
+                    "\n-------------------\n⚠️ Los siguientes elementos no se procesarán debido a problemas en su estructura. Por favor, revise la organización de estas carpetas y archivos:\n\n   🔹"
+                )
+                
+                # Combinar y eliminar duplicados
+                listas_unidas = list(carpetas_omitidas) + list(directorios_excluidos)
+                listas_unidas = sorted(set(listas_unidas))
+                
+                if listas_unidas:
+                    mensaje_detalle += ".\n   🔹".join(listas_unidas[:-1])
+                    if len(listas_unidas) > 1:
+                        mensaje_detalle += ".\n   🔹"
+                    mensaje_detalle += listas_unidas[-1]
+                
+                self.logger.warning(f"⚠️ Los siguientes elementos no se procesarán debido a problemas en su estructura: {listas_unidas}")
+                self.notifier.notify(
+                    GUIMessage(
+                        mensaje_detalle + "\n",
+                        MessageType.TEXT,
+                    )
+                )
+        except Exception as e:
+            self.logger.error(
+                f"Error al mostrar las carpetas omitidas: {str(e)}",
+                exc_info=True,
+            )
 
 
 class MultiExpedienteStrategy(ProcessStrategy):
     """Estrategia para procesar múltiples expedientes con estructura de 5 niveles."""
 
-    def add_folder(self, processor: FileProcessor):
-        # Validaciones previas al procesamiento de carpetas.
-        pass
+    def __init__(self, notifier: gui_notifier, logger=None):
+        super().__init__(notifier, logger)
+        self.expediente = None
+        self.lista_subcarpetas = []
+        self.carpetas_omitidas = set()
+        self.analyzer = None
+        self.despacho = ""
+        self.subserie = ""
+        self.folder_selected = None
 
-    def process(self, processor: FileProcessor):
-        # Procesa expedientes con estructura de 5 niveles.
-        pass
+    def add_folder(self, processor: FileProcessor):
+        """Validaciones previas al procesamiento de carpetas para selected_value == '3'"""
+        from tkinter import filedialog
+        
+        # Para selected_value 2 y 3, processor puede ser None ya que manejamos la selección internamente
+        
+        # Usar la carpeta ya seleccionada en application.py en lugar de solicitar una nueva
+        if hasattr(self, 'folder_selected') and self.folder_selected:
+            folder_selected = self.folder_selected
+        else:
+            # Fallback: solicitar carpeta solo si no fue proporcionada
+            folder_selected = os.path.normpath(filedialog.askdirectory())
+            if folder_selected in [".", ""]:
+                self.notifier.notify(
+                    GUIMessage(
+                        "No se ha seleccionado ninguna carpeta.",
+                        MessageType.DIALOG,
+                        DialogType.WARNING,
+                    )
+                )
+                return False
+
+        self.notifier.notify(GUIMessage("\n*******************", MessageType.TEXT))
+        
+        # Crear una instancia del analizador de carpetas
+        analyzer = FolderAnalyzer({}, None, logger=self.logger)
+        
+        self.expediente = folder_selected
+        estructura_directorios = analyzer.construir_estructura(folder_selected)
+        if not estructura_directorios:
+            self.notifier.notify(
+                GUIMessage(
+                    "La carpeta seleccionada está vacía o no es accesible.",
+                    MessageType.DIALOG,
+                    DialogType.WARNING,
+                )
+            )
+            return False
+
+        profundidad_maxima = analyzer.obtener_profundidad_maxima(estructura_directorios)
+        analyzer = FolderAnalyzer(
+            estructura_directorios, profundidad_maxima, logger=self.logger
+        )
+
+        # Implementación del manejo de anexos masivos para opcion profundidad 5
+        rutas_invalidas = self._validar_estructura_carpetas(
+            estructura_directorios, "3"
+        )
+        # Confirmación de carpetas de anexos masivos
+        cadena_rutas_anexos = ""
+        for i in rutas_invalidas:
+            cadena_rutas_anexos += "   🔹" + i + "\n"
+        if cadena_rutas_anexos != "":
+            self.notifier.notify(
+                GUIMessage(
+                    f"\n-------------------\n❕ Se encontraron anexos masivos en:\n\n{cadena_rutas_anexos}",
+                    MessageType.TEXT,
+                )
+            )
+
+        lista_cui, lista_subcarpetas, carpetas_omitidas, directorios_excluidos = (
+            analyzer.obtener_lista_rutas_subcarpetas(
+                estructura_directorios, 5, "3", None
+            )
+        )
+
+        # Verificar si las listas están vacías o tienen valores por defecto de error
+        if not self._validar_estructura_expediente(
+            lista_cui, lista_subcarpetas, carpetas_omitidas
+        ):
+            self.notifier.notify(GUIMessage("", MessageType.STATUS))
+            return False
+
+        # Llamar al nuevo método para gestionar índices existentes
+        continuar = self.gestionar_indices_existentes(folder_selected, analyzer)
+        if not continuar:
+            return False
+
+        # Guardar referencias para el procesamiento
+        self.lista_subcarpetas = lista_subcarpetas
+        self.carpetas_omitidas = carpetas_omitidas
+        self.analyzer = analyzer
+
+        self.handle_directory_analysis(
+            folder_selected,
+            estructura_directorios,
+            lista_cui,
+            lista_subcarpetas,
+            carpetas_omitidas,
+            analyzer,
+            directorios_excluidos
+        )
+
+        if not self.lista_subcarpetas:
+            self.notifier.notify(GUIMessage("", MessageType.STATUS))
+        else:
+            self.notifier.notify(GUIMessage((1, 1), MessageType.PROGRESS))
+            self.notifier.notify(GUIMessage("Listo para procesar", MessageType.STATUS))
+        
+        # Retornar True para indicar éxito
+        return True
+    
+    def cleanup(self):
+        """Limpia las variables de la estrategia después del procesamiento"""
+        self.expediente = None
+        self.lista_subcarpetas = []
+        self.carpetas_omitidas = set()
+        self.analyzer = None
+        self.despacho = ""
+        self.subserie = ""
+
+    async def process(self, processor: FileProcessor):
+        """Procesa múltiples expedientes con estructura de 5 niveles (selected_value == '3')."""
+        
+        if not self.lista_subcarpetas:
+            self.notifier.notify(
+                GUIMessage(
+                    "Seleccione una carpeta para procesar",
+                    MessageType.DIALOG,
+                    DialogType.INFO,
+                )
+            )
+            return False
+
+        # Obtener datos de entrada almacenados en la estrategia
+        despacho = self.despacho
+        subserie = self.subserie
+
+        self.logger.info(f"Procesando {len(self.lista_subcarpetas)} expedientes")
+        total_carpetas = sum(len(sublista) for sublista in self.lista_subcarpetas)
+
+        # Confirmación con el usuario
+        confirm = self.notifier.notify(
+            GUIMessage(
+                f'Se procesarán {total_carpetas} cuadernos que contiene la carpeta '
+                f'"{os.path.basename(self.expediente)}". ¿Desea continuar?',
+                MessageType.DIALOG,
+                DialogType.CONFIRM,
+            )
+        )
+
+        if not confirm:
+            self.notifier.notify(GUIMessage("", MessageType.STATUS))
+            self.notifier.notify(
+                GUIMessage(
+                    "Procedimiento detenido",
+                    MessageType.DIALOG,
+                    DialogType.INFO,
+                )
+            )
+            return False
+
+        # Iniciar procesamiento
+        self.notifier.notify(GUIMessage("", MessageType.STATUS))
+        self.notifier.notify(GUIMessage((0.1, 1), MessageType.PROGRESS))
+        self.notifier.notify(GUIMessage("\n🔄 Proceso iniciado...\n", MessageType.TEXT))
+        self.notifier.force_update()
+
+        try:
+            processed = 0
+            for sublista in self.lista_subcarpetas:
+                for ruta in sublista:
+                    # Obtener RDO para selected_value == "3" - usar la ruta directamente
+                    rdo = os.path.normpath(ruta)
+                    rdo = self.analyzer._formater_cui(rdo)
+
+                    # Actualizar GUI
+                    self.notifier.notify(
+                        GUIMessage(
+                            "   🔹" + os.path.normpath(
+                                os.path.basename(self.expediente) + "/" + ruta
+                            ) + "\n",
+                            MessageType.TEXT,
+                        )
+                    )
+                    self.notifier.force_update()
+
+                    # Procesar expediente
+                    carpeta = os.path.normpath(os.path.join(self.expediente, ruta))
+                    processor_instance = FileProcessor(
+                        carpeta, "", despacho, subserie, rdo, logger=self.logger
+                    )
+
+                    # Procesar de forma asíncrona
+                    await processor_instance.process()
+
+                    # Actualizar progreso
+                    progress_value = 0.1 + (processed / total_carpetas) * 0.9
+                    self.notifier.notify(GUIMessage((progress_value, 1), MessageType.PROGRESS))
+                    self.notifier.force_update()
+                    processed += 1
+
+            # Finalizar procesamiento
+            self.notifier.notify(GUIMessage((1, 1), MessageType.PROGRESS))
+            self.notifier.notify(GUIMessage("", MessageType.STATUS))
+            self.notifier.notify(
+                GUIMessage("✅ Proceso completado.\n*******************\n\n", MessageType.TEXT)
+            )
+            self.notifier.notify(
+                GUIMessage(
+                    "Proceso completado exitosamente", 
+                    MessageType.DIALOG, 
+                    DialogType.INFO
+                )
+            )
+            self.notifier.notify(GUIMessage((0, 1), MessageType.PROGRESS))
+
+        except Exception as e:
+            self.logger.error(f"Error en procesamiento: {str(e)}", exc_info=True)
+            self.notifier.notify(
+                GUIMessage(
+                    f"Error durante el procesamiento: {str(e)}",
+                    MessageType.DIALOG,
+                    DialogType.ERROR,
+                )
+            )
+
+    def _validar_estructura_carpetas(self, estructura_directorios, selected_value):
+        """Valida la estructura de carpetas y retorna rutas inválidas"""
+        rutas_invalidas = []
+        nivel_maximo = self._obtener_nivel_maximo(selected_value)
+        
+        self._analizar_estructura(
+            estructura_directorios, "", 0, nivel_maximo, rutas_invalidas
+        )
+        
+        return rutas_invalidas
+
+    def _obtener_nivel_maximo(self, selected_value):
+        """Determina nivel máximo según opción seleccionada."""
+        return 2 if selected_value == "2" else 3
+
+    def _analizar_estructura(
+        self, directorio, ruta_actual, nivel, nivel_maximo, rutas_invalidas
+    ):
+        """Analiza recursivamente la estructura buscando carpetas invalidas."""
+        if not isinstance(directorio, dict):
+            return False
+
+        if nivel >= nivel_maximo:
+            self._verificar_subcarpetas(directorio, ruta_actual, rutas_invalidas)
+            return False
+
+        for nombre, contenido in directorio.items():
+            nueva_ruta = os.path.join(ruta_actual, nombre)
+            self._analizar_estructura(
+                contenido, nueva_ruta, nivel + 1, nivel_maximo, rutas_invalidas
+            )
+
+    def _verificar_subcarpetas(self, directorio, ruta_actual, rutas_invalidas):
+        """Verifica si existen subcarpetas en el nivel actual."""
+        for nombre, contenido in directorio.items():
+            if isinstance(contenido, dict):
+                rutas_invalidas.append(os.path.join(ruta_actual, nombre))
+
+    def _validar_estructura_expediente(self, lista_cui, lista_subcarpetas, carpetas_omitidas):
+        """Valida que la estructura del expediente sea correcta"""
+        if (
+            not lista_cui
+            and not lista_subcarpetas
+            and (not carpetas_omitidas or isinstance(carpetas_omitidas, set))
+        ):
+            self.notifier.notify(
+                GUIMessage(
+                    "❌ Error en la estructura de carpetas\n\n"
+                    "Se detectaron archivos sueltos donde debería haber unicamente carpetas.\n\n"
+                    "📝 Recomendaciones:\n\n"
+                    "1. Asegúrese de que sus carpetas siguen exactamente la estructura del protocolo y la opción elegida\n"
+                    "2. No incluya archivos en niveles donde debe haber carpetas",
+                    MessageType.DIALOG,
+                    DialogType.ERROR,
+                )
+            )
+            return False
+        return True
 
     def confirmar_eliminar_indices(self, indices):
-        # Confirma con el usuario si desea eliminar los índices encontrados
-        pass
+        """Confirma con el usuario si desea eliminar los índices encontrados."""
+        cantidad = len(indices)
+        mensaje = f"Se encontr{'aron' if cantidad > 1 else 'ó'} {cantidad} índice{'s' if cantidad > 1 else ''} electrónico{'s' if cantidad > 1 else ''} que impide el procesamiento"
+        confirm = self.notifier.notify(
+            GUIMessage(
+                f"{mensaje}. ¿Desea eliminarlos?",
+                MessageType.DIALOG,
+                DialogType.CONFIRM,
+            )
+        )
+
+        if confirm:
+            self.notifier.notify(
+                GUIMessage(
+                    "\n-------------------\n✅ Índices eliminados:\n", MessageType.TEXT
+                )
+            )
+            for indice in indices:
+                try:
+                    componentes = indice.split(os.sep)[-4:]
+                    ruta_relativa = os.path.join(*componentes)
+                    send2trash.send2trash(indice)
+                    self.notifier.notify(
+                        GUIMessage(f"   🔹 {ruta_relativa}\n", MessageType.TEXT)
+                    )
+                except Exception as e:
+                    self.logger.error(f"Error eliminando índice {indice}: {str(e)}")
+            return True
+        else:
+            self.notifier.notify(
+                GUIMessage(f"\n-------------------\n❕ {mensaje}:\n", MessageType.TEXT)
+            )
+            for indice in indices:
+                componentes = indice.split(os.sep)[-4:]
+                ruta_relativa = os.path.join(*componentes)
+                self.notifier.notify(
+                    GUIMessage(f"   🔹 {ruta_relativa}\n", MessageType.TEXT)
+                )
+            return False
 
     def gestionar_indices_existentes(self, folder_selected, analyzer):
-        # Busca y gestiona índices existentes
-        pass
+        """Busca y gestiona índices existentes."""
+        indices = analyzer.buscar_indices_electronicos(folder_selected)
+        if indices:
+            indices_eliminados = self.confirmar_eliminar_indices(indices)
+            if not indices_eliminados:
+                self.notifier.notify(GUIMessage("", MessageType.STATUS))
+                return False
+        return True
 
-    def handle_directory_analysis(self):
-        # Analiza y procesa la estructura de directorios seleccionada
-        pass
+    def handle_directory_analysis(
+        self,
+        folder_selected=None,
+        estructura_directorios=None,
+        lista_cui=None,
+        lista_subcarpetas=None,
+        carpetas_omitidas=None,
+        analyzer=None,
+        directorios_excluidos=None,
+    ):
+        """Analiza y procesa la estructura de directorios seleccionada."""
+        # Mostrar carpeta seleccionada
+        self.notifier.notify(
+            GUIMessage(
+                f"\n-------------------\n❕ Carpeta seleccionada: {folder_selected}\n",
+                MessageType.TEXT,
+            )
+        )
+        
+        # Procesar y validar CUIs
+        if lista_cui and lista_subcarpetas:
+            cuis_validos = set()
+            cuis_invalidos = set()
+            
+            for cui in lista_cui:
+                es_valido, cui_limpio = self._validar_cui(cui)
+                if es_valido:
+                    cuis_validos.add(cui_limpio)
+                else:
+                    cuis_invalidos.add(cui)
+            
+            # Mostrar CUIs inválidos si los hay
+            if cuis_invalidos:
+                self._mostrar_cuis_invalidos(cuis_invalidos, lista_cui)
+        
+        # Mostrar carpetas omitidas y directorios excluidos
+        if carpetas_omitidas or directorios_excluidos:
+            self._mostrar_carpetas_omitidas(carpetas_omitidas or [], directorios_excluidos or [])
 
     def _mostrar_cuis_invalidos(self, cuis_invalidos, lista_cui=None):
-        # Muestra información sobre los CUIs que no cumplen con el formato requerido
-        pass
+        """Muestra información sobre los CUIs que no cumplen con el formato requerido."""
+        if cuis_invalidos:
+            mensaje = f"\n-------------------\n❕ Se encontr{'aron' if len(cuis_invalidos) > 1 else 'ó'} radicado{'s' if len(cuis_invalidos) > 1 else ''} (CUI) que no {'cumplen' if len(cuis_invalidos) > 1 else 'cumple'} con los 23 dígitos.\n\n   🔹"
+            
+            cuis_invalidos_ordenados = sorted(cuis_invalidos)
+            if cuis_invalidos_ordenados:
+                mensaje += ".\n   🔹".join(cuis_invalidos_ordenados[:-1])
+                if len(cuis_invalidos_ordenados) > 1:
+                    mensaje += ".\n   🔹"
+                mensaje += cuis_invalidos_ordenados[-1]
+            
+            self.notifier.notify(
+                GUIMessage(
+                    mensaje + "\n",
+                    MessageType.TEXT,
+                )
+            )
+    
+    def _mostrar_carpetas_omitidas(self, carpetas_omitidas, directorios_excluidos):
+        """Muestra información sobre las carpetas que fueron omitidas por no cumplir con la estructura."""
+        try:
+            if carpetas_omitidas or directorios_excluidos:
+                mensaje_detalle = (
+                    "\n-------------------\n⚠️ Los siguientes elementos no se procesarán debido a problemas en su estructura. Por favor, revise la organización de estas carpetas y archivos:\n\n   🔹"
+                )
+                
+                # Combinar y eliminar duplicados
+                listas_unidas = list(carpetas_omitidas) + list(directorios_excluidos)
+                listas_unidas = sorted(set(listas_unidas))
+                
+                if listas_unidas:
+                    mensaje_detalle += ".\n   🔹".join(listas_unidas[:-1])
+                    if len(listas_unidas) > 1:
+                        mensaje_detalle += ".\n   🔹"
+                    mensaje_detalle += listas_unidas[-1]
+                
+                self.logger.warning(f"⚠️ Los siguientes elementos no se procesarán debido a problemas en su estructura: {listas_unidas}")
+                self.notifier.notify(
+                    GUIMessage(
+                        mensaje_detalle + "\n",
+                        MessageType.TEXT,
+                    )
+                )
+        except Exception as e:
+            self.logger.error(
+                f"Error al mostrar las carpetas omitidas: {str(e)}",
+                exc_info=True,
+            )
