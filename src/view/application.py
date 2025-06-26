@@ -621,13 +621,9 @@ class Application(ttk.Frame):
         except requests.RequestException as e:
             self.logger.error(f"Error al comprobar actualizaciones: {e}", exc_info=True)
 
-    # Pendiente refactorizar para implementar el patrón strategy con opción subcarpeta, opción 1 y opción 2
     def obtener_rutas(self):
         """
-        - Obtiene la ruta seleccionada por el usuario
-        - Recupera la lista de carpetas en esa ruta
-        - Valida la estructura de las carpetas
-        - Obtiene los CUIs y subcarpetas internas
+        Coordina con las estrategias para obtener rutas - Flujo completamente unificado.
         """
         self.text_widget.see(tk.END)
         self.lista_cui = []
@@ -635,197 +631,64 @@ class Application(ttk.Frame):
         self.carpetas_omitidas = set()
         self.estructura_directorios = {}
 
-        #**********************************
-        folder_selected = os.path.normpath(filedialog.askdirectory())
-        if folder_selected in [".", ""]:
-            tk.messagebox.showwarning(
-                "Advertencia", "No se ha seleccionado ninguna carpeta."
-            )
-            return
-        self.text_widget.insert(tk.END, "\n*******************")
-
         # **********************************
-        # Implementación del patron strategy opción subcarpetas
-        # Agrega la carpeta seleccionada utilizando el contexto para el caso de la opcion subcarpetas
-        if self.selected_value == "1":
-
-            # Procesar archivo
-            despacho = self.entry01.get()
-            subserie = self.entry02.get()
-            radicado = self.entry03.get()
-
-            # validar que existan archivos en la carpeta seleccionada
-            estructura_directorios = os.listdir(folder_selected)
-            if not estructura_directorios:
-                tk.messagebox.showwarning(
-                    "Advertencia",
-                    "La carpeta seleccionada está vacía o no es accesible.",
-                )
-                return
-            # Validar con el usuario a través de un mensaje de confirmación solo en el caso en que dentro de la carpeta seleccionada existan más carpetas adentro
-            #********************************** Funcion repetida integrar en varias funciones adicionales
-            carpetas = []
-            for carpeta in estructura_directorios:
-                if os.path.isdir(os.path.join(folder_selected, carpeta)):
-                    carpetas.append(carpeta)
-            cadena_rutas_anexos = ""
-            for i in carpetas:
-                cadena_rutas_anexos += "   🔹"+i + "\n"
-            if len(carpetas) > 1:
-                self.text_widget.insert(tk.END, f"\n-------------------\n❕ Se encontraron anexos masivos en:\n\n{cadena_rutas_anexos}")
-                self.text_widget.see(tk.END)
-            #**********************************
-
-            processor = FileProcessor(
-                folder_selected, "", despacho, subserie, radicado, logger=self.logger
-            )
-            self.processor = processor
-            self.processing_context.add_folder(self.selected_value, processor)
-
-            return
+        # FLUJO COMPLETAMENTE UNIFICADO - TODAS LAS ESTRATEGIAS SON AUTÓNOMAS
         # **********************************
-
-        # Crear una instancia del analizador de carpetas
-        analyzer = FolderAnalyzer({}, None, logger=self.logger)
-
-        self.expediente = folder_selected
-        estructura_directorios = analyzer.construir_estructura(folder_selected)
-        if not estructura_directorios:
-            tk.messagebox.showwarning(
-                "Advertencia", "La carpeta seleccionada está vacía o no es accesible."
-            )
-            return
-
-        profundidad_maxima = analyzer.obtener_profundidad_maxima(estructura_directorios)
-        # Para poder incorporarla generación de lista de rutas donde se encuentran archivos sueltos donde Solo deberían de ir carpetas se pretende estructurar el objeto folder analizer enviando igualmente el valor seleccionado para que inmediatamente si haga el análisis se genere las rutas de esas carpetas y se vuelva en una variable
-        analyzer = FolderAnalyzer(
-            estructura_directorios, profundidad_maxima, logger=self.logger
+        
+        # Obtener datos del formulario
+        despacho = self.entry01.get()
+        subserie = self.entry02.get()
+        radicado = self.entry03.get() if self.selected_value == "1" else ""
+        
+        # Delegar completamente a las estrategias - No manejo de askdirectory en application
+        result = self.processing_context.add_folder(
+            self.selected_value, None, despacho, subserie, radicado
         )
-
-        # **********************************
-        # Implementación del patron strategy para opciones Expediente y Múltiples Expedientes
-        # Agregar la carpeta seleccionada utilizando el contexto para selected_value "2" y "3"
-        if self.selected_value in ["2", "3"]:
-            # Obtener datos del formulario
-            despacho = self.entry01.get()
-            subserie = self.entry02.get()
-            
-            # Para las estrategias 2 y 3, no necesitamos FileProcessor en add_folder
-            # Pasar la carpeta ya seleccionada para evitar duplicación
-            result = self.processing_context.add_folder(self.selected_value, None, despacho, subserie, folder_selected)
-            
-            # Si la estrategia retorna datos, configurar las variables de clase
-            if result and isinstance(result, dict):
-                self.expediente = result.get('expediente')
-                self.lista_subcarpetas = result.get('lista_subcarpetas', [])
-                self.carpetas_omitidas = result.get('carpetas_omitidas', set())
-                self.analyzer = result.get('analyzer')
-                self.profundidad = result.get('profundidad')
-                
-                # Actualizar la barra de progreso según el resultado
-                if not self.lista_subcarpetas:
-                    self.update_progressbar_status("")
-                else:
-                    self.progress['maximum'] = 1
-                    self.progress["value"] = 1
-                    self.update_progressbar_status("Listo para procesar")
-            
-            return
-        # **********************************
-
-
-
-
-
-
-
-
-
-
-
-
+        
+        # Solo para estrategias 2 y 3: guardar datos para procesamiento posterior
+        if self.selected_value in ["2", "3"] and result and isinstance(result, dict):
+            self.expediente = result.get('expediente')
+            self.lista_subcarpetas = result.get('lista_subcarpetas', [])
+            self.carpetas_omitidas = result.get('carpetas_omitidas', set())
+            self.analyzer = result.get('analyzer')
+            self.profundidad = result.get('profundidad')
+        
+        # Las estrategias manejan completamente el progressbar y mensajes via Observer
 
     def run_async_process(self, app):
         """Inicia el procesamiento asíncrono"""
         asyncio.run(app.procesa_expedientes())
 
-    # Pendiente refactorizar para implementar el patrón strategy con opción subcarpeta, opción 1 y opción 2
     async def procesa_expedientes(self):
-        """Versión asíncrona simplificada del procesamiento de expedientes"""
-        despacho = self.entry01.get()
-        subserie = self.entry02.get()
-
-        if not self.lista_subcarpetas and (
-            self.selected_value != "1" or self.processor is None
-        ):
-            self._mensaje(3)
+        """Procesa expedientes usando estrategias unificadas para todos los tipos."""
+        
+        # **********************************
+        # FLUJO UNIFICADO PARA TODAS LAS ESTRATEGIAS
+        # **********************************
+        
+        # Validación básica: verificar que hay algo que procesar
+        if not self._validar_estado_procesamiento():
+            self._mensaje(3)  # "Seleccione una carpeta para procesar"
             return
 
-        self.logger.info(f"Procesando {len(self.lista_subcarpetas)} expedientes")
-        total_carpetas = sum(len(sublista) for sublista in self.lista_subcarpetas)
-        self.progress["maximum"] = 1  # La barra de progreso va de 0 a 1
+        self.logger.info(f"Iniciando procesamiento con estrategia para selected_value: {self.selected_value}")
+        self.progress["maximum"] = 1
 
-        # Se realiza conteo de archivos lo cual debería de estar en la estrategia pero por el momento se realiza en este punto
-        # Solo mostrar confirmación para selected_value == "1", las estrategias manejan su propia confirmación
+        # Delegar completamente a las estrategias
+        await self.processing_context.process_folder(self.selected_value, None)
+        
+        # Limpiar estado después del procesamiento
+        self._restablecer_variables_clase()
+
+    def _validar_estado_procesamiento(self):
+        """Valida que haya algo que procesar según la estrategia."""
         if self.selected_value == "1":
-            total_archivos = len(os.listdir(self.processor.get_ruta()))
-            
-            if not tk.messagebox.askyesno(
-                message=f'Se procesarán {total_archivos} archivos que contiene la carpeta '
-                f'"{os.path.basename(self.processor.get_ruta())}". '
-                f"¿Desea continuar?.",
-                title=os.path.basename(self.processor.get_ruta()),
-            ):
-                self._restablecer_variables_clase()
-                self.update_progressbar_status("")
-                self._mensaje(6)
-                return
-
-        # **********************************
-        # Implementación del patron strategy opción subcarpetas
-        # Procesa la carpeta seleccionada utilizando el contexto para el caso de la opcion subcarpetas
-        if self.selected_value == "1":
-            processor = FileProcessor(
-                self.processor.get_ruta(),
-                "",
-                despacho,
-                subserie,
-                self.entry03.get(),
-                logger=self.logger,
-            )
-            await self.processing_context.process_folder(self.selected_value, self.processor)
-            self.processor = None
-            self._restablecer_variables_clase()
-            return
-        # **********************************
-
-        # **********************************
-        # Implementación del patron strategy para opciones Expediente y Múltiples Expedientes
-        # Procesa la carpeta seleccionada utilizando el contexto para selected_value "2" y "3"
-        elif self.selected_value in ["2", "3"]:
-            # Para las estrategias 2 y 3, necesitamos acceso a la estrategia para usar sus datos internos
-            strategy = self.processing_context._strategies.get(self.selected_value)
-            
-            if not strategy or not hasattr(strategy, 'expediente') or not strategy.expediente:
-                self._mensaje(3)  # "Seleccione una carpeta para procesar"
-                return
-            
-            # Crear un FileProcessor con los datos del formulario y la información de la estrategia
-            processor = FileProcessor(
-                strategy.expediente,  # Usar la ruta configurada en add_folder()
-                "",
-                despacho,
-                subserie,
-                "",  # El RDO se maneja internamente por las estrategias
-                logger=self.logger,
-            )
-            
-            # Usar el contexto para procesar según la estrategia correspondiente
-            await self.processing_context.process_folder(self.selected_value, processor)
-            
-            # Limpiar variables después del procesamiento
-            self._restablecer_variables_clase()
-            return
+            # Para SingleCuadernoStrategy, verificar que se seleccionó carpeta
+            strategy = self.processing_context._strategies.get("1")
+            return strategy and hasattr(strategy, 'folder_selected') and strategy.folder_selected
+        else:
+            # Para otras estrategias, verificar que hay subcarpetas
+            return bool(self.lista_subcarpetas)
         # **********************************
 
     def _mensaje(self, result=None, mensaje=None):

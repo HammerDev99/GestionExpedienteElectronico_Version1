@@ -92,56 +92,171 @@ class SingleCuadernoStrategy(ProcessStrategy):
 
     def __init__(self, notifier: gui_notifier, logger=None):
         super().__init__(notifier, logger)
+        self.folder_selected = None
+        self.expediente = None
+        self.despacho = ""
+        self.subserie = ""
+        self.radicado = ""
 
     def add_folder(self, processor: FileProcessor):
-        """Validaciones previas al procesamiento de carpetas."""
+        """Validaciones previas al procesamiento de carpetas para un solo cuaderno."""
+        from tkinter import filedialog
+        
+        # 1. Manejar su propio askdirectory()
+        folder_selected = os.path.normpath(filedialog.askdirectory())
+        if folder_selected in [".", ""]:
+            self.notifier.notify(
+                GUIMessage(
+                    "No se ha seleccionado ninguna carpeta.",
+                    MessageType.DIALOG,
+                    DialogType.WARNING,
+                )
+            )
+            return False
 
-        # Crear una instancia del analizador de carpetas
+        self.notifier.notify(GUIMessage("\n*******************", MessageType.TEXT))
+        
+        # 2. Validar que existan archivos en la carpeta seleccionada
+        try:
+            estructura_directorios = os.listdir(folder_selected)
+        except (OSError, PermissionError):
+            self.notifier.notify(
+                GUIMessage(
+                    "La carpeta seleccionada no es accesible.",
+                    MessageType.DIALOG,
+                    DialogType.WARNING,
+                )
+            )
+            return False
+            
+        if not estructura_directorios:
+            self.notifier.notify(
+                GUIMessage(
+                    "La carpeta seleccionada está vacía o no es accesible.",
+                    MessageType.DIALOG,
+                    DialogType.WARNING,
+                )
+            )
+            return False
+
+        # 3. Detectar anexos masivos (carpetas dentro de la carpeta seleccionada)
+        carpetas = []
+        for item in estructura_directorios:
+            if os.path.isdir(os.path.join(folder_selected, item)):
+                carpetas.append(item)
+        
+        if len(carpetas) > 1:
+            cadena_rutas_anexos = ""
+            for carpeta in carpetas:
+                cadena_rutas_anexos += "   🔹" + carpeta + "\n"
+            self.notifier.notify(
+                GUIMessage(
+                    f"\n-------------------\n❕ Se encontraron anexos masivos en:\n\n{cadena_rutas_anexos}",
+                    MessageType.TEXT,
+                )
+            )
+
+        # 4. Crear analizador y gestionar índices existentes
         analyzer = FolderAnalyzer({}, None, logger=self.logger)
-
-        # Llamar al nuevo método para gestionar índices existentes
-        continuar = self.gestionar_indices_existentes(processor.get_ruta(), analyzer)
-        # Detiene ejecución si se encontraron índices y no se eliminaron
+        continuar = self.gestionar_indices_existentes(folder_selected, analyzer)
         if not continuar:
             return False
 
-        # Actualizar archivos en processor
-        processor.set_files(None)
+        # 5. Guardar datos para procesamiento
+        self.folder_selected = folder_selected
+        self.expediente = folder_selected
 
-        # INDICA LA CARPETA SELECCIONADA EN TEXVIEW Y DEMÁS INTERACCIONES DE LA GUI
-        self.handle_directory_analysis(processor.get_ruta())
+        # 6. Mostrar carpeta seleccionada
+        self.notifier.notify(
+            GUIMessage(
+                f"\n-------------------\n❕ Carpeta seleccionada: {folder_selected}\n",
+                MessageType.TEXT,
+            )
+        )
 
-        # Validar CUI
-        cui_valido, cui = self._validar_cui(processor.rdo)
-        if not cui_valido:
-            self._mostrar_cuis_invalidos(cui, None)
-        else:
-            # Actualizar CUI en processor
-            processor.set_cui(cui)
+        # 7. Validar CUI si se proporcionó radicado
+        if self.radicado:
+            cui_valido, cui = self._validar_cui(self.radicado)
+            if not cui_valido:
+                self._mostrar_cuis_invalidos(cui, None)
+            else:
+                self.radicado = cui
+
+        # 8. Actualizar progressbar y status como las otras estrategias
+        self.notifier.notify(GUIMessage((1, 1), MessageType.PROGRESS))
+        self.notifier.notify(GUIMessage("Listo para procesar", MessageType.STATUS))
+
+        return True
 
     async def process(self, processor: FileProcessor):
         """Procesa un cuaderno sin estructura jerárquica."""
+        
+        if not self.folder_selected:
+            self.notifier.notify(
+                GUIMessage(
+                    "Seleccione una carpeta para procesar",
+                    MessageType.DIALOG,
+                    DialogType.INFO,
+                )
+            )
+            return False
 
-        # Notifica el inicio del procesamiento
+        # 1. Manejar su propia confirmación
+        try:
+            total_archivos = len(os.listdir(self.folder_selected))
+        except (OSError, PermissionError):
+            total_archivos = 0
+            
+        confirm = self.notifier.notify(
+            GUIMessage(
+                f'Se procesarán {total_archivos} archivos que contiene la carpeta '
+                f'"{os.path.basename(self.folder_selected)}". ¿Desea continuar?',
+                MessageType.DIALOG,
+                DialogType.CONFIRM,
+            )
+        )
+
+        if not confirm:
+            self.notifier.notify(GUIMessage("", MessageType.STATUS))
+            self.notifier.notify(
+                GUIMessage(
+                    "Procedimiento detenido",
+                    MessageType.DIALOG,
+                    DialogType.INFO,
+                )
+            )
+            return False
+
+        # 2. Crear FileProcessor con los datos de la estrategia
+        processor = FileProcessor(
+            self.folder_selected,
+            "",
+            self.despacho,
+            self.subserie,
+            self.radicado,
+            logger=self.logger,
+        )
+
+        # 3. Notificar inicio del procesamiento
         self.notifier.notify(GUIMessage("", MessageType.STATUS))
         self.notifier.notify(GUIMessage((0.1, 1), MessageType.PROGRESS))
         self.notifier.notify(GUIMessage("\n🔄 Proceso iniciado...\n", MessageType.TEXT))
         self.notifier.notify(
             GUIMessage(
                 "- "
-                + processor.rdo
+                + self.radicado
                 + "/"
-                + os.path.normpath(os.path.basename(processor.ruta))
+                + os.path.normpath(os.path.basename(self.folder_selected))
                 + "\n",
                 MessageType.TEXT,
             )
         )
         self.notifier.force_update()
 
-        # Procesa el cuaderno
+        # 4. Procesar el cuaderno
         processor._process_excel()
 
-        # Notifica finalización
+        # 5. Notificar finalización
         self.notifier.notify(
             GUIMessage(
                 "✅ Proceso completado.\n*******************\n\n", MessageType.TEXT
@@ -157,6 +272,42 @@ class SingleCuadernoStrategy(ProcessStrategy):
             )
         )
         self.notifier.notify(GUIMessage((0, 1), MessageType.PROGRESS))
+        
+        return True
+
+    def _mostrar_cuis_invalidos(self, cuis_invalidos, lista_cui=None):
+        """
+        Muestra información sobre los CUIs que no cumplen con el formato requerido.
+
+        Args:
+            cuis_invalidos (str or set): CUI inválido (string) o conjunto de CUIs inválidos (set)
+            lista_cui (list): Lista original de CUIs
+        """
+
+        if cuis_invalidos or cuis_invalidos == "":
+            # Determinar si es un string o un conjunto
+            if isinstance(cuis_invalidos, str):
+                # Para SingleCuadernoStrategy - un solo CUI como string
+                count = 1
+                mensaje = f"\n-------------------\n❕ Se encontr{'ó'} radicado (CUI) que no cumple con los 23 dígitos.\n\n   🔹{cuis_invalidos}"
+            else:
+                # Para otras estrategias - conjunto de CUIs
+                count = len(cuis_invalidos)
+                mensaje = f"\n-------------------\n❕ Se encontr{'aron' if count > 1 else 'ó'} radicado{'s' if count > 1 else ''} (CUI) que no {'cumplen' if count > 1 else 'cumple'} con los 23 dígitos.\n\n   🔹"
+                
+                # Convertir el set a una cadena formateada
+                cuis_invalidos_ordenados = sorted(cuis_invalidos)
+                if cuis_invalidos_ordenados:
+                    cuis_formateados = ".\n   🔹".join(cuis_invalidos_ordenados)
+                    mensaje += cuis_formateados
+
+            self.notifier.notify(
+                GUIMessage(
+                    mensaje + "\n",
+                    MessageType.TEXT,
+                )
+            )
+
 
     def gestionar_indices_existentes(self, folder_selected, analyzer):
         """
@@ -258,30 +409,6 @@ class SingleCuadernoStrategy(ProcessStrategy):
         self.notifier.notify(GUIMessage((1, 1), MessageType.PROGRESS))
         self.notifier.notify(GUIMessage("Listo para procesar", MessageType.STATUS))
 
-    def _mostrar_cuis_invalidos(self, cuis_invalidos, lista_cui=None):
-        """
-        Muestra información sobre los CUIs que no cumplen con el formato requerido.
-
-        Args:
-            cuis_invalidos (set): Conjunto de CUIs inválidos
-            lista_cui (list): Lista original de CUIs
-        """
-
-        if cuis_invalidos or cuis_invalidos == "":
-            # self._mensaje(None, "Algunas carpetas no cumplen con el formato requerido de 23 dígitos numéricos.")
-
-            mensaje = f"\n-------------------\n❕ Se encontr{'aron' if len(cuis_invalidos) > 1 else 'ó'} radicado{'s' if len(cuis_invalidos) > 1 else ''} (CUI) que no {'cumplen' if len(cuis_invalidos) > 1 else 'cumple'} con los 23 dígitos."
-
-            mensaje += cuis_invalidos
-
-            self.notifier.notify(
-                GUIMessage(
-                    mensaje + "\n",
-                    MessageType.TEXT,
-                )
-            )
-
-
 class SingleExpedienteStrategy(ProcessStrategy):
     """Estrategia para procesar un expediente con estructura de 4 niveles."""
 
@@ -299,23 +426,17 @@ class SingleExpedienteStrategy(ProcessStrategy):
         """Validaciones previas al procesamiento de carpetas para selected_value == '2'"""
         from tkinter import filedialog, messagebox
         
-        # Para selected_value 2 y 3, processor puede ser None ya que manejamos la selección internamente
-        
-        # Usar la carpeta ya seleccionada en application.py en lugar de solicitar una nueva
-        if hasattr(self, 'folder_selected') and self.folder_selected:
-            folder_selected = self.folder_selected
-        else:
-            # Fallback: solicitar carpeta solo si no fue proporcionada
-            folder_selected = os.path.normpath(filedialog.askdirectory())
-            if folder_selected in [".", ""]:
-                self.notifier.notify(
-                    GUIMessage(
-                        "No se ha seleccionado ninguna carpeta.",
-                        MessageType.DIALOG,
-                        DialogType.WARNING,
-                    )
+        # Manejar su propio askdirectory() - Estrategia completamente autónoma
+        folder_selected = os.path.normpath(filedialog.askdirectory())
+        if folder_selected in [".", ""]:
+            self.notifier.notify(
+                GUIMessage(
+                    "No se ha seleccionado ninguna carpeta.",
+                    MessageType.DIALOG,
+                    DialogType.WARNING,
                 )
-                return False
+            )
+            return False
 
         self.notifier.notify(GUIMessage("\n*******************", MessageType.TEXT))
         
@@ -729,23 +850,17 @@ class MultiExpedienteStrategy(ProcessStrategy):
         """Validaciones previas al procesamiento de carpetas para selected_value == '3'"""
         from tkinter import filedialog
         
-        # Para selected_value 2 y 3, processor puede ser None ya que manejamos la selección internamente
-        
-        # Usar la carpeta ya seleccionada en application.py en lugar de solicitar una nueva
-        if hasattr(self, 'folder_selected') and self.folder_selected:
-            folder_selected = self.folder_selected
-        else:
-            # Fallback: solicitar carpeta solo si no fue proporcionada
-            folder_selected = os.path.normpath(filedialog.askdirectory())
-            if folder_selected in [".", ""]:
-                self.notifier.notify(
-                    GUIMessage(
-                        "No se ha seleccionado ninguna carpeta.",
-                        MessageType.DIALOG,
-                        DialogType.WARNING,
-                    )
+        # Manejar su propio askdirectory() - Estrategia completamente autónoma
+        folder_selected = os.path.normpath(filedialog.askdirectory())
+        if folder_selected in [".", ""]:
+            self.notifier.notify(
+                GUIMessage(
+                    "No se ha seleccionado ninguna carpeta.",
+                    MessageType.DIALOG,
+                    DialogType.WARNING,
                 )
-                return False
+            )
+            return False
 
         self.notifier.notify(GUIMessage("\n*******************", MessageType.TEXT))
         

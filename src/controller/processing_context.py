@@ -36,23 +36,27 @@ class ProcessingContext:
         }
         self.analyzer = None
 
-    def add_folder(self, selected_value: str, processor: FileProcessor, despacho=None, subserie=None, folder_selected=None):
+    def add_folder(self, selected_value: str, processor: FileProcessor, despacho=None, subserie=None, radicado=None):
         # Agrega una carpeta usando la estrategia correspondiente al valor seleccionado.
         strategy = self._strategies.get(selected_value)
         self.logger.info(
             f"Agregando carpeta con estrategia {strategy.__class__.__name__}"
         )
 
-        # Para selected_value "2" y "3", almacenar datos del formulario en la estrategia
-        if selected_value in ["2", "3"]:
-            strategy.despacho = despacho
-            strategy.subserie = subserie
-            # Pasar la carpeta ya seleccionada para evitar duplicación
-            if folder_selected:
-                strategy.folder_selected = folder_selected
+        # Inyectar datos del formulario en todas las estrategias
+        strategy.despacho = despacho
+        strategy.subserie = subserie
+        
+        # Para selected_value "1", agregar el radicado
+        if selected_value == "1":
+            strategy.radicado = radicado
 
-        # Ejecutar estrategia
+        # Ejecutar estrategia - Todas manejan su propio askdirectory()
         result = strategy.add_folder(processor)
+        
+        # Para selected_value "1", retornar resultado simple
+        if selected_value == "1":
+            return result
         
         # Para selected_value "2" y "3", retornar los datos de la estrategia
         if selected_value in ["2", "3"] and hasattr(strategy, 'lista_subcarpetas'):
