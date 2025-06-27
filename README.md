@@ -63,29 +63,29 @@ Este proyecto fue desarrollado para gestionar una función específica de caract
 
 1. Descargalo directamente a tu computador o ejecuta el siguiente comando en la terminal para clonar el repositorio de GitHub en tu equipo:
   
-```BASH
-git clone https://github.com/HammerDev99/GestionExpedienteElectronico_Version1.git
-```
+    ```BASH
+    git clone https://github.com/HammerDev99/GestionExpedienteElectronico_Version1.git
+    ```
   
 2. Navega hacia el directorio del repositorio que acabas de clonar:
 
-```BASH
-cd GestionExpedienteElectronico_Version1
-```
+    ```BASH
+    cd GestionExpedienteElectronico_Version1
+    ```
 
 3. Ahora, debes vincular tu repositorio local con el repositorio del fork que quieres hacer en tu cuenta de GitHub. Para ello, ejecuta el siguiente comando:
 
-```BASH
-git remote add fork https://github.com/tu-nombre-de-usuario/GestionExpedienteElectronico_Version1.git
-```
+    ```BASH
+    git remote add fork https://github.com/tu-nombre-de-usuario/GestionExpedienteElectronico_Version1.git
+    ```
 
-Sustituye "tu-nombre-de-usuario" por el usuario que llevas en github.
+    Sustituye "tu-nombre-de-usuario" por el usuario que llevas en github.
 
 4. Luego, ejecuta el siguiente comando para enviar todos los cambios del repositorio local al repositorio del fork en tu cuenta de GitHub:
 
-```Bash
-git push fork master
-```
+    ```Bash
+    git push fork master
+    ```
 
 Con estos pasos, deberías haber creado un fork del repositorio original en tu cuenta de GitHub. Recuerda que un fork es una copia del repositorio original que puedes usar para hacer cambios sin afectar el repositorio original. Puedes enviar tus cambios de vuelta al repositorio original a través de un "pull request".
 
@@ -93,28 +93,28 @@ Con estos pasos, deberías haber creado un fork del repositorio original en tu c
 
 1. Para preparar el programa con buenas prácticas debes de crear el ambiente virtual con el siguiente comando:
 
-```BASH
-python -m venv .venv
-```
+    ```BASH
+    python -m venv .venv
+    ```
 
-  Para activar el ambiente virtual usa:
+      Para activar el ambiente virtual usa:
 
-```BASH
-#WINDOWS
-.venv\Scripts\Activate
-```
+    ```BASH
+    #WINDOWS
+    .venv\Scripts\Activate
+    ```
 
 2. Luego instala las dependencias necesarias:
 
-```BASH
-pip install --upgrade -r requirements.txt
-```
+    ```BASH
+    pip install --upgrade -r requirements.txt
+    ```
 
 3. Una vez instalados los modulos, puedes ejecutar el programa:
 
-```BASH
-python src/__main__.py
-```
+    ```BASH
+    python src/__main__.py
+    ```
 
 4. Por último, debes comprobar que tengas **Microsoft Excel** instalado en tu computador.
 
@@ -178,7 +178,7 @@ python src/__main__.py
   - 2022-02-18 Create README.md
   - 2022-02-02 GUI optimization
   - 2022-01-05 UpdateRepo
-  - 2021-08-10 First use case with names format 
+  - 2021-08-10 First use case with names format
 
 ## Construido con
 
