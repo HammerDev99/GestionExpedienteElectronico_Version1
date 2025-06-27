@@ -86,6 +86,158 @@ class ProcessStrategy(ABC):
         # Muestra información sobre los CUIs que no cumplen con el formato requerido.
         pass
 
+    def confirmar_eliminar_indices(self, indices):
+        """
+        Confirma con el usuario si desea eliminar los índices encontrados.
+        """
+        cantidad = len(indices)
+        mensaje = f"Se encontr{'aron' if cantidad > 1 else 'ó'} {cantidad} índice{'s' if cantidad > 1 else ''} electrónico{'s' if cantidad > 1 else ''} que impide el procesamiento"
+        confirm = self.notifier.notify(
+            GUIMessage(
+                f"{mensaje}. ¿Desea eliminarlos?",
+                MessageType.DIALOG,
+                DialogType.CONFIRM,
+            )
+        )
+
+        if confirm:
+            self.notifier.notify(
+                GUIMessage(
+                    "\n-------------------\n✅ Índices eliminados:\n", MessageType.TEXT
+                )
+            )
+            for indice in indices:
+                try:
+                    componentes = indice.split(os.sep)[-4:]
+                    ruta_relativa = os.path.join(*componentes)
+                    send2trash.send2trash(indice)
+                    self.notifier.notify(
+                        GUIMessage(f"   🔹{ruta_relativa}\n", MessageType.TEXT)
+                    )
+                except Exception as e:
+                    self.logger.error(f"Error eliminando índice {indice}: {str(e)}")
+            return True
+        else:
+            self.notifier.notify(
+                GUIMessage(f"\n-------------------\n❕ {mensaje}:\n", MessageType.TEXT)
+            )
+            for indice in indices:
+                componentes = indice.split(os.sep)[-4:]
+                ruta_relativa = os.path.join(*componentes)
+                self.notifier.notify(
+                    GUIMessage(f"   🔹{ruta_relativa}\n", MessageType.TEXT)
+                )
+            return False
+
+    def gestionar_indices_existentes(self, folder_selected, analyzer):
+        """
+        Busca y gestiona índices existentes.
+
+        Args:
+            folder_selected (str): Ruta de la carpeta seleccionada.
+            analyzer (FolderAnalyzer): Instancia del analizador de carpetas.
+
+        Returns:
+            bool: True si se deben continuar las operaciones, False si se deben detener.
+        """
+        indices = analyzer.buscar_indices_electronicos(folder_selected)
+        if indices:
+            indices_eliminados = self.confirmar_eliminar_indices(indices)
+            if not indices_eliminados:
+                self.notifier.notify(GUIMessage("", MessageType.STATUS))
+                return False
+        return True
+
+    def _validar_estructura_carpetas(self, estructura_directorios, selected_value):
+        """Valida la estructura de carpetas y retorna rutas inválidas"""
+        rutas_invalidas = []
+        nivel_maximo = self._obtener_nivel_maximo(selected_value)
+        
+        self._analizar_estructura(
+            estructura_directorios, "", 0, nivel_maximo, rutas_invalidas
+        )
+        
+        return rutas_invalidas
+
+    def _obtener_nivel_maximo(self, selected_value):
+        """Determina nivel máximo según opción seleccionada."""
+        return 2 if selected_value == "2" else 3
+
+    def _analizar_estructura(
+        self, directorio, ruta_actual, nivel, nivel_maximo, rutas_invalidas
+    ):
+        """Analiza recursivamente la estructura buscando carpetas invalidas."""
+        if not isinstance(directorio, dict):
+            return False
+
+        if nivel >= nivel_maximo:
+            self._verificar_subcarpetas(directorio, ruta_actual, rutas_invalidas)
+            return False
+
+        for nombre, contenido in directorio.items():
+            nueva_ruta = os.path.join(ruta_actual, nombre)
+            self._analizar_estructura(
+                contenido, nueva_ruta, nivel + 1, nivel_maximo, rutas_invalidas
+            )
+
+    def _verificar_subcarpetas(self, directorio, ruta_actual, rutas_invalidas):
+        """Verifica si existen subcarpetas en el nivel actual."""
+        for nombre, contenido in directorio.items():
+            if isinstance(contenido, dict):
+                rutas_invalidas.append(os.path.join(ruta_actual, nombre))
+
+    def _validar_estructura_expediente(self, lista_cui, lista_subcarpetas, carpetas_omitidas):
+        """Valida que la estructura del expediente sea correcta"""
+        if (
+            not lista_cui
+            and not lista_subcarpetas
+            and (not carpetas_omitidas or isinstance(carpetas_omitidas, set))
+        ):
+            self.notifier.notify(
+                GUIMessage(
+                    "❌ Error en la estructura de carpetas\n\n"
+                    "Se detectaron archivos sueltos donde debería haber unicamente carpetas.\n\n"
+                    "📝 Recomendaciones:\n\n"
+                    "1. Asegúrese de que sus carpetas siguen exactamente la estructura del protocolo y la opción elegida\n"
+                    "2. No incluya archivos en niveles donde debe haber carpetas",
+                    MessageType.DIALOG,
+                    DialogType.ERROR,
+                )
+            )
+            return False
+        return True
+
+    def _mostrar_carpetas_omitidas(self, carpetas_omitidas, directorios_excluidos):
+        """Muestra información sobre las carpetas que fueron omitidas por no cumplir con la estructura."""
+        try:
+            if carpetas_omitidas or directorios_excluidos:
+                mensaje_detalle = (
+                    "\n-------------------\n⚠️ Los siguientes elementos no se procesarán debido a problemas en su estructura. Por favor, revise la organización de estas carpetas y archivos:\n\n   🔹"
+                )
+                
+                # Combinar y eliminar duplicados
+                listas_unidas = list(carpetas_omitidas) + list(directorios_excluidos)
+                listas_unidas = sorted(set(listas_unidas))
+                
+                if listas_unidas:
+                    mensaje_detalle += ".\n   🔹".join(listas_unidas[:-1])
+                    if len(listas_unidas) > 1:
+                        mensaje_detalle += ".\n   🔹"
+                    mensaje_detalle += listas_unidas[-1]
+                
+                self.logger.warning(f"⚠️ Los siguientes elementos no se procesarán debido a problemas en su estructura: {listas_unidas}")
+                self.notifier.notify(
+                    GUIMessage(
+                        mensaje_detalle + "\n",
+                        MessageType.TEXT,
+                    )
+                )
+        except Exception as e:
+            self.logger.error(
+                f"Error al mostrar las carpetas omitidas: {str(e)}",
+                exc_info=True,
+            )
+
 
 class SingleCuadernoStrategy(ProcessStrategy):
     """Estrategia para procesar un solo cuaderno sin estructura jerárquica."""
@@ -145,13 +297,13 @@ class SingleCuadernoStrategy(ProcessStrategy):
             if os.path.isdir(os.path.join(folder_selected, item)):
                 carpetas.append(item)
         
-        if len(carpetas) > 1:
+        if len(carpetas) >= 1:
             cadena_rutas_anexos = ""
             for carpeta in carpetas:
                 cadena_rutas_anexos += "   🔹" + carpeta + "\n"
             self.notifier.notify(
                 GUIMessage(
-                    f"\n-------------------\n❕ Se encontraron anexos masivos en:\n\n{cadena_rutas_anexos}",
+                    f"\n-------------------\n❕ Se encontraron anexos masivos en:\n{cadena_rutas_anexos}",
                     MessageType.TEXT,
                 )
             )
@@ -177,14 +329,9 @@ class SingleCuadernoStrategy(ProcessStrategy):
         # 7. Validar CUI si se proporcionó radicado
         if self.radicado or self.radicado == "":
             cui_valido, cui = self._validar_cui(self.radicado)
-            print(f"cui_valido: {cui_valido}")
-            print(f"cui: {cui}")
-            print(f"self.radicado: {self.radicado}")
             if not cui_valido:
-                print(f"entra 1")
                 self._mostrar_cuis_invalidos(cui, None)
             else:
-                print(f"entra 2")
                 self.radicado = cui
 
         # 8. Actualizar progressbar y status como las otras estrategias
@@ -305,76 +452,6 @@ class SingleCuadernoStrategy(ProcessStrategy):
                 )
             )
 
-
-    def gestionar_indices_existentes(self, folder_selected, analyzer):
-        """
-        Busca y gestiona índices existentes.
-
-        Args:
-            folder_selected (str): Ruta de la carpeta seleccionada.
-            analyzer (FolderAnalyzer): Instancia del analizador de carpetas.
-
-        Returns:
-            bool: True si se deben continuar las operaciones, False si se deben detener.
-        """
-        # Buscar y gestionar índices existentes
-        indices = analyzer.buscar_indices_electronicos(folder_selected)
-        if indices:
-            indices_eliminados = self.confirmar_eliminar_indices(indices)
-            if not indices_eliminados:
-
-                # self._restablecer_variables_clase()
-
-                self.notifier.notify(GUIMessage("", MessageType.STATUS))
-                return False  # Detiene ejecución si se encontraron índices y no se eliminaron
-        return (
-            True  # Continúa ejecución si no se encontraron índices o si se eliminaron
-        )
-
-    def confirmar_eliminar_indices(self, indices):
-        """
-        Confirma con el usuario si desea eliminar los índices encontrados.
-        """
-
-        cantidad = len(indices)
-        mensaje = f"Se encontr{'aron' if cantidad > 1 else 'ó'} {cantidad} índice{'s' if cantidad > 1 else ''} electrónico{'s' if cantidad > 1 else ''} que impide el procesamiento"
-        confirm = self.notifier.notify(
-            GUIMessage(
-                f"{mensaje}. ¿Desea eliminarlos?",
-                MessageType.DIALOG,
-                DialogType.CONFIRM,
-            )
-        )
-
-        if confirm:
-            self.notifier.notify(
-                GUIMessage(
-                    "\n-------------------\n✅ Índices eliminados:\n", MessageType.TEXT
-                )
-            )
-            for indice in indices:
-                try:
-                    componentes = indice.split(os.sep)[-4:]
-                    ruta_relativa = os.path.join(*componentes)
-                    send2trash.send2trash(indice)
-                    self.notifier.notify(
-                        GUIMessage(f"   🔹 {ruta_relativa}\n", MessageType.TEXT)
-                    )
-                except Exception as e:
-                    self.logger.error(f"Error eliminando índice {indice}: {str(e)}")
-            return True
-        else:
-            self.notifier.notify(
-                GUIMessage(f"\n-------------------\n❕ {mensaje}:\n", MessageType.TEXT)
-            )
-            for indice in indices:
-                # Obtener los últimos 4 componentes de la ruta
-                componentes = indice.split(os.sep)[-4:]
-                ruta_relativa = os.path.join(*componentes)
-                self.notifier.notify(
-                    GUIMessage(f"   🔹 {ruta_relativa}\n", MessageType.TEXT)
-                )
-            return False
 
     def handle_directory_analysis(
         self,
@@ -524,65 +601,6 @@ class SingleExpedienteStrategy(ProcessStrategy):
         self.despacho = ""
         self.subserie = ""
 
-    def _validar_estructura_carpetas(self, estructura_directorios, selected_value):
-        """Valida la estructura de carpetas y retorna rutas inválidas"""
-        rutas_invalidas = []
-        nivel_maximo = self._obtener_nivel_maximo(selected_value)
-        
-        self._analizar_estructura(
-            estructura_directorios, "", 0, nivel_maximo, rutas_invalidas
-        )
-        
-        return rutas_invalidas
-
-    def _obtener_nivel_maximo(self, selected_value):
-        """Determina nivel máximo según opción seleccionada."""
-        return 2 if selected_value == "2" else 3
-
-    def _analizar_estructura(
-        self, directorio, ruta_actual, nivel, nivel_maximo, rutas_invalidas
-    ):
-        """Analiza recursivamente la estructura buscando carpetas invalidas."""
-        if not isinstance(directorio, dict):
-            return False
-
-        if nivel >= nivel_maximo:
-            self._verificar_subcarpetas(directorio, ruta_actual, rutas_invalidas)
-            return False
-
-        for nombre, contenido in directorio.items():
-            nueva_ruta = os.path.join(ruta_actual, nombre)
-            self._analizar_estructura(
-                contenido, nueva_ruta, nivel + 1, nivel_maximo, rutas_invalidas
-            )
-
-    def _verificar_subcarpetas(self, directorio, ruta_actual, rutas_invalidas):
-        """Verifica si existen subcarpetas en el nivel actual."""
-        for nombre, contenido in directorio.items():
-            if isinstance(contenido, dict):
-                rutas_invalidas.append(os.path.join(ruta_actual, nombre))
-
-    def _validar_estructura_expediente(self, lista_cui, lista_subcarpetas, carpetas_omitidas):
-        """Valida que la estructura del expediente sea correcta"""
-        if (
-            not lista_cui
-            and not lista_subcarpetas
-            and (not carpetas_omitidas or isinstance(carpetas_omitidas, set))
-        ):
-            self.notifier.notify(
-                GUIMessage(
-                    "❌ Error en la estructura de carpetas\n\n"
-                    "Se detectaron archivos sueltos donde debería haber unicamente carpetas.\n\n"
-                    "📝 Recomendaciones:\n\n"
-                    "1. Asegúrese de que sus carpetas siguen exactamente la estructura del protocolo y la opción elegida\n"
-                    "2. No incluya archivos en niveles donde debe haber carpetas",
-                    MessageType.DIALOG,
-                    DialogType.ERROR,
-                )
-            )
-            return False
-        return True
-
     async def process(self, processor: FileProcessor):
         """Procesa un expediente con estructura de 4 niveles (selected_value == '2')."""
         from tkinter import messagebox
@@ -690,57 +708,6 @@ class SingleExpedienteStrategy(ProcessStrategy):
                 )
             )
 
-    def confirmar_eliminar_indices(self, indices):
-        """Confirma con el usuario si desea eliminar los índices encontrados."""
-        cantidad = len(indices)
-        mensaje = f"Se encontr{'aron' if cantidad > 1 else 'ó'} {cantidad} índice{'s' if cantidad > 1 else ''} electrónico{'s' if cantidad > 1 else ''} que impide el procesamiento"
-        confirm = self.notifier.notify(
-            GUIMessage(
-                f"{mensaje}. ¿Desea eliminarlos?",
-                MessageType.DIALOG,
-                DialogType.CONFIRM,
-            )
-        )
-
-        if confirm:
-            self.notifier.notify(
-                GUIMessage(
-                    "\n-------------------\n✅ Índices eliminados:\n", MessageType.TEXT
-                )
-            )
-            for indice in indices:
-                try:
-                    componentes = indice.split(os.sep)[-4:]
-                    ruta_relativa = os.path.join(*componentes)
-                    send2trash.send2trash(indice)
-                    self.notifier.notify(
-                        GUIMessage(f"   🔹 {ruta_relativa}\n", MessageType.TEXT)
-                    )
-                except Exception as e:
-                    self.logger.error(f"Error eliminando índice {indice}: {str(e)}")
-            return True
-        else:
-            self.notifier.notify(
-                GUIMessage(f"\n-------------------\n❕ {mensaje}:\n", MessageType.TEXT)
-            )
-            for indice in indices:
-                componentes = indice.split(os.sep)[-4:]
-                ruta_relativa = os.path.join(*componentes)
-                self.notifier.notify(
-                    GUIMessage(f"   🔹 {ruta_relativa}\n", MessageType.TEXT)
-                )
-            return False
-
-    def gestionar_indices_existentes(self, folder_selected, analyzer):
-        """Busca y gestiona índices existentes."""
-        indices = analyzer.buscar_indices_electronicos(folder_selected)
-        if indices:
-            indices_eliminados = self.confirmar_eliminar_indices(indices)
-            if not indices_eliminados:
-                self.notifier.notify(GUIMessage("", MessageType.STATUS))
-                return False
-        return True
-
     def handle_directory_analysis(
         self,
         folder_selected=None,
@@ -796,37 +763,6 @@ class SingleExpedienteStrategy(ProcessStrategy):
                     mensaje + "\n",
                     MessageType.TEXT,
                 )
-            )
-    
-    def _mostrar_carpetas_omitidas(self, carpetas_omitidas, directorios_excluidos):
-        """Muestra información sobre las carpetas que fueron omitidas por no cumplir con la estructura."""
-        try:
-            if carpetas_omitidas or directorios_excluidos:
-                mensaje_detalle = (
-                    "\n-------------------\n⚠️ Los siguientes elementos no se procesarán debido a problemas en su estructura. Por favor, revise la organización de estas carpetas y archivos:\n\n   🔹"
-                )
-                
-                # Combinar y eliminar duplicados
-                listas_unidas = list(carpetas_omitidas) + list(directorios_excluidos)
-                listas_unidas = sorted(set(listas_unidas))
-                
-                if listas_unidas:
-                    mensaje_detalle += ".\n   🔹".join(listas_unidas[:-1])
-                    if len(listas_unidas) > 1:
-                        mensaje_detalle += ".\n   🔹"
-                    mensaje_detalle += listas_unidas[-1]
-                
-                self.logger.warning(f"⚠️ Los siguientes elementos no se procesarán debido a problemas en su estructura: {listas_unidas}")
-                self.notifier.notify(
-                    GUIMessage(
-                        mensaje_detalle + "\n",
-                        MessageType.TEXT,
-                    )
-                )
-        except Exception as e:
-            self.logger.error(
-                f"Error al mostrar las carpetas omitidas: {str(e)}",
-                exc_info=True,
             )
 
 
@@ -1054,116 +990,6 @@ class MultiExpedienteStrategy(ProcessStrategy):
                 )
             )
 
-    def _validar_estructura_carpetas(self, estructura_directorios, selected_value):
-        """Valida la estructura de carpetas y retorna rutas inválidas"""
-        rutas_invalidas = []
-        nivel_maximo = self._obtener_nivel_maximo(selected_value)
-        
-        self._analizar_estructura(
-            estructura_directorios, "", 0, nivel_maximo, rutas_invalidas
-        )
-        
-        return rutas_invalidas
-
-    def _obtener_nivel_maximo(self, selected_value):
-        """Determina nivel máximo según opción seleccionada."""
-        return 2 if selected_value == "2" else 3
-
-    def _analizar_estructura(
-        self, directorio, ruta_actual, nivel, nivel_maximo, rutas_invalidas
-    ):
-        """Analiza recursivamente la estructura buscando carpetas invalidas."""
-        if not isinstance(directorio, dict):
-            return False
-
-        if nivel >= nivel_maximo:
-            self._verificar_subcarpetas(directorio, ruta_actual, rutas_invalidas)
-            return False
-
-        for nombre, contenido in directorio.items():
-            nueva_ruta = os.path.join(ruta_actual, nombre)
-            self._analizar_estructura(
-                contenido, nueva_ruta, nivel + 1, nivel_maximo, rutas_invalidas
-            )
-
-    def _verificar_subcarpetas(self, directorio, ruta_actual, rutas_invalidas):
-        """Verifica si existen subcarpetas en el nivel actual."""
-        for nombre, contenido in directorio.items():
-            if isinstance(contenido, dict):
-                rutas_invalidas.append(os.path.join(ruta_actual, nombre))
-
-    def _validar_estructura_expediente(self, lista_cui, lista_subcarpetas, carpetas_omitidas):
-        """Valida que la estructura del expediente sea correcta"""
-        if (
-            not lista_cui
-            and not lista_subcarpetas
-            and (not carpetas_omitidas or isinstance(carpetas_omitidas, set))
-        ):
-            self.notifier.notify(
-                GUIMessage(
-                    "❌ Error en la estructura de carpetas\n\n"
-                    "Se detectaron archivos sueltos donde debería haber unicamente carpetas.\n\n"
-                    "📝 Recomendaciones:\n\n"
-                    "1. Asegúrese de que sus carpetas siguen exactamente la estructura del protocolo y la opción elegida\n"
-                    "2. No incluya archivos en niveles donde debe haber carpetas",
-                    MessageType.DIALOG,
-                    DialogType.ERROR,
-                )
-            )
-            return False
-        return True
-
-    def confirmar_eliminar_indices(self, indices):
-        """Confirma con el usuario si desea eliminar los índices encontrados."""
-        cantidad = len(indices)
-        mensaje = f"Se encontr{'aron' if cantidad > 1 else 'ó'} {cantidad} índice{'s' if cantidad > 1 else ''} electrónico{'s' if cantidad > 1 else ''} que impide el procesamiento"
-        confirm = self.notifier.notify(
-            GUIMessage(
-                f"{mensaje}. ¿Desea eliminarlos?",
-                MessageType.DIALOG,
-                DialogType.CONFIRM,
-            )
-        )
-
-        if confirm:
-            self.notifier.notify(
-                GUIMessage(
-                    "\n-------------------\n✅ Índices eliminados:\n", MessageType.TEXT
-                )
-            )
-            for indice in indices:
-                try:
-                    componentes = indice.split(os.sep)[-4:]
-                    ruta_relativa = os.path.join(*componentes)
-                    send2trash.send2trash(indice)
-                    self.notifier.notify(
-                        GUIMessage(f"   🔹 {ruta_relativa}\n", MessageType.TEXT)
-                    )
-                except Exception as e:
-                    self.logger.error(f"Error eliminando índice {indice}: {str(e)}")
-            return True
-        else:
-            self.notifier.notify(
-                GUIMessage(f"\n-------------------\n❕ {mensaje}:\n", MessageType.TEXT)
-            )
-            for indice in indices:
-                componentes = indice.split(os.sep)[-4:]
-                ruta_relativa = os.path.join(*componentes)
-                self.notifier.notify(
-                    GUIMessage(f"   🔹 {ruta_relativa}\n", MessageType.TEXT)
-                )
-            return False
-
-    def gestionar_indices_existentes(self, folder_selected, analyzer):
-        """Busca y gestiona índices existentes."""
-        indices = analyzer.buscar_indices_electronicos(folder_selected)
-        if indices:
-            indices_eliminados = self.confirmar_eliminar_indices(indices)
-            if not indices_eliminados:
-                self.notifier.notify(GUIMessage("", MessageType.STATUS))
-                return False
-        return True
-
     def handle_directory_analysis(
         self,
         folder_selected=None,
@@ -1220,35 +1046,4 @@ class MultiExpedienteStrategy(ProcessStrategy):
                     mensaje + "\n",
                     MessageType.TEXT,
                 )
-            )
-    
-    def _mostrar_carpetas_omitidas(self, carpetas_omitidas, directorios_excluidos):
-        """Muestra información sobre las carpetas que fueron omitidas por no cumplir con la estructura."""
-        try:
-            if carpetas_omitidas or directorios_excluidos:
-                mensaje_detalle = (
-                    "\n-------------------\n⚠️ Los siguientes elementos no se procesarán debido a problemas en su estructura. Por favor, revise la organización de estas carpetas y archivos:\n\n   🔹"
-                )
-                
-                # Combinar y eliminar duplicados
-                listas_unidas = list(carpetas_omitidas) + list(directorios_excluidos)
-                listas_unidas = sorted(set(listas_unidas))
-                
-                if listas_unidas:
-                    mensaje_detalle += ".\n   🔹".join(listas_unidas[:-1])
-                    if len(listas_unidas) > 1:
-                        mensaje_detalle += ".\n   🔹"
-                    mensaje_detalle += listas_unidas[-1]
-                
-                self.logger.warning(f"⚠️ Los siguientes elementos no se procesarán debido a problemas en su estructura: {listas_unidas}")
-                self.notifier.notify(
-                    GUIMessage(
-                        mensaje_detalle + "\n",
-                        MessageType.TEXT,
-                    )
-                )
-        except Exception as e:
-            self.logger.error(
-                f"Error al mostrar las carpetas omitidas: {str(e)}",
-                exc_info=True,
             )
