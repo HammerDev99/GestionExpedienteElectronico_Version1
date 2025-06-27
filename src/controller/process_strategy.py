@@ -376,6 +376,88 @@ class ProcessStrategy(ABC):
             )
         )
 
+    # === MÉTODOS COMUNES DE HANDLE_DIRECTORY_ANALYSIS ===
+    def _validate_and_process_cuis(self, lista_cui, lista_subcarpetas):
+        """
+        Valida y procesa los CUIs encontrados en la estructura de directorios.
+        
+        Args:
+            lista_cui (list): Lista de CUIs a validar
+            lista_subcarpetas (list): Lista de subcarpetas correspondientes
+        """
+        if lista_cui and lista_subcarpetas:
+            cuis_validos = set()
+            cuis_invalidos = set()
+            
+            for cui in lista_cui:
+                es_valido, cui_limpio = self._validar_cui(cui)
+                if es_valido:
+                    cuis_validos.add(cui_limpio)
+                else:
+                    cuis_invalidos.add(cui)
+            
+            # Mostrar CUIs inválidos si los hay
+            if cuis_invalidos:
+                self._mostrar_cuis_invalidos(cuis_invalidos, lista_cui)
+
+    def _show_omitted_folders_if_any(self, carpetas_omitidas, directorios_excluidos):
+        """
+        Muestra carpetas omitidas y directorios excluidos si existen.
+        
+        Args:
+            carpetas_omitidas (set or list): Carpetas omitidas
+            directorios_excluidos (set or list): Directorios excluidos
+        """
+        if carpetas_omitidas or directorios_excluidos:
+            self._mostrar_carpetas_omitidas(carpetas_omitidas or [], directorios_excluidos or [])
+
+    def _show_directory_analysis_complete(self, folder_selected):
+        """
+        Muestra que el análisis de directorio está completo y listo para procesar.
+        
+        Args:
+            folder_selected (str): Ruta de la carpeta seleccionada
+        """
+        # Ya tenemos _notify_folder_selected() pero SingleCuaderno necesita progreso adicional
+        self._notify_folder_selected(folder_selected)
+        # Para SingleCuaderno, agregar progreso y status (las otras estrategias no lo necesitan)
+
+    def _show_directory_analysis_complete_with_progress(self, folder_selected):
+        """
+        Muestra que el análisis está completo con progreso (específico para SingleCuaderno).
+        
+        Args:
+            folder_selected (str): Ruta de la carpeta seleccionada  
+        """
+        self._notify_folder_selected(folder_selected)
+        self._notify_ready_to_process()
+
+    def _mostrar_cuis_invalidos(self, cuis_invalidos, lista_cui=None):
+        """
+        Muestra información sobre los CUIs que no cumplen con el formato requerido.
+        Implementación común para SingleExpediente y MultiExpediente.
+        
+        Args:
+            cuis_invalidos (set): Conjunto de CUIs inválidos
+            lista_cui (list): Lista original de CUIs (no usada en implementación base)
+        """
+        if cuis_invalidos:
+            mensaje = f"\n------------------------------------------------------------------\n❕ Se encontr{'aron' if len(cuis_invalidos) > 1 else 'ó'} radicado{'s' if len(cuis_invalidos) > 1 else ''} (CUI) que no {'cumplen' if len(cuis_invalidos) > 1 else 'cumple'} con los 23 dígitos.\n\n   🔹"
+            
+            cuis_invalidos_ordenados = sorted(cuis_invalidos)
+            if cuis_invalidos_ordenados:
+                mensaje += ".\n   🔹".join(cuis_invalidos_ordenados[:-1])
+                if len(cuis_invalidos_ordenados) > 1:
+                    mensaje += ".\n   🔹"
+                mensaje += cuis_invalidos_ordenados[-1]
+            
+            self.notifier.notify(
+                GUIMessage(
+                    mensaje,
+                    MessageType.TEXT,
+                )
+            )
+
 
 class SingleCuadernoStrategy(ProcessStrategy):
     """Estrategia para procesar un solo cuaderno sin estructura jerárquica."""
@@ -523,15 +605,7 @@ class SingleCuadernoStrategy(ProcessStrategy):
             carpetas_omitidas (set, opcional): Conjunto de carpetas omitidas
             analyzer (FolderAnalyzer, opcional): Instancia del analizador de carpetas
         """
-
-        self.notifier.notify(
-            GUIMessage(
-                f"\n------------------------------------------------------------------\n❕ Carpeta seleccionada:\n\n{folder_selected}",
-                MessageType.TEXT,
-            )
-        )
-        self.notifier.notify(GUIMessage((1, 1), MessageType.PROGRESS))
-        self.notifier.notify(GUIMessage("Listo para procesar", MessageType.STATUS))
+        self._show_directory_analysis_complete_with_progress(folder_selected)
 
     def _mostrar_cuis_invalidos(self, cuis_invalidos, lista_cui=None):
         """
@@ -725,51 +799,14 @@ class SingleExpedienteStrategy(ProcessStrategy):
         directorios_excluidos=None,
     ):
         """Analiza y procesa la estructura de directorios seleccionada."""
-        self.notifier.notify(
-            GUIMessage(
-                f"\n------------------------------------------------------------------\n❕ Carpeta seleccionada:\n\n{folder_selected}",
-                MessageType.TEXT,
-            )
-        )
+        # Mostrar carpeta seleccionada
+        self._show_directory_analysis_complete(folder_selected)
         
         # Procesar y validar CUIs
-        if lista_cui and lista_subcarpetas:
-            cuis_validos = set()
-            cuis_invalidos = set()
-            
-            for cui in lista_cui:
-                es_valido, cui_limpio = self._validar_cui(cui)
-                if es_valido:
-                    cuis_validos.add(cui_limpio)
-                else:
-                    cuis_invalidos.add(cui)
-            
-            # Mostrar CUIs inválidos si los hay
-            if cuis_invalidos:
-                self._mostrar_cuis_invalidos(cuis_invalidos, lista_cui)
+        self._validate_and_process_cuis(lista_cui, lista_subcarpetas)
         
         # Mostrar carpetas omitidas y directorios excluidos
-        if carpetas_omitidas or directorios_excluidos:
-            self._mostrar_carpetas_omitidas(carpetas_omitidas or [], directorios_excluidos or [])
-
-    def _mostrar_cuis_invalidos(self, cuis_invalidos, lista_cui=None):
-        """Muestra información sobre los CUIs que no cumplen con el formato requerido."""
-        if cuis_invalidos:
-            mensaje = f"\n------------------------------------------------------------------\n❕ Se encontr{'aron' if len(cuis_invalidos) > 1 else 'ó'} radicado{'s' if len(cuis_invalidos) > 1 else ''} (CUI) que no {'cumplen' if len(cuis_invalidos) > 1 else 'cumple'} con los 23 dígitos.\n\n   🔹"
-            
-            cuis_invalidos_ordenados = sorted(cuis_invalidos)
-            if cuis_invalidos_ordenados:
-                mensaje += ".\n   🔹".join(cuis_invalidos_ordenados[:-1])
-                if len(cuis_invalidos_ordenados) > 1:
-                    mensaje += ".\n   🔹"
-                mensaje += cuis_invalidos_ordenados[-1]
-            
-            self.notifier.notify(
-                GUIMessage(
-                    mensaje,
-                    MessageType.TEXT,
-                )
-            )
+        self._show_omitted_folders_if_any(carpetas_omitidas, directorios_excluidos)
 
 
 class MultiExpedienteStrategy(ProcessStrategy):
@@ -944,48 +981,10 @@ class MultiExpedienteStrategy(ProcessStrategy):
     ):
         """Analiza y procesa la estructura de directorios seleccionada."""
         # Mostrar carpeta seleccionada
-        self.notifier.notify(
-            GUIMessage(
-                f"\n------------------------------------------------------------------\n❕ Carpeta seleccionada:\n\n{folder_selected}",
-                MessageType.TEXT,
-            )
-        )
+        self._show_directory_analysis_complete(folder_selected)
         
         # Procesar y validar CUIs
-        if lista_cui and lista_subcarpetas:
-            cuis_validos = set()
-            cuis_invalidos = set()
-            
-            for cui in lista_cui:
-                es_valido, cui_limpio = self._validar_cui(cui)
-                if es_valido:
-                    cuis_validos.add(cui_limpio)
-                else:
-                    cuis_invalidos.add(cui)
-            
-            # Mostrar CUIs inválidos si los hay
-            if cuis_invalidos:
-                self._mostrar_cuis_invalidos(cuis_invalidos, lista_cui)
+        self._validate_and_process_cuis(lista_cui, lista_subcarpetas)
         
         # Mostrar carpetas omitidas y directorios excluidos
-        if carpetas_omitidas or directorios_excluidos:
-            self._mostrar_carpetas_omitidas(carpetas_omitidas or [], directorios_excluidos or [])
-
-    def _mostrar_cuis_invalidos(self, cuis_invalidos, lista_cui=None):
-        """Muestra información sobre los CUIs que no cumplen con el formato requerido."""
-        if cuis_invalidos:
-            mensaje = f"\n------------------------------------------------------------------\n❕ Se encontr{'aron' if len(cuis_invalidos) > 1 else 'ó'} radicado{'s' if len(cuis_invalidos) > 1 else ''} (CUI) que no {'cumplen' if len(cuis_invalidos) > 1 else 'cumple'} con los 23 dígitos.\n\n   🔹"
-            
-            cuis_invalidos_ordenados = sorted(cuis_invalidos)
-            if cuis_invalidos_ordenados:
-                mensaje += ".\n   🔹".join(cuis_invalidos_ordenados[:-1])
-                if len(cuis_invalidos_ordenados) > 1:
-                    mensaje += ".\n   🔹"
-                mensaje += cuis_invalidos_ordenados[-1]
-            
-            self.notifier.notify(
-                GUIMessage(
-                    mensaje,
-                    MessageType.TEXT,
-                )
-            )
+        self._show_omitted_folders_if_any(carpetas_omitidas, directorios_excluidos)
