@@ -6,6 +6,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 **Solución RDA (Robotic Desktop Automation)** para automatizar la creación de índices electrónicos de expedientes judiciales según los estándares del sistema judicial colombiano (PCSJA20-11567 de 2020).
 
+**Versión Actual**: 1.4.4  
+**Estado**: Refactorización activa en rama `refactor/processing-strategies`
+
 ## Comandos Comunes de Desarrollo
 
 ### Configuración del Entorno

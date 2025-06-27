@@ -238,6 +238,73 @@ class ProcessStrategy(ABC):
                 exc_info=True,
             )
 
+    # === MÉTODOS DE NOTIFICACIÓN COMÚN ===
+    def _notify_no_folder_selected(self):
+        """Notifica que no se ha seleccionado ninguna carpeta."""
+        self.notifier.notify(
+            GUIMessage(
+                "No se ha seleccionado ninguna carpeta.",
+                MessageType.DIALOG,
+                DialogType.WARNING,
+            )
+        )
+
+    def _notify_start_processing(self):
+        """Notifica el inicio del procesamiento."""
+        self.notifier.notify(GUIMessage("\n*******************", MessageType.TEXT))
+
+    def _notify_folder_selected(self, folder_path):
+        """Notifica la carpeta seleccionada con formato estándar."""
+        self.notifier.notify(
+            GUIMessage(
+                f"\n------------------------------------------------------------------\n❕ Carpeta seleccionada:\n\n🔹{folder_path}",
+                MessageType.TEXT,
+            )
+        )
+
+    def _notify_ready_to_process(self):
+        """Notifica que está listo para procesar."""
+        self.notifier.notify(GUIMessage((1, 1), MessageType.PROGRESS))
+        self.notifier.notify(GUIMessage("Listo para procesar", MessageType.STATUS))
+
+    def _notify_empty_folder(self):
+        """Notifica que la carpeta está vacía o no es accesible."""
+        self.notifier.notify(
+            GUIMessage(
+                "La carpeta seleccionada está vacía o no es accesible.",
+                MessageType.DIALOG,
+                DialogType.WARNING,
+            )
+        )
+
+    def _notify_process_stopped(self):
+        """Notifica que el procedimiento fue detenido por el usuario."""
+        self.notifier.notify(GUIMessage("", MessageType.STATUS))
+        self.notifier.notify(
+            GUIMessage(
+                "Procedimiento detenido",
+                MessageType.DIALOG,
+                DialogType.INFO,
+            )
+        )
+
+    def _select_and_validate_folder(self):
+        """
+        Selecciona y valida la carpeta inicial común para todas las estrategias.
+        
+        Returns:
+            str or None: Ruta de la carpeta seleccionada o None si no se seleccionó
+        """
+        from tkinter import filedialog
+        
+        folder_selected = os.path.normpath(filedialog.askdirectory())
+        if folder_selected in [".", ""]:
+            self._notify_no_folder_selected()
+            return None
+        
+        self._notify_start_processing()
+        return folder_selected
+
 
 class SingleCuadernoStrategy(ProcessStrategy):
     """Estrategia para procesar un solo cuaderno sin estructura jerárquica."""
@@ -252,43 +319,21 @@ class SingleCuadernoStrategy(ProcessStrategy):
 
     def add_folder(self, processor: FileProcessor):
         """Validaciones previas al procesamiento de carpetas para un solo cuaderno."""
-        from tkinter import filedialog
         
-        # 1. Manejar su propio askdirectory()
-        folder_selected = os.path.normpath(filedialog.askdirectory())
-        if folder_selected in [".", ""]:
-            self.notifier.notify(
-                GUIMessage(
-                    "No se ha seleccionado ninguna carpeta.",
-                    MessageType.DIALOG,
-                    DialogType.WARNING,
-                )
-            )
+        # 1. Selección y validación inicial común
+        folder_selected = self._select_and_validate_folder()
+        if not folder_selected:
             return False
-
-        self.notifier.notify(GUIMessage("\n*******************", MessageType.TEXT))
         
         # 2. Validar que existan archivos en la carpeta seleccionada
         try:
             estructura_directorios = os.listdir(folder_selected)
         except (OSError, PermissionError):
-            self.notifier.notify(
-                GUIMessage(
-                    "La carpeta seleccionada no es accesible.",
-                    MessageType.DIALOG,
-                    DialogType.WARNING,
-                )
-            )
+            self._notify_empty_folder()
             return False
             
         if not estructura_directorios:
-            self.notifier.notify(
-                GUIMessage(
-                    "La carpeta seleccionada está vacía o no es accesible.",
-                    MessageType.DIALOG,
-                    DialogType.WARNING,
-                )
-            )
+            self._notify_empty_folder()
             return False
 
         # 3. Detectar anexos masivos (carpetas dentro de la carpeta seleccionada)
@@ -319,12 +364,7 @@ class SingleCuadernoStrategy(ProcessStrategy):
         self.expediente = folder_selected
 
         # 6. Mostrar carpeta seleccionada
-        self.notifier.notify(
-            GUIMessage(
-                f"\n------------------------------------------------------------------\n❕ Carpeta seleccionada:\n\n🔹{folder_selected}",
-                MessageType.TEXT,
-            )
-        )
+        self._notify_folder_selected(folder_selected)
 
         # 7. Validar CUI si se proporcionó radicado
         if self.radicado or self.radicado == "":
@@ -335,8 +375,7 @@ class SingleCuadernoStrategy(ProcessStrategy):
                 self.radicado = cui
 
         # 8. Actualizar progressbar y status como las otras estrategias
-        self.notifier.notify(GUIMessage((1, 1), MessageType.PROGRESS))
-        self.notifier.notify(GUIMessage("Listo para procesar", MessageType.STATUS))
+        self._notify_ready_to_process()
 
         return True
 
@@ -369,14 +408,7 @@ class SingleCuadernoStrategy(ProcessStrategy):
         )
 
         if not confirm:
-            self.notifier.notify(GUIMessage("", MessageType.STATUS))
-            self.notifier.notify(
-                GUIMessage(
-                    "Procedimiento detenido",
-                    MessageType.DIALOG,
-                    DialogType.INFO,
-                )
-            )
+            self._notify_process_stopped()
             return False
 
         # 2. Crear FileProcessor con los datos de la estrategia
@@ -431,19 +463,12 @@ class SingleCuadernoStrategy(ProcessStrategy):
         Muestra información sobre los CUIs que no cumplen con el formato requerido.
 
         Args:
-            cuis_invalidos (str or set): CUI inválido (string) o conjunto de CUIs inválidos (set)
-            lista_cui (list): Lista original de CUIs
+            cuis_invalidos (str): CUI inválido para SingleCuaderno
+            lista_cui (list): Lista original de CUIs (no usada en SingleCuaderno)
         """
-
         if cuis_invalidos or cuis_invalidos == "":
-            # self._mensaje(None, "Algunas carpetas no cumplen con el formato requerido de 23 dígitos numéricos.")
-
-            mensaje = f"\n------------------------------------------------------------------\n❕ Se encontr{'aron' if len(cuis_invalidos) > 1 else 'ó'} radicado{'s' if len(cuis_invalidos) > 1 else ''} (CUI) que no {'cumplen' if len(cuis_invalidos) > 1 else 'cumple'} con los 23 dígitos."
-
-            mensaje += cuis_invalidos
-
-            print(f"mensaje: {mensaje}")
-
+            mensaje = f"\n------------------------------------------------------------------\n❕ Se encontró radicado (CUI) que no cumple con los 23 dígitos."
+            
             self.notifier.notify(
                 GUIMessage(
                     mensaje,
@@ -497,21 +522,12 @@ class SingleExpedienteStrategy(ProcessStrategy):
 
     def add_folder(self, processor: FileProcessor):
         """Validaciones previas al procesamiento de carpetas para selected_value == '2'"""
-        from tkinter import filedialog, messagebox
+        from tkinter import messagebox
         
-        # Manejar su propio askdirectory() - Estrategia completamente autónoma
-        folder_selected = os.path.normpath(filedialog.askdirectory())
-        if folder_selected in [".", ""]:
-            self.notifier.notify(
-                GUIMessage(
-                    "No se ha seleccionado ninguna carpeta.",
-                    MessageType.DIALOG,
-                    DialogType.WARNING,
-                )
-            )
+        # Selección y validación inicial común
+        folder_selected = self._select_and_validate_folder()
+        if not folder_selected:
             return False
-
-        self.notifier.notify(GUIMessage("\n*******************", MessageType.TEXT))
         
         # Crear una instancia del analizador de carpetas
         analyzer = FolderAnalyzer({}, None, logger=self.logger)
@@ -519,13 +535,7 @@ class SingleExpedienteStrategy(ProcessStrategy):
         self.expediente = folder_selected
         estructura_directorios = analyzer.construir_estructura(folder_selected)
         if not estructura_directorios:
-            self.notifier.notify(
-                GUIMessage(
-                    "La carpeta seleccionada está vacía o no es accesible.",
-                    MessageType.DIALOG,
-                    DialogType.WARNING,
-                )
-            )
+            self._notify_empty_folder()
             return False
 
         profundidad_maxima = analyzer.obtener_profundidad_maxima(estructura_directorios)
@@ -585,8 +595,7 @@ class SingleExpedienteStrategy(ProcessStrategy):
         if not self.lista_subcarpetas:
             self.notifier.notify(GUIMessage("", MessageType.STATUS))
         else:
-            self.notifier.notify(GUIMessage((1, 1), MessageType.PROGRESS))
-            self.notifier.notify(GUIMessage("Listo para procesar", MessageType.STATUS))
+            self._notify_ready_to_process()
         
         # Retornar True para indicar éxito
         return True
@@ -623,14 +632,7 @@ class SingleExpedienteStrategy(ProcessStrategy):
         )
 
         if not confirm:
-            self.notifier.notify(GUIMessage("", MessageType.STATUS))
-            self.notifier.notify(
-                GUIMessage(
-                    "Procedimiento detenido",
-                    MessageType.DIALOG,
-                    DialogType.INFO,
-                )
-            )
+            self._notify_process_stopped()
             return False
 
         # Iniciar procesamiento
@@ -771,21 +773,11 @@ class MultiExpedienteStrategy(ProcessStrategy):
 
     def add_folder(self, processor: FileProcessor):
         """Validaciones previas al procesamiento de carpetas para selected_value == '3'"""
-        from tkinter import filedialog
         
-        # Manejar su propio askdirectory() - Estrategia completamente autónoma
-        folder_selected = os.path.normpath(filedialog.askdirectory())
-        if folder_selected in [".", ""]:
-            self.notifier.notify(
-                GUIMessage(
-                    "No se ha seleccionado ninguna carpeta.",
-                    MessageType.DIALOG,
-                    DialogType.WARNING,
-                )
-            )
+        # Selección y validación inicial común  
+        folder_selected = self._select_and_validate_folder()
+        if not folder_selected:
             return False
-
-        self.notifier.notify(GUIMessage("\n*******************", MessageType.TEXT))
         
         # Crear una instancia del analizador de carpetas
         analyzer = FolderAnalyzer({}, None, logger=self.logger)
@@ -793,13 +785,7 @@ class MultiExpedienteStrategy(ProcessStrategy):
         self.expediente = folder_selected
         estructura_directorios = analyzer.construir_estructura(folder_selected)
         if not estructura_directorios:
-            self.notifier.notify(
-                GUIMessage(
-                    "La carpeta seleccionada está vacía o no es accesible.",
-                    MessageType.DIALOG,
-                    DialogType.WARNING,
-                )
-            )
+            self._notify_empty_folder()
             return False
 
         profundidad_maxima = analyzer.obtener_profundidad_maxima(estructura_directorios)
@@ -859,8 +845,7 @@ class MultiExpedienteStrategy(ProcessStrategy):
         if not self.lista_subcarpetas:
             self.notifier.notify(GUIMessage("", MessageType.STATUS))
         else:
-            self.notifier.notify(GUIMessage((1, 1), MessageType.PROGRESS))
-            self.notifier.notify(GUIMessage("Listo para procesar", MessageType.STATUS))
+            self._notify_ready_to_process()
         
         # Retornar True para indicar éxito
         return True
@@ -896,14 +881,7 @@ class MultiExpedienteStrategy(ProcessStrategy):
         )
 
         if not confirm:
-            self.notifier.notify(GUIMessage("", MessageType.STATUS))
-            self.notifier.notify(
-                GUIMessage(
-                    "Procedimiento detenido",
-                    MessageType.DIALOG,
-                    DialogType.INFO,
-                )
-            )
+            self._notify_process_stopped()
             return False
 
         # Iniciar procesamiento
