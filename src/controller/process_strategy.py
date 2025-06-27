@@ -23,6 +23,10 @@ else:
 class ProcessStrategy(ABC):
     """Define la interfaz común para todas las estrategias de procesamiento."""
 
+    def __init__(self, notifier: gui_notifier, logger=None):
+        self.notifier = notifier
+        self.logger = logger or logging.getLogger(self.__class__.__name__)
+    
     @abstractmethod
     def add_folder(self, processor: FileProcessor):
         # Validaciones previas al procesamiento de carpetas.
@@ -31,6 +35,16 @@ class ProcessStrategy(ABC):
     @abstractmethod
     async def process(self, processor: FileProcessor):
         # Procesa las carpetas seleccionadas.
+        pass
+    
+    @abstractmethod
+    def _mostrar_cuis_invalidos(self, cuis_invalidos, lista_cui=None):
+        # Muestra información sobre los CUIs que no cumplen con el formato requerido.
+        pass
+
+    @abstractmethod
+    def handle_directory_analysis(self):
+        # Analiza y procesa la estructura de directorios seleccionada.
         pass
 
     @abstractmethod
@@ -42,20 +56,6 @@ class ProcessStrategy(ABC):
     def confirmar_eliminar_indices(self, indices):
         # Confirma con el usuario si desea eliminar los índices encontrados.
         pass
-
-    @abstractmethod
-    def handle_directory_analysis(self):
-        # Analiza y procesa la estructura de directorios seleccionada.
-        pass
-
-    @abstractmethod
-    def _mostrar_cuis_invalidos(self, cuis_invalidos, lista_cui=None):
-        # Muestra información sobre los CUIs que no cumplen con el formato requerido.
-        pass
-
-    def __init__(self, notifier: gui_notifier, logger=None):
-        self.notifier = notifier
-        self.logger = logger or logging.getLogger(self.__class__.__name__)
 
     def _validar_cui(self, cui):
         """
@@ -450,7 +450,6 @@ class SingleCuadernoStrategy(ProcessStrategy):
                     MessageType.TEXT,
                 )
             )
-
 
     def handle_directory_analysis(
         self,
