@@ -175,11 +175,16 @@ class SingleCuadernoStrategy(ProcessStrategy):
         )
 
         # 7. Validar CUI si se proporcionó radicado
-        if self.radicado:
+        if self.radicado or self.radicado == "":
             cui_valido, cui = self._validar_cui(self.radicado)
+            print(f"cui_valido: {cui_valido}")
+            print(f"cui: {cui}")
+            print(f"self.radicado: {self.radicado}")
             if not cui_valido:
+                print(f"entra 1")
                 self._mostrar_cuis_invalidos(cui, None)
             else:
+                print(f"entra 2")
                 self.radicado = cui
 
         # 8. Actualizar progressbar y status como las otras estrategias
@@ -285,21 +290,13 @@ class SingleCuadernoStrategy(ProcessStrategy):
         """
 
         if cuis_invalidos or cuis_invalidos == "":
-            # Determinar si es un string o un conjunto
-            if isinstance(cuis_invalidos, str):
-                # Para SingleCuadernoStrategy - un solo CUI como string
-                count = 1
-                mensaje = f"\n-------------------\n❕ Se encontr{'ó'} radicado (CUI) que no cumple con los 23 dígitos.\n\n   🔹{cuis_invalidos}"
-            else:
-                # Para otras estrategias - conjunto de CUIs
-                count = len(cuis_invalidos)
-                mensaje = f"\n-------------------\n❕ Se encontr{'aron' if count > 1 else 'ó'} radicado{'s' if count > 1 else ''} (CUI) que no {'cumplen' if count > 1 else 'cumple'} con los 23 dígitos.\n\n   🔹"
-                
-                # Convertir el set a una cadena formateada
-                cuis_invalidos_ordenados = sorted(cuis_invalidos)
-                if cuis_invalidos_ordenados:
-                    cuis_formateados = ".\n   🔹".join(cuis_invalidos_ordenados)
-                    mensaje += cuis_formateados
+            # self._mensaje(None, "Algunas carpetas no cumplen con el formato requerido de 23 dígitos numéricos.")
+
+            mensaje = f"\n-------------------\n❕ Se encontr{'aron' if len(cuis_invalidos) > 1 else 'ó'} radicado{'s' if len(cuis_invalidos) > 1 else ''} (CUI) que no {'cumplen' if len(cuis_invalidos) > 1 else 'cumple'} con los 23 dígitos."
+
+            mensaje += cuis_invalidos
+
+            print(f"mensaje: {mensaje}")
 
             self.notifier.notify(
                 GUIMessage(
