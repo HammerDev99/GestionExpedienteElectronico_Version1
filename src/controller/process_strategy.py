@@ -238,7 +238,7 @@ class ProcessStrategy(ABC):
                 exc_info=True,
             )
 
-    # === MÉTODOS DE NOTIFICACIÓN COMÚN ===
+    # === MÉTODOS COMUNES DE ADD_FOLDER ===
     def _notify_no_folder_selected(self):
         """Notifica que no se ha seleccionado ninguna carpeta."""
         self.notifier.notify(
@@ -304,6 +304,77 @@ class ProcessStrategy(ABC):
         
         self._notify_start_processing()
         return folder_selected
+
+    # === MÉTODOS COMUNES DE PROCESS() ===
+    def _notify_select_folder_to_process(self):
+        """Notifica que se debe seleccionar una carpeta para procesar."""
+        self.notifier.notify(
+            GUIMessage(
+                "Seleccione una carpeta para procesar",
+                MessageType.DIALOG,
+                DialogType.INFO,
+            )
+        )
+
+    def _get_user_confirmation(self, total_items, item_type, folder_name):
+        """
+        Obtiene confirmación del usuario para procesar.
+        
+        Args:
+            total_items (int): Número total de elementos a procesar
+            item_type (str): Tipo de elemento (archivos, cuadernos, etc.)
+            folder_name (str): Nombre de la carpeta
+            
+        Returns:
+            bool: True si el usuario confirma, False si cancela
+        """
+        return self.notifier.notify(
+            GUIMessage(
+                f'Se procesarán {total_items} {item_type} que contiene la carpeta '
+                f'"{folder_name}". ¿Desea continuar?',
+                MessageType.DIALOG,
+                DialogType.CONFIRM,
+            )
+        )
+
+    def _notify_processing_start(self):
+        """Notifica el inicio del procesamiento con progreso y mensajes estándar."""
+        self.notifier.notify(GUIMessage("", MessageType.STATUS))
+        self.notifier.notify(GUIMessage((0.1, 1), MessageType.PROGRESS))
+        self.notifier.notify(GUIMessage("\n------------------------------------------------------------------\n🔄 Proceso iniciado...\n\n", MessageType.TEXT))
+        self.notifier.force_update()
+
+    def _notify_processing_complete(self):
+        """Notifica la finalización exitosa del procesamiento."""
+        self.notifier.notify(GUIMessage((1, 1), MessageType.PROGRESS))
+        self.notifier.notify(GUIMessage("", MessageType.STATUS))
+        self.notifier.notify(
+            GUIMessage("\n✅ Proceso completado.\n------------------------------------------------------------------\n*******************\n\n", MessageType.TEXT)
+        )
+        self.notifier.notify(
+            GUIMessage(
+                "Proceso completado exitosamente",
+                MessageType.DIALOG,
+                DialogType.INFO,
+            )
+        )
+        self.notifier.notify(GUIMessage((0, 1), MessageType.PROGRESS))
+
+    def _notify_processing_error(self, error_message):
+        """
+        Notifica un error durante el procesamiento.
+        
+        Args:
+            error_message (str): Mensaje de error a mostrar
+        """
+        self.logger.error(f"Error en procesamiento: {error_message}", exc_info=True)
+        self.notifier.notify(
+            GUIMessage(
+                f"Error durante el procesamiento: {error_message}",
+                MessageType.DIALOG,
+                DialogType.ERROR,
+            )
+        )
 
 
 class SingleCuadernoStrategy(ProcessStrategy):
@@ -383,13 +454,7 @@ class SingleCuadernoStrategy(ProcessStrategy):
         """Procesa un cuaderno sin estructura jerárquica."""
         
         if not self.folder_selected:
-            self.notifier.notify(
-                GUIMessage(
-                    "Seleccione una carpeta para procesar",
-                    MessageType.DIALOG,
-                    DialogType.INFO,
-                )
-            )
+            self._notify_select_folder_to_process()
             return False
 
         # 1. Manejar su propia confirmación
@@ -398,13 +463,10 @@ class SingleCuadernoStrategy(ProcessStrategy):
         except (OSError, PermissionError):
             total_archivos = 0
             
-        confirm = self.notifier.notify(
-            GUIMessage(
-                f'Se procesarán {total_archivos} archivos que contiene la carpeta '
-                f'"{os.path.basename(self.folder_selected)}". ¿Desea continuar?',
-                MessageType.DIALOG,
-                DialogType.CONFIRM,
-            )
+        confirm = self._get_user_confirmation(
+            total_archivos, 
+            "archivos", 
+            os.path.basename(self.folder_selected)
         )
 
         if not confirm:
@@ -422,9 +484,7 @@ class SingleCuadernoStrategy(ProcessStrategy):
         )
 
         # 3. Notificar inicio del procesamiento
-        self.notifier.notify(GUIMessage("", MessageType.STATUS))
-        self.notifier.notify(GUIMessage((0.1, 1), MessageType.PROGRESS))
-        self.notifier.notify(GUIMessage("\n------------------------------------------------------------------\n🔄 Proceso iniciado...\n\n", MessageType.TEXT))
+        self._notify_processing_start()
         self.notifier.notify(
             GUIMessage(
                 "🔹"
@@ -434,47 +494,14 @@ class SingleCuadernoStrategy(ProcessStrategy):
                 MessageType.TEXT,
             )
         )
-        self.notifier.force_update()
 
         # 4. Procesar el cuaderno
         processor._process_excel()
 
         # 5. Notificar finalización
-        self.notifier.notify(
-            GUIMessage(
-                "\n✅ Proceso completado.\n------------------------------------------------------------------\n*******************\n\n", MessageType.TEXT
-            )
-        )
-        self.notifier.notify(GUIMessage((1, 1), MessageType.PROGRESS))
-        self.notifier.notify(GUIMessage("", MessageType.STATUS))
-        self.notifier.notify(
-            GUIMessage(
-                "Proceso completado exitosamente",
-                MessageType.DIALOG,
-                DialogType.INFO,
-            )
-        )
-        self.notifier.notify(GUIMessage((0, 1), MessageType.PROGRESS))
+        self._notify_processing_complete()
         
         return True
-
-    def _mostrar_cuis_invalidos(self, cuis_invalidos, lista_cui=None):
-        """
-        Muestra información sobre los CUIs que no cumplen con el formato requerido.
-
-        Args:
-            cuis_invalidos (str): CUI inválido para SingleCuaderno
-            lista_cui (list): Lista original de CUIs (no usada en SingleCuaderno)
-        """
-        if cuis_invalidos or cuis_invalidos == "":
-            mensaje = f"\n------------------------------------------------------------------\n❕ Se encontró radicado (CUI) que no cumple con los 23 dígitos."
-            
-            self.notifier.notify(
-                GUIMessage(
-                    mensaje,
-                    MessageType.TEXT,
-                )
-            )
 
     def handle_directory_analysis(
         self,
@@ -505,6 +532,24 @@ class SingleCuadernoStrategy(ProcessStrategy):
         )
         self.notifier.notify(GUIMessage((1, 1), MessageType.PROGRESS))
         self.notifier.notify(GUIMessage("Listo para procesar", MessageType.STATUS))
+
+    def _mostrar_cuis_invalidos(self, cuis_invalidos, lista_cui=None):
+        """
+        Muestra información sobre los CUIs que no cumplen con el formato requerido.
+
+        Args:
+            cuis_invalidos (str): CUI inválido para SingleCuaderno
+            lista_cui (list): Lista original de CUIs (no usada en SingleCuaderno)
+        """
+        if cuis_invalidos or cuis_invalidos == "":
+            mensaje = f"\n------------------------------------------------------------------\n❕ Se encontró radicado (CUI) que no cumple con los 23 dígitos."
+            
+            self.notifier.notify(
+                GUIMessage(
+                    mensaje,
+                    MessageType.TEXT,
+                )
+            )
 
 
 class SingleExpedienteStrategy(ProcessStrategy):
@@ -605,13 +650,7 @@ class SingleExpedienteStrategy(ProcessStrategy):
         from tkinter import messagebox
         
         if not self.lista_subcarpetas:
-            self.notifier.notify(
-                GUIMessage(
-                    "Seleccione una carpeta para procesar",
-                    MessageType.DIALOG,
-                    DialogType.INFO,
-                )
-            )
+            self._notify_select_folder_to_process()
             return False
 
         # Obtener datos de entrada almacenados en la estrategia
@@ -622,13 +661,10 @@ class SingleExpedienteStrategy(ProcessStrategy):
         total_carpetas = sum(len(sublista) for sublista in self.lista_subcarpetas)
 
         # Confirmación con el usuario
-        confirm = self.notifier.notify(
-            GUIMessage(
-                f'Se procesarán {total_carpetas} cuadernos que contiene la carpeta '
-                f'"{os.path.basename(self.expediente)}". ¿Desea continuar?',
-                MessageType.DIALOG,
-                DialogType.CONFIRM,
-            )
+        confirm = self._get_user_confirmation(
+            total_carpetas,
+            "cuadernos",
+            os.path.basename(self.expediente)
         )
 
         if not confirm:
@@ -636,10 +672,7 @@ class SingleExpedienteStrategy(ProcessStrategy):
             return False
 
         # Iniciar procesamiento
-        self.notifier.notify(GUIMessage("", MessageType.STATUS))
-        self.notifier.notify(GUIMessage((0.1, 1), MessageType.PROGRESS))
-        self.notifier.notify(GUIMessage("\n------------------------------------------------------------------\n🔄 Proceso iniciado...\n\n", MessageType.TEXT))
-        self.notifier.force_update()
+        self._notify_processing_start()
 
         try:
             processed = 0
@@ -676,29 +709,10 @@ class SingleExpedienteStrategy(ProcessStrategy):
                     processed += 1
 
             # Finalizar procesamiento
-            self.notifier.notify(GUIMessage((1, 1), MessageType.PROGRESS))
-            self.notifier.notify(GUIMessage("", MessageType.STATUS))
-            self.notifier.notify(
-                GUIMessage("\n✅ Proceso completado.\n------------------------------------------------------------------\n*******************\n\n", MessageType.TEXT)
-            )
-            self.notifier.notify(
-                GUIMessage(
-                    "Proceso completado exitosamente", 
-                    MessageType.DIALOG, 
-                    DialogType.INFO
-                )
-            )
-            self.notifier.notify(GUIMessage((0, 1), MessageType.PROGRESS))
+            self._notify_processing_complete()
 
         except Exception as e:
-            self.logger.error(f"Error en procesamiento: {str(e)}", exc_info=True)
-            self.notifier.notify(
-                GUIMessage(
-                    f"Error durante el procesamiento: {str(e)}",
-                    MessageType.DIALOG,
-                    DialogType.ERROR,
-                )
-            )
+            self._notify_processing_error(str(e))
 
     def handle_directory_analysis(
         self,
@@ -854,13 +868,7 @@ class MultiExpedienteStrategy(ProcessStrategy):
         """Procesa múltiples expedientes con estructura de 5 niveles (selected_value == '3')."""
         
         if not self.lista_subcarpetas:
-            self.notifier.notify(
-                GUIMessage(
-                    "Seleccione una carpeta para procesar",
-                    MessageType.DIALOG,
-                    DialogType.INFO,
-                )
-            )
+            self._notify_select_folder_to_process()
             return False
 
         # Obtener datos de entrada almacenados en la estrategia
@@ -871,13 +879,10 @@ class MultiExpedienteStrategy(ProcessStrategy):
         total_carpetas = sum(len(sublista) for sublista in self.lista_subcarpetas)
 
         # Confirmación con el usuario
-        confirm = self.notifier.notify(
-            GUIMessage(
-                f'Se procesarán {total_carpetas} cuadernos que contiene la carpeta '
-                f'"{os.path.basename(self.expediente)}". ¿Desea continuar?',
-                MessageType.DIALOG,
-                DialogType.CONFIRM,
-            )
+        confirm = self._get_user_confirmation(
+            total_carpetas,
+            "cuadernos",
+            os.path.basename(self.expediente)
         )
 
         if not confirm:
@@ -885,10 +890,7 @@ class MultiExpedienteStrategy(ProcessStrategy):
             return False
 
         # Iniciar procesamiento
-        self.notifier.notify(GUIMessage("", MessageType.STATUS))
-        self.notifier.notify(GUIMessage((0.1, 1), MessageType.PROGRESS))
-        self.notifier.notify(GUIMessage("\n------------------------------------------------------------------\n🔄 Proceso iniciado...\n\n", MessageType.TEXT))
-        self.notifier.force_update()
+        self._notify_processing_start()
 
         try:
             processed = 0
@@ -925,29 +927,10 @@ class MultiExpedienteStrategy(ProcessStrategy):
                     processed += 1
 
             # Finalizar procesamiento
-            self.notifier.notify(GUIMessage((1, 1), MessageType.PROGRESS))
-            self.notifier.notify(GUIMessage("", MessageType.STATUS))
-            self.notifier.notify(
-                GUIMessage("\n✅ Proceso completado.\n------------------------------------------------------------------\n*******************\n\n", MessageType.TEXT)
-            )
-            self.notifier.notify(
-                GUIMessage(
-                    "Proceso completado exitosamente", 
-                    MessageType.DIALOG, 
-                    DialogType.INFO
-                )
-            )
-            self.notifier.notify(GUIMessage((0, 1), MessageType.PROGRESS))
+            self._notify_processing_complete()
 
         except Exception as e:
-            self.logger.error(f"Error en procesamiento: {str(e)}", exc_info=True)
-            self.notifier.notify(
-                GUIMessage(
-                    f"Error durante el procesamiento: {str(e)}",
-                    MessageType.DIALOG,
-                    DialogType.ERROR,
-                )
-            )
+            self._notify_processing_error(str(e))
 
     def handle_directory_analysis(
         self,
