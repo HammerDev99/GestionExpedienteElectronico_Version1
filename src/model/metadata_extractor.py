@@ -315,13 +315,16 @@ class MetadataExtractor:
     def size_units_converter(self, size):
         """
         Convierte el tamaño del archivo de bytes a una cadena legible con las unidades apropiadas.
+        Usa las mismas reglas de precisión que OneDrive.
         Args:
             size (int): El tamaño del archivo en bytes.
         Returns:
             str: Una cadena que representa el tamaño en las unidades apropiadas (BYTES, KB, MB, GB, TB).
         Notes:
-            - La función convierte el tamaño a la unidad más grande posible sin exceder el tamaño dado.
-            - Si el tamaño es 0, devuelve "0 BYTES".
+            - KB < 100: 1 decimal (ej: 59.8 KB)
+            - KB >= 100: entero (ej: 330 KB)  
+            - MB: 2 decimales (ej: 2.49 MB)
+            - GB/TB: 2 decimales
         """
 
         kb = 1024
@@ -329,18 +332,35 @@ class MetadataExtractor:
         mb = kb * 1024
         gb = mb * 1024
         tb = gb * 1024
-        if size >= tb:
-            return "%.1f TB" % float(size / tb)
-        if size >= gb:
-            return "%.1f GB" % float(size / gb)
-        if size >= mb:
-            return "%.1f MB" % float(size / mb)
-        if size >= kb:
-            return "%.1f KB" % float(size / kb)
-        if size < kb:
-            return "%.0f BYTES" % float(size / file_size_bytes)
+        
         if size == 0:
             return "0 BYTES"
+        elif size < kb:
+            return "%.0f BYTES" % float(size / file_size_bytes)
+        elif size < mb:
+            # Lógica KB con precisión variable según OneDrive
+            kb_value = size / kb
+            if kb_value < 100:
+                # Menos de 100 KB: mostrar 1 decimal si no es entero
+                if kb_value == int(kb_value):
+                    return "%.0f KB" % kb_value
+                else:
+                    return "%.1f KB" % kb_value
+            else:
+                # 100 KB o más: redondear a entero
+                return "%.0f KB" % round(kb_value)
+        elif size < gb:
+            # MB: siempre 2 decimales como OneDrive
+            mb_value = size / mb
+            return "%.2f MB" % mb_value
+        elif size < tb:
+            # GB: 2 decimales
+            gb_value = size / gb
+            return "%.2f GB" % gb_value
+        else:
+            # TB: 2 decimales
+            tb_value = size / tb
+            return "%.2f TB" % tb_value
 
     def page_counter(self, file):
         """
