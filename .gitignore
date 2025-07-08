@@ -5,7 +5,14 @@ __pycache__/
 
 # Folder
 .venv/
-docs/
+docs/0. Revisión de literatura
+docs/1. Análisis de requisitos
+docs/2. Diseño del sistema
+docs/3. Implementación
+docs/4. Verificación y mantenimiento
+docs/code_signing
+docs/5. Otros archivos
+docs/6. ARCHITECTURE.md
 
 # Files
 setup.py
@@ -341,3 +348,5 @@ docs/old_tooltip3.png
 docs/Pasos manejo de archivos.md
 docs/textchain.py
 docs/tooltip3 - copia.png
+.claude/settings.local.json
+.claude/

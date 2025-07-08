@@ -122,6 +122,11 @@ Con estos pasos, deberías haber creado un fork del repositorio original en tu c
 
 ## Registro de cambios
 
+- 2025-07-08 Nuevo Release 🚀 GestionExpedienteElectronico v1.4.5
+  - Implementación de conversión de tamaños de archivo siguiendo estándares de OneDrive: Mejora significativa en la función size_units_converter para mostrar tamaños de archivo en unidades legibles con precisión y formato optimizado.
+  - Refactorización completa del patrón Strategy: Implementación de arquitectura MVC con estrategias completamente autónomas que eliminan la duplicación de código y mejoran la modularidad del sistema.
+  - Mejoras en la validación de CUIs: Optimización del manejo de radicados vacíos y mejora en los mensajes de notificación con detalles específicos sobre CUIs inválidos en todas las estrategias de procesamiento.
+  - Optimización del sistema de logging: Mejoras en la calidad del registro de logs y reorganización estructural del proyecto con eliminación de archivos obsoletos.
 - 2025-03-10 Nuevo Release 🚀 GestionExpedienteElectronico v1.4.4
   - Refactorización de la interfaz de usuario para optimizar la gestión de carpetas: Mejoras significativas en la organización y procesamiento de expedientes en diversas condiciones, omitiendo automáticamente elementos no procesables.
   - Mejora en la comunicación con el usuario: Rediseño del formato de notificaciones para aumentar la legibilidad e incorporación de indicadores de progreso durante el procesamiento de carpetas seleccionadas.
