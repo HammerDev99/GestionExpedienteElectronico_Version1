@@ -1,0 +1,148 @@
+site_name: GestionExpedienteElectronico_Version1
+site_description: Documentación completa de la solución RDA para automatizar la creación de índices electrónicos de expedientes judiciales
+site_author: HammerDev99
+site_url: https://hammerdev99.github.io/GestionExpedienteElectronico_Version1
+
+repo_name: HammerDev99/GestionExpedienteElectronico_Version1
+repo_url: https://github.com/HammerDev99/GestionExpedienteElectronico_Version1
+edit_uri: edit/master/docs/
+
+theme:
+  name: material
+  language: es
+  palette:
+    - scheme: default
+      primary: blue
+      accent: indigo
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - scheme: slate
+      primary: blue
+      accent: indigo
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - navigation.expand
+    - navigation.top
+    - search.highlight
+    - search.share
+    - content.code.annotate
+    - content.code.copy
+  icon:
+    repo: fontawesome/brands/github
+
+nav:
+  - Inicio: index.md
+  - Guía del Usuario:
+    - Descripción General: user-guide/overview.md
+    - Instalación: user-guide/installation.md
+    - Primeros Pasos: user-guide/getting-started.md
+    - Tipos de Procesamiento: user-guide/processing-types.md
+    - Interfaz Gráfica: user-guide/gui-guide.md
+    - Herramientas Adicionales: user-guide/tools.md
+    - FAQ: user-guide/faq.md
+  - Arquitectura:
+    - Visión General: architecture/overview.md
+    - Patrones de Diseño: architecture/design-patterns.md
+    - Estructura MVC: architecture/mvc-structure.md
+    - Patrón Strategy: architecture/strategy-pattern.md
+    - Modelo de Datos: architecture/data-model.md
+  - API y Código:
+    - Estructura del Proyecto: api/project-structure.md
+    - Modelos (Model): api/model.md
+    - Vistas (View): api/view.md
+    - Controladores (Controller): api/controller.md
+    - Utilidades: api/utils.md
+    - Tests: api/tests.md
+  - Desarrollo:
+    - Configuración del Entorno: development/environment-setup.md
+    - Convenciones de Código: development/coding-conventions.md
+    - Testing: development/testing.md
+    - Debugging: development/debugging.md
+    - Contribución: development/contributing.md
+  - Despliegue:
+    - Build con PyInstaller: deployment/pyinstaller.md
+    - Firma de Código: deployment/code-signing.md
+    - Distribución: deployment/distribution.md
+  - Referencia:
+    - Dependencias: reference/dependencies.md
+    - Configuración: reference/configuration.md
+    - Logging: reference/logging.md
+    - Cambios: reference/changelog.md
+    - Licencia: reference/license.md
+
+plugins:
+  - search:
+      lang: es
+  - mkdocstrings:
+      handlers:
+        python:
+          paths: [src]
+          options:
+            docstring_style: google
+            show_source: true
+            show_root_heading: true
+
+markdown_extensions:
+  - abbr
+  - admonition
+  - attr_list
+  - def_list
+  - footnotes
+  - md_in_html
+  - toc:
+      permalink: true
+  - pymdownx.arithmatex:
+      generic: true
+  - pymdownx.betterem:
+      smart_enable: all
+  - pymdownx.caret
+  - pymdownx.details
+  - pymdownx.emoji:
+      emoji_generator: !!python/name:materialx.emoji.to_svg
+      emoji_index: !!python/name:materialx.emoji.twemoji
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.keys
+  - pymdownx.magiclink:
+      repo_url_shorthand: true
+      user: hammerdev99
+      repo: GestionExpedienteElectronico_Version1
+  - pymdownx.mark
+  - pymdownx.smartsymbols
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  - pymdownx.tilde
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/HammerDev99
+    - icon: fontawesome/brands/twitter
+      link: https://twitter.com/hammerdev99
+  version:
+    provider: mike
+
+extra_css:
+  - assets/extra.css
+
+extra_javascript:
+  - javascripts/mathjax.js
+  - https://polyfill.io/v3/polyfill.min.js?features=es6
+  - https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js
+
+copyright: Copyright &copy; 2025 HammerDev99

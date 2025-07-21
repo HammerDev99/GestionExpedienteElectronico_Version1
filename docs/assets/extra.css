@@ -1,0 +1,164 @@
+/* Custom CSS for GestionExpedienteElectronico Documentation */
+
+/* Brand Colors */
+:root {
+  --primary-color: #2196f3;
+  --accent-color: #3f51b5;
+  --success-color: #4caf50;
+  --warning-color: #ff9800;
+  --error-color: #f44336;
+}
+
+/* Code blocks with enhanced styling */
+.codehilite {
+  border-radius: 8px;
+  padding: 1rem;
+  margin: 1rem 0;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+/* Mermaid diagrams styling */
+.mermaid {
+  text-align: center;
+  margin: 2rem auto;
+}
+
+/* Custom admonition styles */
+.admonition.tip {
+  border-left-color: var(--success-color);
+}
+
+.admonition.warning {
+  border-left-color: var(--warning-color);
+}
+
+.admonition.danger {
+  border-left-color: var(--error-color);
+}
+
+/* Table enhancements */
+table {
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+/* Navigation enhancements */
+.md-nav__title {
+  font-weight: 600;
+}
+
+/* Code inline styling */
+code {
+  background-color: rgba(33, 150, 243, 0.1);
+  padding: 2px 4px;
+  border-radius: 4px;
+  font-size: 0.85em;
+}
+
+/* Enhanced buttons */
+.md-button {
+  border-radius: 8px;
+  transition: all 0.3s ease;
+}
+
+.md-button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+/* Custom icons for different sections */
+.md-nav__item--section > .md-nav__link[title="Guía del Usuario"]::before {
+  content: "👤";
+  margin-right: 0.5rem;
+}
+
+.md-nav__item--section > .md-nav__link[title="Arquitectura"]::before {
+  content: "🏗️";
+  margin-right: 0.5rem;
+}
+
+.md-nav__item--section > .md-nav__link[title="API y Código"]::before {
+  content: "⚙️";
+  margin-right: 0.5rem;
+}
+
+.md-nav__item--section > .md-nav__link[title="Desarrollo"]::before {
+  content: "💻";
+  margin-right: 0.5rem;
+}
+
+.md-nav__item--section > .md-nav__link[title="Despliegue"]::before {
+  content: "🚀";
+  margin-right: 0.5rem;
+}
+
+.md-nav__item--section > .md-nav__link[title="Referencia"]::before {
+  content: "📚";
+  margin-right: 0.5rem;
+}
+
+/* Responsive image styling */
+img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  margin: 1rem auto;
+  display: block;
+}
+
+/* Enhanced search results */
+.md-search__result {
+  border-radius: 8px;
+  margin-bottom: 0.5rem;
+}
+
+/* Footer customization */
+.md-footer {
+  margin-top: 2rem;
+}
+
+/* Version selector styling */
+.md-version {
+  border-radius: 4px;
+}
+
+/* Custom styling for architecture diagrams */
+.architecture-diagram {
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  padding: 2rem;
+  border-radius: 12px;
+  margin: 2rem 0;
+  text-align: center;
+}
+
+/* Syntax highlighting enhancements */
+.highlight .k { color: #0066cc; font-weight: bold; }
+.highlight .s { color: #008800; }
+.highlight .c { color: #999999; font-style: italic; }
+
+/* Dark mode specific adjustments */
+[data-md-color-scheme="slate"] {
+  --md-code-bg-color: #2d3748;
+  --md-code-fg-color: #e2e8f0;
+}
+
+[data-md-color-scheme="slate"] .codehilite {
+  background-color: var(--md-code-bg-color);
+}
+
+/* Print styles */
+@media print {
+  .md-header,
+  .md-tabs,
+  .md-sidebar,
+  .md-footer {
+    display: none !important;
+  }
+  
+  .md-content {
+    margin: 0 !important;
+    max-width: none !important;
+  }
+}

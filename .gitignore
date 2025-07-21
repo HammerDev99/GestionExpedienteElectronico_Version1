@@ -2,6 +2,7 @@
 __pycache__/
 .vscode/
 .idea
+.claude/
 
 # Folder
 .venv/
@@ -13,6 +14,7 @@ docs/4. Verificación y mantenimiento
 docs/code_signing
 docs/5. Otros archivos
 docs/6. ARCHITECTURE.md
+docs/others
 
 # Files
 setup.py
