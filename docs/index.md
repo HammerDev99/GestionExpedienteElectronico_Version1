@@ -4,7 +4,7 @@
 
 **GestionExpedienteElectronico_Version1** es una solución RDA (Robotic Desktop Automation) diseñada para automatizar la creación de índices electrónicos de expedientes judiciales siguiendo los estándares del sistema judicial colombiano establecidos en el protocolo PCSJA20-11567 de 2020.
 
-![Demo de la aplicación](../src/assets/Demo.gif)
+![Demo de la aplicación](assets/Demo.gif)
 
 ## ¿Qué es GestionExpedienteElectronico?
 

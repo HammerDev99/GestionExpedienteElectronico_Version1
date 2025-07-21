@@ -1,0 +1,18 @@
+# Ignorar carpetas legacy y archivos temporales
+others/
+temp/
+draft/
+*.tmp
+*.bak
+
+# Ignorar archivos de desarrollo
+.vscode/
+__pycache__/
+*.pyc
+.DS_Store
+Thumbs.db
+
+# Ignorar documentación antigua
+6. ARCHITECTURE.md
+old_docs/
+backup/
