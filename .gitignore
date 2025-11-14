@@ -6,7 +6,6 @@ __pycache__/
 
 # Folder
 .venv/
-site/
 docs/deploy-docs/
 docs/0. Revisión de literatura
 docs/1. Análisis de requisitos
@@ -199,9 +198,6 @@ venv.bak/
 
 # Rope project settings
 .ropeproject
-
-# mkdocs documentation
-/site
 
 # mypy
 .mypy_cache/

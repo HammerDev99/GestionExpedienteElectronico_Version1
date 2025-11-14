@@ -1,38 +1,41 @@
 # Script de sincronización de documentación
-# Construye los docs con MkDocs y los sincroniza con el subproyecto en docs/deploy-docs
+# Construye los docs con MkDocs directamente en docs/deploy-docs/
+# Ejecutar desde: docs/sync-docs.ps1
+
+Write-Host "📍 Ubicación actual: $PWD" -ForegroundColor Gray
+
+# Ir al directorio raíz del proyecto (un nivel arriba)
+$projectRoot = Split-Path -Parent $PSScriptRoot
+$deployPath = Join-Path $projectRoot "docs\deploy-docs"
+
+Push-Location $projectRoot
 
 Write-Host "🔨 Construyendo documentación con MkDocs..." -ForegroundColor Cyan
 
-# Construir documentación
+# Construir documentación (MkDocs la genera directamente en docs/deploy-docs/)
 mkdocs build
 
 if ($LASTEXITCODE -ne 0) {
     Write-Host "❌ Error al construir documentación" -ForegroundColor Red
+    Pop-Location
     exit 1
 }
 
-Write-Host "✅ Documentación construida exitosamente" -ForegroundColor Green
+Write-Host "✅ Documentación construida exitosamente en docs/deploy-docs/" -ForegroundColor Green
 
 # Verificar que existe docs/deploy-docs
-if (-not (Test-Path "docs\deploy-docs\.git")) {
+if (-not (Test-Path "$deployPath\.git")) {
     Write-Host "⚠️  WARNING: docs\deploy-docs no está inicializado como repositorio Git" -ForegroundColor Yellow
     Write-Host "   Ejecuta primero:" -ForegroundColor Yellow
     Write-Host "   cd docs\deploy-docs" -ForegroundColor Gray
     Write-Host "   git init" -ForegroundColor Gray
     Write-Host "   git branch -M main" -ForegroundColor Gray
     Write-Host "   git remote add origin https://github.com/TU_USUARIO/AgilEx-Docs.git" -ForegroundColor Gray
+    Pop-Location
     exit 1
 }
 
-# Limpiar docs/deploy-docs (excepto .git)
-Write-Host "🧹 Limpiando docs\deploy-docs..." -ForegroundColor Cyan
-Get-ChildItem -Path "docs\deploy-docs" -Exclude ".git" | Remove-Item -Recurse -Force
-
-# Copiar contenido de site/ a docs/deploy-docs/
-Write-Host "📦 Copiando archivos a docs\deploy-docs..." -ForegroundColor Cyan
-Copy-Item -Path "site\*" -Destination "docs\deploy-docs\" -Recurse -Force
-
-# Crear .gitignore en docs/deploy-docs
+# Crear .gitignore
 $gitignore = @"
 # Archivos del sistema
 .DS_Store
@@ -43,9 +46,9 @@ desktop.ini
 *.tmp
 *.bak
 "@
-Set-Content -Path "docs\deploy-docs\.gitignore" -Value $gitignore
+Set-Content -Path "$deployPath\.gitignore" -Value $gitignore
 
-# Crear README.md en docs/deploy-docs
+# Crear README.md
 $readme = @"
 # AgilEx by Marduk - Documentación
 
@@ -62,66 +65,40 @@ Esta documentación se genera automáticamente desde el proyecto principal:
 
 ## 📝 Para actualizar
 
-En el proyecto principal:
+En el proyecto principal (desde la carpeta docs/):
 ``````powershell
 # Construir y sincronizar
 .\sync-docs.ps1
 
-# Hacer commit y push (ver opciones en el script)
+# Hacer commit manualmente en deploy-docs/
+cd deploy-docs
+git add .
+git commit -m "Actualiza documentación"
+git push origin main
 ``````
 
 ---
 *Última actualización: $(Get-Date -Format "yyyy-MM-dd HH:mm:ss")*
 "@
-Set-Content -Path "docs\deploy-docs\README.md" -Value $readme
+Set-Content -Path "$deployPath\README.md" -Value $readme
 
-Write-Host "✅ Archivos sincronizados en docs\deploy-docs" -ForegroundColor Green
+Write-Host "✅ Archivos sincronizados en deploy-docs/" -ForegroundColor Green
 
 # Mostrar estadísticas
-$fileCount = (Get-ChildItem -Path "docs\deploy-docs" -Recurse -File | Measure-Object).Count
-$totalSize = (Get-ChildItem -Path "docs\deploy-docs" -Recurse -File | Measure-Object -Property Length -Sum).Sum / 1MB
+$fileCount = (Get-ChildItem -Path $deployPath -Recurse -File | Measure-Object).Count
+$totalSize = (Get-ChildItem -Path $deployPath -Recurse -File | Measure-Object -Property Length -Sum).Sum / 1MB
 Write-Host "📊 Total archivos: $fileCount" -ForegroundColor Yellow
 Write-Host "📊 Tamaño total: $([math]::Round($totalSize, 2)) MB" -ForegroundColor Yellow
 
-# Preguntar si hacer commit
-Write-Host "`n¿Deseas hacer commit y push ahora? (S/N)" -ForegroundColor Yellow
-$respuesta = Read-Host
+# Volver al directorio original
+Pop-Location
 
-if ($respuesta -eq "S" -or $respuesta -eq "s") {
-    Push-Location "docs\deploy-docs"
-
-    # Ver estado
-    git status
-
-    Write-Host "`n📝 Ingresa el mensaje del commit (Enter para usar mensaje automático):" -ForegroundColor Cyan
-    $commitMessage = Read-Host
-
-    if ([string]::IsNullOrWhiteSpace($commitMessage)) {
-        $commitMessage = "Actualiza documentación - $(Get-Date -Format 'yyyy-MM-dd HH:mm')"
-    }
-
-    # Commit
-    git add .
-    git commit -m $commitMessage
-
-    # Push
-    Write-Host "`n🚀 Haciendo push a GitHub..." -ForegroundColor Cyan
-    git push origin main
-
-    if ($LASTEXITCODE -eq 0) {
-        Write-Host "✅ Push exitoso! Webhook de Easypanel se activará automáticamente" -ForegroundColor Green
-        Write-Host "🌐 Documentación estará disponible en: https://docs.agilex.sprintjudicial.com" -ForegroundColor Cyan
-    } else {
-        Write-Host "❌ Error al hacer push" -ForegroundColor Red
-    }
-
-    Pop-Location
-} else {
-    Write-Host "`n💡 Puedes hacer commit manualmente:" -ForegroundColor Yellow
-    Write-Host "   cd docs\deploy-docs" -ForegroundColor Gray
-    Write-Host "   git add ." -ForegroundColor Gray
-    Write-Host "   git commit -m 'Actualiza documentación'" -ForegroundColor Gray
-    Write-Host "   git push origin main" -ForegroundColor Gray
-}
-
-Write-Host "`n🎉 ¡Proceso completado!" -ForegroundColor Green
+Write-Host "`n✅ Sincronización completada!" -ForegroundColor Green
+Write-Host "`n💡 Para publicar los cambios:" -ForegroundColor Cyan
+Write-Host "   cd deploy-docs" -ForegroundColor Gray
+Write-Host "   git add ." -ForegroundColor Gray
+Write-Host "   git commit -m 'Actualiza documentación v1.5.0'" -ForegroundColor Gray
+Write-Host "   git push origin main" -ForegroundColor Gray
+Write-Host "`n🌐 Una vez pusheado, Easypanel actualizará automáticamente:" -ForegroundColor Cyan
+Write-Host "   https://docs.agilex.sprintjudicial.com" -ForegroundColor Blue
+Write-Host "`n🎉 ¡Listo!" -ForegroundColor Green

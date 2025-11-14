@@ -3,6 +3,9 @@ site_description: Documentación completa de la solución RDA para automatizar l
 site_author: HammerDev99
 site_url: https://docs.agilex.sprintjudicial.com
 
+# Directorio de salida del sitio estático
+site_dir: docs/deploy-docs
+
 repo_name: HammerDev99/GestionExpedienteElectronico_Version1
 repo_url: https://github.com/HammerDev99/GestionExpedienteElectronico_Version1
 edit_uri: edit/master/docs/

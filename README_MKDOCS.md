@@ -96,16 +96,31 @@ mkdocs serve
 # Generar sitio estático
 mkdocs build
 
-# Los archivos se generarán en: site/
+# Los archivos se generarán en: docs/deploy-docs/
 ```
 
-### Despliegue en GitHub Pages
+### Despliegue Automatizado con Easypanel
+
+El proyecto está configurado para desplegar automáticamente a un VPS con Easypanel:
 
 ```bash
-# Deploy directo a GitHub Pages
-mkdocs gh-deploy
+# Desde la carpeta docs/
+cd docs
+.\sync-docs.ps1
 
-# O configurar GitHub Actions para deploy automático
+# El script automáticamente:
+# 1. Construye el sitio con MkDocs
+# 2. Genera los archivos en docs/deploy-docs/
+# 3. Crea archivos README.md y .gitignore
+
+# Hacer commit manual en deploy-docs/
+cd deploy-docs
+git add .
+git commit -m "Actualiza documentación v1.5.0"
+git push origin main
+
+# Easypanel detecta el push vía webhook y actualiza:
+# https://docs.agilex.sprintjudicial.com
 ```
 
 ## 📋 Páginas Pendientes (Opcionales)
