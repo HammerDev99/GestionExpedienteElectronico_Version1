@@ -372,18 +372,37 @@ class MetadataExtractor:
         Módulos:
             PyPDF2, warnings, os, sys
         Tipos de archivos compatibles:
-            - PDF (.pdf)
-            - Documentos de Word (.docx, .doc)
-            - Hojas de cálculo de Excel (.xls, .xlsx, .xlsm)
-            - Archivos de imagen (.bmp, .jpeg, .jpg, .png, .tif, .gif)
-            - Archivos de video (.mp4, .wmv)
-            - Archivos de texto (.txt, .textclipping)
-            - Archivos de correo electrónico (.eml)
-            - Archivos HTML (.html)
+            - PDF (.pdf) - conteo real de páginas
+            - Documentos de Word (.docx, .doc) - conteo real de páginas
+            - Hojas de cálculo de Excel (.xls, .xlsx, .xlsm) - 1 página
+            - Archivos de imagen (.bmp, .jpeg, .jpg, .png, .tif, .gif) - 1 página
+            - Archivos de video (.mp4, .wmv, .avi, .mov, .mkv, .flv, .webm, .mpeg, .mpg, .m4v) - 1 página
+            - Archivos de audio (.mp3, .wav, .wma, .aac, .flac, .ogg, .m4a) - 1 página
+            - Archivos de texto (.txt, .textclipping) - 1 página
+            - Archivos de correo electrónico (.eml) - 1 página
+            - Archivos HTML (.html) - 1 página
+            - Archivos comprimidos (.zip, .rar, .7z) - 1 página
         """
 
         _path, extension = os.path.splitext(file)
         extension = extension.lower()
+
+        # Extensiones que se cuentan como 1 página
+        single_page_extensions = {
+            # Hojas de cálculo
+            ".xls", ".xlsx", ".xlsm",
+            # Imágenes
+            ".bmp", ".jpeg", ".jpg", ".png", ".tif", ".gif",
+            # Videos
+            ".mp4", ".wmv", ".avi", ".mov", ".mkv", ".flv", ".webm", ".mpeg", ".mpg", ".m4v",
+            # Audio
+            ".mp3", ".wav", ".wma", ".aac", ".flac", ".ogg", ".m4a",
+            # Texto y otros
+            ".txt", ".textclipping", ".eml", ".html",
+            # Archivos comprimidos
+            ".zip", ".rar", ".7z"
+        }
+
         if os.path.isfile(file):
             if extension == ".pdf":
                 try:
@@ -399,23 +418,7 @@ class MetadataExtractor:
                     return total_pages
                 except Exception:
                     return 0
-            elif (
-                extension == ".xls"
-                or extension == ".xlsx"
-                or extension == ".xlsm"
-                or extension == ".bmp"
-                or extension == ".jpeg"
-                or extension == ".jpg"
-                or extension == ".mp4"
-                or extension == ".png"
-                or extension == ".tif"
-                or extension == ".textclipping"
-                or extension == ".wmv"
-                or extension == ".eml"
-                or extension == ".txt"
-                or extension == ".gif"
-                or extension == ".html"
-            ):
+            elif extension in single_page_extensions:
                 return 1
             else:
                 return 0

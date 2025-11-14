@@ -128,7 +128,7 @@ class Application(ttk.Frame):
         self.help_menu.add_separator()
         self.help_menu.add_command(
             label="Video tutorial (link 1)",
-            command=lambda: self._callback("https://enki.care/Ultimate"),
+            command=lambda: self._callback("https://enki.care/UltimateO"),
         )
         self.help_menu.add_command(
             label="Video tutorial (link 2)",

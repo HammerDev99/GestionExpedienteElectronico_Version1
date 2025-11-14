@@ -2,7 +2,7 @@
 
 ## Tabla de contenidos
 
-- [GestionExpedienteElectronico](#gestionexpedienteelectronico)
+- [Agilex (antes GestionExpedienteElectronico)](#agilex-antes-gestionexpedienteelectronico)
   - [Tabla de contenidos](#tabla-de-contenidos)
   - [Descripción](#descripción)
   - [Demo](#demo)
@@ -122,6 +122,11 @@ Con estos pasos, deberías haber creado un fork del repositorio original en tu c
 
 ## Registro de cambios
 
+- 2025-11-13 Nuevo Release 🚀 GestionExpedienteElectronico v1.5
+  - Mejora en la gestión de archivos protegidos: Implementación de nuevas técnicas para manejar documentos con restricciones de acceso, garantizando la integridad del expediente electrónico.
+  - Actualización de la interfaz de usuario: Rediseño de elementos visuales para una experiencia más intuitiva y amigable, facilitando la navegación y uso del software.
+  - Optimización del rendimiento: Ajustes técnicos que reducen el tiempo de procesamiento y mejoran la eficiencia general del sistema.
+  - Corrección de errores menores: Solución de bugs reportados en versiones anteriores para asegurar una operación más estable y confiable.
 - 2025-07-08 Nuevo Release 🚀 GestionExpedienteElectronico v1.4.5
   - Implementación de conversión de tamaños de archivo siguiendo estándares de OneDrive: Mejora significativa en la función size_units_converter para mostrar tamaños de archivo en unidades legibles con precisión y formato optimizado.
   - Refactorización completa del patrón Strategy: Implementación de arquitectura MVC con estrategias completamente autónomas que eliminan la duplicación de código y mejoran la modularidad del sistema.
