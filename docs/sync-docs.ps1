@@ -36,7 +36,7 @@ if (-not (Test-Path "$deployPath\.git")) {
 }
 
 # Crear Dockerfile para Nginx
-<# $dockerfile = @"
+$dockerfile = @"
 # Dockerfile para servir documentación estática con Nginx
 # Optimizado para MkDocs Material
 
@@ -66,8 +66,12 @@ RUN echo 'server { \
     \
     # Manejar rutas para documentación \
     location / { \
-        try_files $uri $uri/ =404; \
+        try_files `$uri `$uri/ =404; \
     } \
+    \
+    # Seguridad básica \
+    add_header X-Frame-Options "SAMEORIGIN" always; \
+    add_header X-Content-Type-Options "nosniff" always; \
 }' > /etc/nginx/conf.d/default.conf
 
 # Exponer puerto 80
@@ -95,7 +99,7 @@ desktop.ini
 *.tmp
 *.bak
 "@
-Set-Content -Path "$deployPath\.gitignore" -Value $gitignore #>
+Set-Content -Path "$deployPath\.gitignore" -Value $gitignore
 
 # Crear README.md
 $readme = @"
