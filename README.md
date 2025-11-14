@@ -122,11 +122,13 @@ Con estos pasos, deberías haber creado un fork del repositorio original en tu c
 
 ## Registro de cambios
 
-- 2025-11-13 Nuevo Release 🚀 GestionExpedienteElectronico v1.5
-  - Mejora en la gestión de archivos protegidos: Implementación de nuevas técnicas para manejar documentos con restricciones de acceso, garantizando la integridad del expediente electrónico.
-  - Actualización de la interfaz de usuario: Rediseño de elementos visuales para una experiencia más intuitiva y amigable, facilitando la navegación y uso del software.
-  - Optimización del rendimiento: Ajustes técnicos que reducen el tiempo de procesamiento y mejoran la eficiencia general del sistema.
-  - Corrección de errores menores: Solución de bugs reportados en versiones anteriores para asegurar una operación más estable y confiable.
+- 2025-11-13 Nuevo Release 🚀 GestionExpedienteElectronico v1.5.0
+  - Integración con Umami Analytics: Implementación de sistema de analytics básico y respetuoso con la privacidad para tracking de uso de la aplicación, enviando únicamente versión y eventos de inicio.
+  - Validación ampliada de formatos de archivo: Soporte completo para archivos comprimidos (.zip, .rar, .7z), formatos de video adicionales (.avi, .mov, .mkv, .flv, .webm, .mpeg, .mpg, .m4v) y formatos de audio (.mp3, .wav, .wma, .aac, .flac, .ogg, .m4a), todos contabilizados como 1 página.
+  - Mejoras de seguridad en metadatos del ejecutable: Actualización de version_info.rc con información institucional completa (Rama Judicial - CENDOJ), licencia MIT, descripción técnica detallada y validación "No malware" para optimizar resultados en análisis estático de seguridad (SAST) y reducir falsos positivos en VirusTotal.
+  - Actualización de logo institucional: Implementación de logo oficial proporcionado por la UTDI de la Rama Judicial con configuración dual en ventana Tkinter y ejecutable empaquetado para visualización correcta.
+  - Documentación técnica profesional con MkDocs: Implementación completa de documentación estructurada con MkDocs Material, incluyendo guías de usuario, API, arquitectura y deployment.
+  - Refactorización del código de validación: Optimización de page_counter() usando conjuntos (set) para mejor legibilidad y mantenibilidad del código.
 - 2025-07-08 Nuevo Release 🚀 GestionExpedienteElectronico v1.4.5
   - Implementación de conversión de tamaños de archivo siguiendo estándares de OneDrive: Mejora significativa en la función size_units_converter para mostrar tamaños de archivo en unidades legibles con precisión y formato optimizado.
   - Refactorización completa del patrón Strategy: Implementación de arquitectura MVC con estrategias completamente autónomas que eliminan la duplicación de código y mejoran la modularidad del sistema.

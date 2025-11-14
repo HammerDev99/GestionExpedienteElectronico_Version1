@@ -75,6 +75,14 @@ class Application(ttk.Frame):
             root.resizable(False, False)
             # root.geometry("350x300")
             root.protocol("WM_DELETE_WINDOW", self._on_closing)
+
+            # Configurar ícono de la ventana
+            try:
+                icon_path = resource_manager.get_path("src/assets/law_logo.ico")
+                root.iconbitmap(icon_path)
+            except Exception as e:
+                self.logger.warning(f"No se pudo cargar el ícono de la ventana: {e}")
+
             self.pack(padx=20, pady=20)  # Añadir padding aquí
 
             # Configurar el sistema de notificación
