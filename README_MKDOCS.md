@@ -90,6 +90,24 @@ mkdocs serve
 # Acceder en: http://localhost:8000
 ```
 
+### Estructura de Directorios
+
+```
+docs/
+├── source/          # Archivos fuente de documentación (.md)
+│   ├── index.md
+│   ├── api/
+│   ├── architecture/
+│   ├── assets/
+│   ├── deployment/
+│   ├── development/
+│   ├── javascripts/
+│   ├── reference/
+│   └── user-guide/
+├── deploy-docs/     # Sitio estático generado (Git independiente)
+└── sync-docs.ps1    # Script de build
+```
+
 ### Build para Producción
 
 ```bash
@@ -109,7 +127,7 @@ cd docs
 .\sync-docs.ps1
 
 # El script automáticamente:
-# 1. Construye el sitio con MkDocs
+# 1. Construye el sitio con MkDocs desde docs/source/
 # 2. Genera los archivos en docs/deploy-docs/
 # 3. Crea archivos README.md y .gitignore
 
