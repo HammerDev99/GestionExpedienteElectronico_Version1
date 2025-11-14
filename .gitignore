@@ -352,3 +352,8 @@ docs/textchain.py
 docs/tooltip3 - copia.png
 .claude/settings.local.json
 .claude/
+scripts/Rasultados autofirmado.png
+scripts/README_SIGNING.md
+scripts/sign_executable.bat
+scripts/sign_executable.ps1
+SECURITY.md
