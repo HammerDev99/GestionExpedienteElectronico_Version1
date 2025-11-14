@@ -123,6 +123,7 @@ Con estos pasos, deberías haber creado un fork del repositorio original en tu c
 ## Registro de cambios
 
 - 2025-11-13 Nuevo Release 🚀 GestionExpedienteElectronico v1.5.0
+  - Incorporación de enlaces directo en el menú de ayuda con acceso rápido a la documentación oficial de Agilex by Marduk facilitando el acceso a recursos de usuario básico y técnico, desde la interfaz de usuario.
   - Integración con Umami Analytics: Implementación de sistema de analytics básico y respetuoso con la privacidad para tracking de uso de la aplicación, enviando únicamente versión y eventos de inicio.
   - Validación ampliada de formatos de archivo: Soporte completo para archivos comprimidos (.zip, .rar, .7z), formatos de video adicionales (.avi, .mov, .mkv, .flv, .webm, .mpeg, .mpg, .m4v) y formatos de audio (.mp3, .wav, .wma, .aac, .flac, .ogg, .m4a), todos contabilizados como 1 página.
   - Mejoras de seguridad en metadatos del ejecutable: Actualización de version_info.rc con información institucional completa (Rama Judicial - CENDOJ), licencia MIT, descripción técnica detallada y validación "No malware" para optimizar resultados en análisis estático de seguridad (SAST) y reducir falsos positivos en VirusTotal.

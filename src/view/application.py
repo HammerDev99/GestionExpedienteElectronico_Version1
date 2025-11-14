@@ -151,6 +151,12 @@ class Application(ttk.Frame):
         )
         self.help_menu.add_separator()
         self.help_menu.add_command(
+            label="Documentación Agilex by Marduk",
+            command=lambda: self._callback(
+                "https://docs.agilex.sprintjudicial.com"
+            ),
+        )
+        self.help_menu.add_command(
             label="Tablas de retención documental",
             command=lambda: self._callback(
                 "https://enki.care/Tablas_Retencion_Documental"
