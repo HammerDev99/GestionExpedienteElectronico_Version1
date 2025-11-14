@@ -1,7 +1,7 @@
-site_name: GestionExpedienteElectronico_Version1
+site_name: AgilEx by Marduk - Documentación
 site_description: Documentación completa de la solución RDA para automatizar la creación de índices electrónicos de expedientes judiciales
 site_author: HammerDev99
-site_url: https://hammerdev99.github.io/GestionExpedienteElectronico_Version1
+site_url: https://docs.agilex.sprintjudicial.com
 
 repo_name: HammerDev99/GestionExpedienteElectronico_Version1
 repo_url: https://github.com/HammerDev99/GestionExpedienteElectronico_Version1
@@ -37,41 +37,21 @@ theme:
 
 nav:
   - Inicio: index.md
+  - Release v1.5.0: RELEASE_v1.5.0.md
   - Guía del Usuario:
     - Descripción General: user-guide/overview.md
     - Instalación: user-guide/installation.md
     - Primeros Pasos: user-guide/getting-started.md
-    - Tipos de Procesamiento: user-guide/processing-types.md
-    - Interfaz Gráfica: user-guide/gui-guide.md
-    - Herramientas Adicionales: user-guide/tools.md
-    - FAQ: user-guide/faq.md
   - Arquitectura:
     - Visión General: architecture/overview.md
-    - Patrones de Diseño: architecture/design-patterns.md
-    - Estructura MVC: architecture/mvc-structure.md
-    - Patrón Strategy: architecture/strategy-pattern.md
-    - Modelo de Datos: architecture/data-model.md
   - API y Código:
     - Estructura del Proyecto: api/project-structure.md
-    - Modelos (Model): api/model.md
-    - Vistas (View): api/view.md
-    - Controladores (Controller): api/controller.md
-    - Utilidades: api/utils.md
-    - Tests: api/tests.md
   - Desarrollo:
     - Configuración del Entorno: development/environment-setup.md
-    - Convenciones de Código: development/coding-conventions.md
-    - Testing: development/testing.md
-    - Debugging: development/debugging.md
-    - Contribución: development/contributing.md
   - Despliegue:
     - Build con PyInstaller: deployment/pyinstaller.md
-    - Firma de Código: deployment/code-signing.md
-    - Distribución: deployment/distribution.md
   - Referencia:
     - Dependencias: reference/dependencies.md
-    - Configuración: reference/configuration.md
-    - Logging: reference/logging.md
     - Cambios: reference/changelog.md
     - Licencia: reference/license.md
 

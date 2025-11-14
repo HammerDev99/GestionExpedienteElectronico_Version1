@@ -235,10 +235,9 @@ La aplicación te alertará sobre:
 
 Una vez cómodo con el procesamiento básico:
 
-1. **Explorar procesamiento de expedientes complejos**: Ver [Tipos de Procesamiento](processing-types.md)
-2. **Personalizar configuraciones**: Revisar [Configuración](../reference/configuration.md)
-3. **Usar herramientas adicionales**: Explorar el banco de herramientas
-4. **Automatizar flujos**: Aprender sobre procesamiento por lotes
+1. **Explorar procesamiento de expedientes complejos**: Experimenta con los 3 tipos de procesamiento disponibles
+2. **Usar herramientas adicionales**: Explorar el banco de herramientas
+3. **Automatizar flujos**: Aprender sobre procesamiento por lotes
 
 ## Obtener Ayuda
 
@@ -248,11 +247,11 @@ Una vez cómodo con el procesamiento básico:
 - **Ventana de herramientas**: Acceder a utilidades adicionales
 
 ### Recursos Adicionales
-- **[FAQ](faq.md)**: Respuestas a preguntas frecuentes
-- **[Interfaz Gráfica](gui-guide.md)**: Guía detallada de la GUI
 - **[Referencia](../reference/dependencies.md)**: Documentación técnica completa
+- **[Arquitectura](../architecture/overview.md)**: Comprende el diseño del sistema
+- **[Desarrollo](../development/environment-setup.md)**: Guía para contribuidores
 
 ---
 
 !!! tip "¿Listo para más?"
-    Una vez que hayas completado tu primer procesamiento exitoso, explora los [Tipos de Procesamiento Avanzados](processing-types.md) para casos más complejos.
+    Una vez que hayas completado tu primer procesamiento exitoso, consulta la [Guía de Usuario](overview.md) para conocer funcionalidades avanzadas.

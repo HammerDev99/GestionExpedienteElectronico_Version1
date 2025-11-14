@@ -705,4 +705,4 @@ if exe_path.exists():
 ---
 
 !!! success "Build Completado"
-    Con esta configuración puedes crear ejecutables robustos y optimizados. Continúa con [Firma de Código](code-signing.md) para distribución segura.
+    Con esta configuración puedes crear ejecutables robustos y optimizados para distribución.

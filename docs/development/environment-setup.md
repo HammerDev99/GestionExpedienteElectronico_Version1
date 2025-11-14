@@ -701,4 +701,4 @@ def test_excel_function(mock_app):
 ---
 
 !!! success "Entorno Listo"
-    Con esta configuración tienes un entorno de desarrollo completo y profesional. Continúa con [Convenciones de Código](coding-conventions.md) para aprender las mejores prácticas del proyecto.
+    Con esta configuración tienes un entorno de desarrollo completo y profesional. Consulta el [CLAUDE.md](https://github.com/HammerDev99/GestionExpedienteElectronico_Version1/blob/master/CLAUDE.md) para conocer las mejores prácticas del proyecto.

@@ -63,7 +63,7 @@ python src/__main__.py
 
 - **[Guía del Usuario](user-guide/overview.md)**: Aprende a usar la aplicación paso a paso
 - **[Instalación](user-guide/installation.md)**: Guía detallada de instalación y configuración
-- **[Tipos de Procesamiento](user-guide/processing-types.md)**: Comprende los diferentes modos de operación
+- **[Primeros Pasos](user-guide/getting-started.md)**: Guía rápida para comenzar a usar la aplicación
 
 ### Para Desarrolladores
 

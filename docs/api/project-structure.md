@@ -396,4 +396,4 @@ graph TD
 ---
 
 !!! info "Navegación de Código"
-    Para explorar el código en detalle, visita las páginas específicas de cada capa: [Model](model.md), [View](view.md), [Controller](controller.md).
+    Para explorar el código en detalle, consulta el [repositorio en GitHub](https://github.com/HammerDev99/GestionExpedienteElectronico_Version1) o revisa la [Guía de Desarrollo](../development/environment-setup.md).
