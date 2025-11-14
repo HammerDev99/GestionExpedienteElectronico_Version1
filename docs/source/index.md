@@ -1,12 +1,16 @@
-# GestionExpedienteElectronico_Version1
+# AgilEx
+
+<div align="center">
+  <img src="assets/UTDI_Mesa-de-trabajo-1Logo_Agilex.webp" alt="Logo AgilEx" width="300"/>
+</div>
 
 ## Bienvenido a la Documentación
 
-**GestionExpedienteElectronico_Version1** es una solución RDA (Robotic Desktop Automation) diseñada para automatizar la creación de índices electrónicos de expedientes judiciales siguiendo los estándares del sistema judicial colombiano establecidos en el protocolo PCSJA20-11567 de 2020.
+**AgilEx** (anteriormente conocido como GestionExpedienteElectronico) es una solución RDA (Robotic Desktop Automation) diseñada para automatizar la creación de índices electrónicos de expedientes judiciales siguiendo los estándares del sistema judicial colombiano establecidos en el protocolo PCSJA20-11567 de 2020.
 
 ![Demo de la aplicación](assets/Demo.gif)
 
-## ¿Qué es GestionExpedienteElectronico?
+## ¿Qué es AgilEx?
 
 Esta aplicación permite realizar de forma automatizada la **creación y diligenciamiento** del formato índice electrónico con los metadatos de los archivos alojados en una carpeta específica. Los archivos (documentos) conforman un expediente electrónico y mediante este software se crea **desde cero** el índice del mismo.
 
