@@ -1,4 +1,4 @@
-# GestionExpedienteElectronico
+# Agilex (antes GestionExpedienteElectronico)
 
 ## Tabla de contenidos
 
@@ -216,3 +216,4 @@ Este documento tiene por objeto informar a los usuarios del software GestionExpe
 ---
 
 > La cooperación con los demás constituye la base de la sociedad (extraído de "software libre para una comunidad libre" autor Richard M. Stallman)
+
