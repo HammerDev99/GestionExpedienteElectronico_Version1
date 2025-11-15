@@ -14,7 +14,7 @@ edit_uri: edit/master/docs/source/
 theme:
   name: material
   language: es
-  custom_dir: overrides
+  custom_dir: docs/overrides
   palette:
     - scheme: default
       primary: blue
