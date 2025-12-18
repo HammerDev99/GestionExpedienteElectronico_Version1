@@ -21,7 +21,7 @@ UMAMI_HOSTNAME = "agilex-desktop.local"
 VERSION = "1.5"
 
 # Deshabilitar analytics en modo desarrollo si se desea
-# umami.disable()  # Descomentar para deshabilitar en desarrollo
+umami.disable()  # Deshabilitado para cumplir con políticas institucionales
     
 
 def main():
