@@ -131,6 +131,7 @@ scripts/certificacion_firma_digital/
 | 2026-04-15 | **REGRESIÓN detectada en despliegue:** binario onedir firmado se cierra automáticamente en equipo de Rama Judicial (XDR + ASR + AppLocker bloquean DLLs no firmadas adyacentes). Pivote: regreso a `onefile` como flujo principal de distribución | Daniel Arbeláez | Hallazgo 5 en `HALLAZGOS_CERT_ACTUAL.md` |
 | 2026-04-15 | Cotización EV Code Signing recibida de proveedor local. Pendiente validar si raíz está en Microsoft Trusted Root Program antes de comprar | Daniel Arbeláez | `evidencias/preguntas_andes_scd.md` |
 | 2026-04-15 | Implementación pivote onefile: limpieza `config/main.spec`, creación `build_and_sign.ps1` (todo-en-uno), actualización RUNBOOK con flujo onefile como principal | Claude | `scripts/build_and_sign.ps1`, `RUNBOOK_COMANDOS.md` |
+| 2026-04-15 | Validación cruzada informe Diana: 23 datos técnicos verificados (21 OK, 2 corregidos: tildes en Subject del cert + manifest version 1.4.4→1.5.0). Recompilación + re-firma onefile con manifest corregido | Daniel Arbeláez | SHA256 post-firma definitivo: `CD0D9EFBE36BAC8FBE68DEB80B944048CBFD0157EB78E791328CC90509A2CCBC`. Timestamp DigiCert 2026-04-15 21:07:40 |
 | _pendiente_ | Envío reporte FP a Microsoft WDSI | — | ticket ID de WDSI |
 | _pendiente_ | Solicitud whitelist a SOC | — | radicado de correo |
 | _pendiente_ | Decisión sobre CA comercial (OV vs EV) | — | cotización adjunta |

@@ -352,6 +352,7 @@ docs/tooltip3 - copia.png
 .claude/
 # Certificación firma digital — datos internos (hostnames, emails SOC, PII)
 scripts/certificacion_firma_digital/plantillas/
+scripts/certificacion_firma_digital/evidencias/
 scripts/certificacion_firma_digital/HALLAZGOS_CERT_ACTUAL.md
 scripts/certificacion_firma_digital/RUNBOOK_COMANDOS.md
 ~$*.docx
