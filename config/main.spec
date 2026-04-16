@@ -109,6 +109,5 @@ exe = EXE(
     icon=get_path('src', 'assets', 'law_logo.ico'),  # Icono de la aplicación
     uac_admin=False,  # NO requiere permisos de administrador
     uac_uiaccess=False,  # NO requiere acceso UI Automation
-    key=None,
-    cert='docs\\others\\code_signing\\cert.pem'  # Certificado para firma (ignorado por PyInstaller, usar SignTool post-build)
+    key=None
 )

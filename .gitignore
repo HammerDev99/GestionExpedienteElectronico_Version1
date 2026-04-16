@@ -350,8 +350,41 @@ docs/textchain.py
 docs/tooltip3 - copia.png
 .claude/settings.local.json
 .claude/
+# Certificación firma digital — datos internos (hostnames, emails SOC, PII)
+scripts/certificacion_firma_digital/plantillas/
+scripts/certificacion_firma_digital/HALLAZGOS_CERT_ACTUAL.md
+scripts/certificacion_firma_digital/RUNBOOK_COMANDOS.md
+~$*.docx
+*.code-workspace
 scripts/Rasultados autofirmado.png
 scripts/README_SIGNING.md
 scripts/sign_executable.bat
 scripts/sign_executable.ps1
 SECURITY.md
+scripts/problemas_firma_equipo_entidad/WhatsApp Image 2026-04-15 at 8.48.50 AM.jpeg
+scripts/problemas_firma_equipo_entidad/WhatsApp Image 2026-04-15 at 8.48.51 A.jpeg
+scripts/problemas_firma_equipo_entidad/WhatsApp Image 2026-04-15 at 8.48.51 AM.jpeg
+scripts/certificacion_firma_digital/evidencias/cert_public.cer
+scripts/certificacion_firma_digital/evidencias/cert_public.rar
+scripts/certificacion_firma_digital/evidencias/hash_sha256.txt
+scripts/certificacion_firma_digital/evidencias/problemas_firma_equipo_entidad/WhatsApp Image 2026-04-15 at 8.48.50 AM.jpeg
+scripts/certificacion_firma_digital/evidencias/problemas_firma_equipo_entidad/WhatsApp Image 2026-04-15 at 8.48.51 A.jpeg
+scripts/certificacion_firma_digital/evidencias/problemas_firma_equipo_entidad/WhatsApp Image 2026-04-15 at 8.48.51 AM.jpeg
+scripts/certificacion_firma_digital/evidencias/virustotal/_parse_vt.py
+scripts/certificacion_firma_digital/evidencias/virustotal/VirusTotal - File - cd89fd0f10c6027221f56c867bf2922ddfe691a6c802a1b383d335fbd1437023.html
+scripts/certificacion_firma_digital/evidencias/virustotal/virustotal_result.txt
+scripts/certificacion_firma_digital/evidencias/virustotal/VirusTotal - File - cd89fd0f10c6027221f56c867bf2922ddfe691a6c802a1b383d335fbd1437023_files/analytics.js.descarga
+scripts/certificacion_firma_digital/evidencias/virustotal/VirusTotal - File - cd89fd0f10c6027221f56c867bf2922ddfe691a6c802a1b383d335fbd1437023_files/anchor.html
+scripts/certificacion_firma_digital/evidencias/virustotal/VirusTotal - File - cd89fd0f10c6027221f56c867bf2922ddfe691a6c802a1b383d335fbd1437023_files/core-js.9c2b3ec09627a6214771964b087f6447.js.descarga
+scripts/certificacion_firma_digital/evidencias/virustotal/VirusTotal - File - cd89fd0f10c6027221f56c867bf2922ddfe691a6c802a1b383d335fbd1437023_files/css
+scripts/certificacion_firma_digital/evidencias/virustotal/VirusTotal - File - cd89fd0f10c6027221f56c867bf2922ddfe691a6c802a1b383d335fbd1437023_files/df-messenger.js.descarga
+scripts/certificacion_firma_digital/evidencias/virustotal/VirusTotal - File - cd89fd0f10c6027221f56c867bf2922ddfe691a6c802a1b383d335fbd1437023_files/enterprise.js.descarga
+scripts/certificacion_firma_digital/evidencias/virustotal/VirusTotal - File - cd89fd0f10c6027221f56c867bf2922ddfe691a6c802a1b383d335fbd1437023_files/gtm.js.descarga
+scripts/certificacion_firma_digital/evidencias/virustotal/VirusTotal - File - cd89fd0f10c6027221f56c867bf2922ddfe691a6c802a1b383d335fbd1437023_files/js
+scripts/certificacion_firma_digital/evidencias/virustotal/VirusTotal - File - cd89fd0f10c6027221f56c867bf2922ddfe691a6c802a1b383d335fbd1437023_files/main.5f73bda39cfd0d4f4f27.js.descarga
+scripts/certificacion_firma_digital/evidencias/virustotal/VirusTotal - File - cd89fd0f10c6027221f56c867bf2922ddfe691a6c802a1b383d335fbd1437023_files/qrcode.min.js.descarga
+scripts/certificacion_firma_digital/evidencias/virustotal/VirusTotal - File - cd89fd0f10c6027221f56c867bf2922ddfe691a6c802a1b383d335fbd1437023_files/recaptcha__es_419.js.descarga
+scripts/certificacion_firma_digital/evidencias/virustotal/VirusTotal - File - cd89fd0f10c6027221f56c867bf2922ddfe691a6c802a1b383d335fbd1437023_files/regenerator-runtime.6d5da0232f4ab85670e271f840b48b0.descarga
+scripts/certificacion_firma_digital/evidencias/virustotal/VirusTotal - File - cd89fd0f10c6027221f56c867bf2922ddfe691a6c802a1b383d335fbd1437023_files/saved_resource.html
+scripts/certificacion_firma_digital/evidencias/virustotal/VirusTotal - File - cd89fd0f10c6027221f56c867bf2922ddfe691a6c802a1b383d335fbd1437023_files/saved_resource(1).html
+scripts/certificacion_firma_digital/evidencias/virustotal/VirusTotal - File - cd89fd0f10c6027221f56c867bf2922ddfe691a6c802a1b383d335fbd1437023_files/styles__ltr.css

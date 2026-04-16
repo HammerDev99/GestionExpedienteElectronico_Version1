@@ -2,6 +2,10 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## Considerations
+Always reply in spanish (code in english) even input english.
+Not use large (simplify) explanatory comments unless requested
+
 ## Proyecto: GestionExpedienteElectronico_Version1
 
 **Solución RDA (Robotic Desktop Automation)** para automatizar la creación de índices electrónicos de expedientes judiciales según los estándares del sistema judicial colombiano (PCSJA20-11567 de 2020).
