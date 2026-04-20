@@ -5,7 +5,7 @@ import os
 # Datos adicionales de autoridad
 author_name = "Daniel Arbelaez Alvarez"
 author_email = "darbelaal@cendoj.ramajudicial.gov.co"
-software_version = "1.5.0"
+software_version = "1.5.1"
 
 # Determinar sistema operativo
 is_windows = sys.platform == 'win32'

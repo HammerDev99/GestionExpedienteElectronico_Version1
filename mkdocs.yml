@@ -42,6 +42,7 @@ theme:
 
 nav:
   - Inicio: index.md
+  - Release v1.5.1: RELEASE_v1.5.1.md
   - Release v1.5.0: RELEASE_v1.5.0.md
   - Guía del Usuario:
     - Descripción General: user-guide/overview.md

@@ -122,6 +122,11 @@ Con estos pasos, deberías haber creado un fork del repositorio original en tu c
 
 ## Registro de cambios
 
+- 2026-04-20 Nuevo Release 🚀 GestionExpedienteElectronico v1.5.1
+  - Re-firmado Authenticode del binario con certificado renovado tras el vencimiento del anterior (2026-03-04): algoritmo SHA256 + timestamp RFC 3161 (DigiCert TSA), cert vigente 2026-04-15 a 2029-04-15, thumbprint 92ADA07AA3455816E2555C6CDF8D5120AE7D57B1.
+  - Actualización de metadatos PE (version_info.rc) a FileVersion/ProductVersion 1.5.1.0 y alineación del manifiesto UAC (app.manifest assemblyIdentity 1.5.1.0) para trazabilidad del build ante el SOC Rama Judicial (incidente XDR 804977).
+  - Compilación definitiva en modo onefile (PyInstaller) para compatibilidad con entornos corporativos con ASR/AppLocker activos.
+  - Sin cambios funcionales en el comportamiento de la aplicación respecto a 1.5.0; los cambios son exclusivamente de firma digital, metadatos y trazabilidad del binario.
 - 2025-11-13 Nuevo Release 🚀 GestionExpedienteElectronico v1.5.0
   - Incorporación de enlaces directo en el menú de ayuda con acceso rápido a la documentación oficial de Agilex by Marduk facilitando el acceso a recursos de usuario básico y técnico, desde la interfaz de usuario.
   - Integración con Umami Analytics: Implementación de sistema de analytics básico y respetuoso con la privacidad para tracking de uso de la aplicación, enviando únicamente versión y eventos de inicio.

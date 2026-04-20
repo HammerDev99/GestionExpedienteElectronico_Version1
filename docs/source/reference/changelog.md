@@ -2,6 +2,40 @@
 
 ## Historial de Versiones
 
+### 🔏 Versión 1.5.1 - Abril 2026
+
+**Cambio de trazabilidad y re-firma digital (sin cambios funcionales)**
+
+Esta versión no introduce modificaciones en el comportamiento del aplicativo. Los cambios son exclusivamente de firma digital, metadatos PE y trazabilidad del binario, en el marco de la gestión del incidente XDR 804977 con el SOC de la Rama Judicial.
+
+#### Firma digital renovada
+- **Certificado de firma actualizado**: nuevo certificado self-signed SHA256 (RSA 4096) vigente del 2026-04-15 al 2029-04-15.
+- **Thumbprint estable**: `92ADA07AA3455816E2555C6CDF8D5120AE7D57B1` (utilizable como criterio de whitelist).
+- **Algoritmo Authenticode**: SHA256 + Timestamp RFC 3161 (DigiCert TSA).
+- **Modo de compilación definitivo**: PyInstaller onefile (compatibilidad con ASR/AppLocker en entornos corporativos).
+
+#### Metadatos PE actualizados
+- `FileVersion` y `ProductVersion` en `version_info.rc`: **1.5.1.0**.
+- `assemblyIdentity version` en `app.manifest`: **1.5.1.0**.
+- `last_version.json`: **1.5.1**.
+
+#### Contexto
+- Incidente SOC Rama Judicial: `804977` / `RJ-MDE-MAL-ALERT-002` (detección "Malgent" — falso positivo).
+- Validación externa: VirusTotal 1/72 motores, Microsoft Defender = Undetected.
+- Trámite paralelo: certificado comercial EV Code Signing con Andes SCD (white-label Sectigo, raíz incluida en Microsoft Trusted Root Program), validado técnicamente el 2026-04-20.
+
+### 🚀 Versión 1.5.0 - Noviembre 2025
+
+**Release funcional previa — integración con Umami Analytics y validación ampliada de formatos**
+
+- Incorporación de enlaces directos a la documentación oficial en el menú de ayuda.
+- Integración con Umami Analytics (privacy-respecting, solo versión y evento de inicio).
+- Validación ampliada de formatos: archivos comprimidos (.zip, .rar, .7z), video (.avi, .mov, .mkv, .flv, .webm, .mpeg, .mpg, .m4v) y audio (.mp3, .wav, .wma, .aac, .flac, .ogg, .m4a).
+- Actualización de metadatos PE del ejecutable con información institucional completa.
+- Actualización de logo institucional (UTDI Rama Judicial).
+- Documentación técnica profesional con MkDocs Material.
+- Refactorización de validaciones usando conjuntos (`set`).
+
 ### 🚀 Versión 1.4.5 - Julio 2025
 
 **Mejoras Principales:**
