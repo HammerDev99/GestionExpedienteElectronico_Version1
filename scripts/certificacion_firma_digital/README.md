@@ -132,9 +132,13 @@ scripts/certificacion_firma_digital/
 | 2026-04-15 | Cotización EV Code Signing recibida de proveedor local. Pendiente validar si raíz está en Microsoft Trusted Root Program antes de comprar | Daniel Arbeláez | `evidencias/preguntas_andes_scd.md` |
 | 2026-04-15 | Implementación pivote onefile: limpieza `config/main.spec`, creación `build_and_sign.ps1` (todo-en-uno), actualización RUNBOOK con flujo onefile como principal | Claude | `scripts/build_and_sign.ps1`, `RUNBOOK_COMANDOS.md` |
 | 2026-04-15 | Validación cruzada informe Diana: 23 datos técnicos verificados (21 OK, 2 corregidos: tildes en Subject del cert + manifest version 1.4.4→1.5.0). Recompilación + re-firma onefile con manifest corregido | Daniel Arbeláez | SHA256 post-firma definitivo: `CD0D9EFBE36BAC8FBE68DEB80B944048CBFD0157EB78E791328CC90509A2CCBC`. Timestamp DigiCert 2026-04-15 21:07:40 |
+| 2026-04-20 | Respuesta oficial de Andes SCD (Katerine López Villamil): EV Code Signing white-label de Sectigo, raíz en Microsoft Trusted Root Program, reputación SmartScreen inmediata, token FIPS 140-2. Producto técnicamente validado como viable | Daniel Arbeláez | `evidencias/respuesta_andes_scd_2026-04-20.txt` |
+| 2026-04-20 | Reunión técnica con el SOC Rama Judicial — acordado envío de evidencia (informe técnico, hash, cert público, binario firmado) para pruebas estáticas y dinámicas | SOC Rama Judicial + Daniel Arbeláez | Acta/minuta de reunión |
+| 2026-04-20 | Bump versión 1.5.0 → **1.5.1** (patch, SemVer) sin cambios funcionales, solo trazabilidad: `version_info.rc` FileVersion/ProductVersion 1.5.1.0, `app.manifest` assemblyIdentity 1.5.1.0, `last_version.json` 1.5.1, `config/main.spec` software_version 1.5.1. Recompilación onefile + re-firma con mismo cert (thumbprint `92ADA07A…7D57B1`) | Daniel Arbeláez | SHA256 post-firma 1.5.1: `09657C47EB8657838E1B75C413185247543D479A0B14F90E45D4F62CAB7E1BF7`. Timestamp DigiCert 2026-04-20 15:18:23 |
 | _pendiente_ | Envío reporte FP a Microsoft WDSI | — | ticket ID de WDSI |
-| _pendiente_ | Solicitud whitelist a SOC | — | radicado de correo |
-| _pendiente_ | Decisión sobre CA comercial (OV vs EV) | — | cotización adjunta |
+| _pendiente_ | Envío al SOC: informe técnico PDF + exe 1.5.1 + cert_public.cer + hash + evidencias | — | radicado de correo |
+| _pendiente_ | Cotización formal Andes SCD con tiempos y proceso EV persona natural | — | cotización adjunta |
+| _pendiente_ | Compra e instalación cert EV definitivo | — | token FIPS 140-2 |
 
 ---
 
