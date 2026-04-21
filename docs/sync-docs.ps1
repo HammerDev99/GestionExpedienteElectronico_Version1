@@ -105,6 +105,14 @@ try {
     Write-ColorMessage "Generando archivos de despliegue..." "Progress"
 
     # Crear Dockerfile optimizado para Nginx
+    #
+    # Estrategia copy-on-startup:
+    # - COPY pone los archivos en /app/html (staging), no en el root de Nginx
+    # - En cada arranque del contenedor, el CMD limpia /usr/share/nginx/html y
+    #   lo repuebla desde /app/html con los archivos del build actual
+    # - Esto garantiza que cualquier bind mount / volumen que el orquestador
+    #   monte sobre el root de Nginx se sobreescriba con contenido fresco, y que
+    #   el Last-Modified refleje la fecha del último deploy (no un mtime viejo)
     $dockerfile = @"
 # Dockerfile para servir documentación estática con Nginx
 # Optimizado para MkDocs Material y mejores prácticas de seguridad
@@ -114,10 +122,12 @@ FROM nginx:alpine
 # Etiquetas de metadata
 LABEL maintainer="HammerDev99" \
       description="Documentación estática de AgilEx con Nginx" \
-      version="1.0"
+      version="1.1"
 
-# Copiar archivos estáticos al directorio de Nginx
-COPY . /usr/share/nginx/html
+# Copiar archivos estáticos a una carpeta de staging (no directamente al root de Nginx)
+# para que el CMD de arranque repueble /usr/share/nginx/html en cada inicio,
+# incluso si el orquestador monta un volumen sobre el root.
+COPY . /app/html
 
 # Configuración optimizada de Nginx
 RUN echo 'server { \
@@ -170,12 +180,21 @@ RUN echo 'server { \
     error_log /var/log/nginx/error.log warn; \
 }' > /etc/nginx/conf.d/default.conf
 
+# Instalar curl para healthcheck HTTP (alpine no lo trae por defecto)
+RUN apk add --no-cache curl
+
 # Exponer puerto 80
 EXPOSE 80
 
 # Healthcheck para validar que Nginx está respondiendo
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
-    CMD wget --quiet --tries=1 --spider http://localhost/ || exit 1
+    CMD curl -fsS http://localhost/ -o /dev/null || exit 1
+
+# Copy-on-startup: en cada arranque del contenedor, limpia /usr/share/nginx/html
+# (por si un volumen o bind mount trae contenido viejo) y lo repuebla desde el
+# staging /app/html con los archivos del build actual. Luego inicia Nginx en
+# primer plano como proceso PID 1 con exec para conservar señales.
+CMD ["sh", "-c", "rm -rf /usr/share/nginx/html/* /usr/share/nginx/html/.??* 2>/dev/null; cp -r /app/html/. /usr/share/nginx/html/ && exec nginx -g 'daemon off;'"]
 "@
 
     # Crear .dockerignore mejorado
