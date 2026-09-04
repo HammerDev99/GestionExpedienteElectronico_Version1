@@ -17,10 +17,10 @@ def create_tool_images(output_dir="src/assets/tools"):
     """
     UTILIDAD DE DESARROLLO — no invocar en runtime.
 
-    Genera las imagenes de placeholder de las herramientas. Se ejecuta
-    manualmente durante el desarrollo; las imagenes resultantes viajan
-    en el bundle via config/main.spec. En produccion la aplicacion se
-    instala en Program Files, donde escribir en su propio arbol de
+    Genera las imágenes de placeholder de las herramientas. Se ejecuta
+    manualmente durante el desarrollo; las imágenes resultantes viajan
+    en el bundle vía config/main.spec. En producción la aplicación se
+    instala en Program Files, donde escribir en su propio árbol de
     archivos falla con PermissionError.
     """
 
