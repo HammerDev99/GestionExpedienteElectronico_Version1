@@ -14,11 +14,15 @@ else:
     from utils.resource_manager import resource_manager
 
 def create_tool_images(output_dir="src/assets/tools"):
-    
-    #Crea imágenes de placeholder para cada herramienta.
-    
-    #Args:
-    #    output_dir (str): Directorio donde se guardarán las imágenes.
+    """
+    UTILIDAD DE DESARROLLO — no invocar en runtime.
+
+    Genera las imagenes de placeholder de las herramientas. Se ejecuta
+    manualmente durante el desarrollo; las imagenes resultantes viajan
+    en el bundle via config/main.spec. En produccion la aplicacion se
+    instala en Program Files, donde escribir en su propio arbol de
+    archivos falla con PermissionError.
+    """
 
     # Asegurar que el directorio existe
     os.makedirs(output_dir, exist_ok=True)
