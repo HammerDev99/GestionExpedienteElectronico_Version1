@@ -136,17 +136,17 @@ class Application(ttk.Frame):
         self.help_menu.add_separator()
         self.help_menu.add_command(
             label="Video tutorial (link 1)",
-            command=lambda: self._callback("https://enki.care/UltimateO"),
+            command=lambda: self._callback("https://etbcsj-my.sharepoint.com/personal/apropiaciondigital_deaj_ramajudicial_gov_co/_layouts/15/stream.aspx?id=%2Fpersonal%2Fapropiaciondigital%5Fdeaj%5Framajudicial%5Fgov%5Fco%2FDocuments%2FApropiacion%20Digital%2FConocimiento%2FPortal%20de%20Competencias%20Digitales%2FAgilEX%2FSesiones%2FAgilEX%20%20Capacitaci%C3%B3n%20t%C3%A9cnicos%20Manizales%2C%20Cali%20y%20Mesa%20de%20servicios%2D20251009%5F100845%2DGrabaci%C3%B3n%20de%20la%20reuni%C3%B3n%2Emp4&nav=eyJyZWZlcnJhbEluZm8iOnsicmVmZXJyYWxBcHAiOiJTdHJlYW1XZWJBcHAiLCJyZWZlcnJhbFZpZXciOiJTaGFyZURpYWxvZy1MaW5rIiwicmVmZXJyYWxBcHBQbGF0Zm9ybSI6IldlYiIsInJlZmVycmFsTW9kZSI6InZpZXcifX0&ga=1&referrer=StreamWebApp%2EWeb&referrerScenario=AddressBarCopied%2Eview%2E47e18292%2Db8df%2D40db%2Da05a%2Dfd40b87c2950"),
         )
         self.help_menu.add_command(
             label="Video tutorial (link 2)",
-            command=lambda: self._callback("https://enki.care/UltimateY"),
+            command=lambda: self._callback("https://youtu.be/W2iFk21wKHg?si=Mpj24GplTKncovxY"),
         )
         self.help_menu.add_separator()
         self.help_menu.add_command(
             label="Experto en expediente electrónico (agente IA)",
             command=lambda: self._callback(
-                "https://enki.care/Experto_en_Expediente_Electronico"
+                "https://gestionexpedienteelectronico.streamlit.app/Experto_en_Expediente_Electronico"
             ),
         )
         self.help_menu.add_separator()
@@ -159,19 +159,19 @@ class Application(ttk.Frame):
         self.help_menu.add_command(
             label="Tablas de retención documental",
             command=lambda: self._callback(
-                "https://enki.care/Tablas_Retencion_Documental"
+                "https://www.ramajudicial.gov.co/web/centro-de-documentacion-judicial/tablas-de-retencion-documental"
             ),
         )
         self.help_menu.add_command(
             label="Protocolo de gestión de expedientes electrónicos v2",
             command=lambda: self._callback(
-                "https://enki.care/Protocolo_Gestion_Expedientes_Electrónicos_v2"
+                "https://www.ramajudicial.gov.co/documents/3196516/46103054/Protocolo+para+la+gesti%C3%B3n+de+documentos+electronicos.pdf/cb0d98ef-2844-4570-b12a-5907d76bc1a3"
             ),
         )
         self.help_menu.add_command(
             label="Condiciones archivísticas mínimas para migrar a Alfresco",
             command=lambda: self._callback(
-                "https://enki.care/Condiciones_Archivisticas_Minimas_Alfresco"
+                "https://etbcsj-my.sharepoint.com/:b:/g/personal/darbelaal_cendoj_ramajudicial_gov_co/IQCq35sBkGKBRLV0EQrFZjyAAe2DAUGSiclSZRLPXSsTr-Q?e=v3Xcaf"
             ),
         )
 
@@ -214,7 +214,7 @@ class Application(ttk.Frame):
             self.update_label.bind(
                 "<Button-1>",
                 lambda e: self._callback(
-                    "https://enki.care/Latest_Agilex_By_Marduk"
+                    "https://github.com/HammerDev99/GestionExpedienteElectronico_Version1/releases/download/latest/AgilEx_by_Marduk.exe"
                 ),
             )
 
