@@ -62,8 +62,10 @@ def test_setup_logger_survives_unwritable_location(monkeypatch):
     assert len(stream_handlers) >= 1
 
 
-def test_setup_logger_never_raises_on_makedirs_failure(monkeypatch):
+def test_setup_logger_never_raises_on_makedirs_failure(tmp_path, monkeypatch):
     """Regresion: os.makedirs fallando no debe propagar excepcion."""
+    monkeypatch.chdir(tmp_path)
+
     def deny(*args, **kwargs):
         raise PermissionError("acceso denegado")
 
