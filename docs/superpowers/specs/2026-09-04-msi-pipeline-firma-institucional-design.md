@@ -213,6 +213,26 @@ Sin manejo explícito, actualizar o desinstalar con la aplicación abierta harí
 
 El instalador incorpora `util:CloseApplication` (extensión `WixToolset.Util.wixext`) para pedir el cierre de la aplicación en lugar de exigir reinicio, con `RebootPrompt="no"`.
 
+### 5.8 Notificación de nueva versión sin descarga directa
+
+> **Añadido 2026-09-05, tras la validación del instalador.**
+
+La aplicación incluye un mecanismo de aviso de actualización: compara la versión de `last_version.json` empaquetada en el binario contra la publicada en el repositorio, y muestra un aviso en la interfaz cuando existe una versión superior.
+
+**La detección se mantiene sin cambios** — es independiente del método de empaquetado, porque lee un recurso del propio binario.
+
+**Lo que se elimina es la descarga directa.** El aviso enlazaba al `.exe` publicado en las *releases* de GitHub. Ese comportamiento es incompatible con el modelo de distribución institucional por tres razones:
+
+| Problema | Consecuencia |
+|---|---|
+| Instalación paralela | El usuario obtendría un `.exe` suelto conviviendo con la instalación registrada del MSI; la versión instalada seguiría siendo la anterior |
+| Binario sin firma institucional | El artefacto de GitHub no lleva la firma de la entidad — es precisamente el que motivó la gestión de mitigación de falsos positivos |
+| Ruta de baja confianza | La carpeta de descargas del usuario es una de las ubicaciones que ASR y AppLocker evalúan con mayor restricción |
+
+En un despliegue institucional por GPO/SCCM, la actualización la distribuye el área responsable; el usuario final no descarga ni instala por su cuenta.
+
+**Comportamiento adoptado:** el aviso es únicamente informativo — muestra que existe una versión más reciente y remite al canal institucional, sin enlace de descarga ni cursor de acción. La publicación del paquete actualizado queda a cargo de la Rama Judicial en su repositorio institucional.
+
 ## 6. Fase B — Script `build-signed-msi.ps1`
 
 ### 6.1 Principio de diseño

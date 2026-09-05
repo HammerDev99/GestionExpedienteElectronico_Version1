@@ -204,19 +204,17 @@ class Application(ttk.Frame):
             self.update_frame = tk.Frame(self)
             self.update_frame.pack(side=tk.TOP, fill=tk.X)
 
+            # Notificacion informativa unicamente: no redirige a ninguna
+            # descarga. La distribucion se realiza por el canal institucional
+            # de la Rama Judicial, no por descarga directa del usuario, para
+            # no generar instalaciones paralelas sin la firma de la entidad
+            # ni depender de rutas de baja confianza para AppLocker/ASR.
             self.update_label = tk.Label(
                 self.update_frame,
-                text="🚀 Nueva versión disponible",
+                text="🚀 Nueva versión disponible — solicítela por el canal institucional",
                 fg="green",
-                cursor="hand2",
             )
             self.update_label.pack(side=tk.RIGHT, padx=0, pady=0)
-            self.update_label.bind(
-                "<Button-1>",
-                lambda e: self._callback(
-                    "https://github.com/HammerDev99/GestionExpedienteElectronico_Version1/releases/download/latest/AgilEx_by_Marduk.exe"
-                ),
-            )
 
         # Crear un Frame para contener el label01 y el icono de ayuda
         self.frame_label01 = tk.Frame(self)
