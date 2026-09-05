@@ -37,13 +37,13 @@ $script:IsSelfSigned = $false
 $script:SignTool = $null
 $script:RarExe = $null
 
-if ($OutputDir -eq "") { $OutputDir = Join-Path $script:Root "salida" }
-if (-not (Test-Path $OutputDir)) {
-    New-Item -ItemType Directory -Force -Path $OutputDir | Out-Null
+# Cierra el transcript de forma tolerante: si nunca se inicio (por ejemplo,
+# porque el fallo ocurrio antes de Start-Transcript), Stop-Transcript lanza
+# "The host is not currently transcribing", un error crudo de PowerShell que
+# no aporta nada al operador y ensucia un mensaje que de otro modo es claro.
+function Close-TranscriptSafely {
+    try { Stop-Transcript | Out-Null } catch { }
 }
-
-$script:TranscriptPath = Join-Path $OutputDir "transcript.log"
-Start-Transcript -Path $script:TranscriptPath -Force | Out-Null
 
 # Cierra el transcript ante cualquier excepcion terminante no controlada por
 # Stop-WithError (permisos, rutas invalidas, fallos de Get-FileHash, etc.).
@@ -53,9 +53,24 @@ trap {
     Write-Host ""
     Write-Host "[ERROR] Error no controlado: $($_.Exception.Message)" -ForegroundColor Red
     Write-Host "[ACCION] Revise el detalle del error arriba y contacte al desarrollador." -ForegroundColor Yellow
-    Stop-Transcript | Out-Null
+    Close-TranscriptSafely
     exit 99
 }
+
+if ($OutputDir -eq "") { $OutputDir = Join-Path $script:Root "salida" }
+if (-not (Test-Path $OutputDir)) {
+    try {
+        New-Item -ItemType Directory -Force -Path $OutputDir -ErrorAction Stop | Out-Null
+    } catch {
+        Write-Host ""
+        Write-Host "[ERROR] No se pudo crear el directorio de salida: $OutputDir" -ForegroundColor Red
+        Write-Host "[ACCION] Verifique que la ruta de -OutputDir existe y es accesible, o use el valor por defecto." -ForegroundColor Yellow
+        exit 10
+    }
+}
+
+$script:TranscriptPath = Join-Path $OutputDir "transcript.log"
+Start-Transcript -Path $script:TranscriptPath -Force | Out-Null
 
 function Write-Stage {
     param([string]$Message)
@@ -68,7 +83,7 @@ function Stop-WithError {
     Write-Host ""
     Write-Host "[ERROR] $Message" -ForegroundColor Red
     Write-Host "[ACCION] $Action" -ForegroundColor Yellow
-    Stop-Transcript | Out-Null
+    Close-TranscriptSafely
     exit $Code
 }
 
@@ -209,4 +224,4 @@ $hashBefore = Test-BinaryIntegrity
 
 Write-Host ""
 Write-Host "Etapas 0 y 1 completadas." -ForegroundColor Green
-Stop-Transcript | Out-Null
+Close-TranscriptSafely
