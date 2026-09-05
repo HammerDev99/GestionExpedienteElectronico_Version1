@@ -6,11 +6,10 @@
 
 **Cambio de trazabilidad y re-firma digital (sin cambios funcionales)**
 
-Esta versión no introduce modificaciones en el comportamiento del aplicativo. Los cambios son exclusivamente de firma digital, metadatos PE y trazabilidad del binario, en el marco de la gestión del incidente XDR 804977 con el SOC de la Rama Judicial.
+Esta versión no introduce modificaciones en el comportamiento del aplicativo. Los cambios son exclusivamente de firma digital, metadatos PE y trazabilidad del binario, en el marco de una gestión de mitigación de falsos positivos de detección con el área de Seguridad Informática de la Rama Judicial.
 
 #### Firma digital renovada
-- **Certificado de firma actualizado**: nuevo certificado self-signed SHA256 (RSA 4096) vigente del 2026-04-15 al 2029-04-15.
-- **Thumbprint estable**: `92ADA07AA3455816E2555C6CDF8D5120AE7D57B1` (utilizable como criterio de whitelist).
+- **Certificado de firma actualizado**: nuevo certificado SHA256 (RSA 4096) vigente del 2026-04-15 al 2029-04-15.
 - **Algoritmo Authenticode**: SHA256 + Timestamp RFC 3161 (DigiCert TSA).
 - **Modo de compilación definitivo**: PyInstaller onefile (compatibilidad con ASR/AppLocker en entornos corporativos).
 
@@ -20,9 +19,8 @@ Esta versión no introduce modificaciones en el comportamiento del aplicativo. L
 - `last_version.json`: **1.5.1**.
 
 #### Contexto
-- Incidente SOC Rama Judicial: `804977` / `RJ-MDE-MAL-ALERT-002` (detección "Malgent" — falso positivo).
-- Validación externa: VirusTotal 1/72 motores, Microsoft Defender = Undetected.
-- Trámite paralelo: certificado comercial EV Code Signing con Andes SCD (white-label Sectigo, raíz incluida en Microsoft Trusted Root Program), validado técnicamente el 2026-04-20.
+- Detección aislada de un motor antivirus, confirmada como falso positivo mediante validación externa (VirusTotal 1/72 motores, Microsoft Defender = Undetected).
+- La distribución institucional (GPO/SCCM) se realiza mediante paquete `.msi` firmado por el área de Seguridad Informática con el certificado de la entidad — ver [Guía de Instalación](../user-guide/installation.md#opcion-3-distribucion-institucional-msi-firmado).
 
 ### 🚀 Versión 1.5.0 - Noviembre 2025
 

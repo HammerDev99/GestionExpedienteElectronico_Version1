@@ -4,11 +4,11 @@
 
 > Release de **trazabilidad y seguridad de firma digital** — no introduce cambios funcionales respecto a 1.5.0. El comportamiento y las capacidades de la aplicación permanecen idénticos.
 
-- **Firma digital Authenticode renovada**: certificado self-signed SHA256 (RSA 4096) vigente del 2026-04-15 al 2029-04-15, con marca de tiempo RFC 3161 de DigiCert. Thumbprint estable `92ADA07AA3455816E2555C6CDF8D5120AE7D57B1` durante 3 años, válido como criterio de whitelist ante SOCs institucionales.
+- **Firma digital Authenticode renovada**: certificado SHA256 (RSA 4096) vigente del 2026-04-15 al 2029-04-15, con marca de tiempo RFC 3161 de DigiCert.
 - **Compilación definitiva en modo `onefile`**: un único ejecutable sin DLLs sueltas, optimizado para entornos corporativos con Microsoft Defender XDR, Attack Surface Reduction (ASR) y AppLocker activos.
 - **Metadatos PE actualizados a 1.5.1.0** (`FileVersion`, `ProductVersion`, `assemblyIdentity`) para trazabilidad explícita del binario ante herramientas de análisis estático y procedimientos de SOC.
 - **Identidad jurídica ajustada a persona natural**: `CompanyName="Daniel Arbelaez Alvarez"`, `LegalCopyright` con referencia a Licencia MIT y derechos morales irrenunciables (Ley 23 de 1982, art. 30). Aporte voluntario al Sistema Judicial Colombiano, sin relación contractual.
-- **Gestión en curso de certificado EV Code Signing**: validación técnica positiva con Andes SCD (white-label de Sectigo, raíz incluida en el Microsoft Trusted Root Program). Una vez emitido y aplicado, eliminará definitivamente la advertencia "Editor desconocido" de SmartScreen y otorgará reputación inmediata en Microsoft Defender.
+- **Distribución institucional MSI**: para despliegue en la Rama Judicial, AgilEx se distribuye también como paquete `.msi` firmado por el área de Seguridad Informática, eliminando la advertencia "Editor desconocido" de SmartScreen en esos equipos — ver la [Guía de Instalación](user-guide/installation.md#opcion-3-distribucion-institucional-msi-firmado).
 - **Validación externa independiente conservada**: VirusTotal 1/72 motores antivirus (detección aislada heurística genérica de Bkav Pro). Microsoft Defender, Kaspersky, ESET, Symantec, Sophos, BitDefender, CrowdStrike, SentinelOne y el resto de motores empresariales referentes = Undetected.
 
 ## 🔎 Vista previa
@@ -43,10 +43,13 @@ Get-FileHash .\AgilEx_by_Marduk.exe -Algorithm SHA256
 ```
 
 **Certificado firmante:**
-- Subject: `CN=Daniel Arbelaez Alvarez, OU=AgilEx by Marduk, L=Bogota, S=Bogota D.C., C=CO, E=darbelaal@cendoj.ramajudicial.gov.co`
-- Thumbprint: `92ADA07AA3455816E2555C6CDF8D5120AE7D57B1`
 - Vigencia: 2026-04-15 a 2029-04-15
 - Algoritmo: Authenticode SHA256 + Timestamp RFC 3161 (DigiCert TSA)
+
+!!! tip "Verificación del firmante"
+    Para consultar el firmante y el thumbprint del certificado del ejecutable
+    que tenga en su equipo, ejecute en PowerShell:
+    `Get-AuthenticodeSignature .\AgilEx_by_Marduk.exe | Format-List SignerCertificate`
 
 ## 🎓 Recursos Adicionales
 
