@@ -7,14 +7,7 @@ __pycache__/
 # Folder
 .venv/
 docs/deploy-docs/
-docs/0. Revisión de literatura
-docs/1. Análisis de requisitos
-docs/2. Diseño del sistema
-docs/3. Implementación
-docs/4. Verificación y mantenimiento
 docs/code_signing
-docs/5. Otros archivos
-docs/6. ARCHITECTURE.md
 docs/others
 
 # Files
@@ -364,7 +357,6 @@ scripts/Rasultados autofirmado.png
 scripts/README_SIGNING.md
 scripts/sign_executable.bat
 scripts/sign_executable.ps1
-SECURITY.md
 scripts/problemas_firma_equipo_entidad/WhatsApp Image 2026-04-15 at 8.48.50 AM.jpeg
 scripts/problemas_firma_equipo_entidad/WhatsApp Image 2026-04-15 at 8.48.51 A.jpeg
 scripts/problemas_firma_equipo_entidad/WhatsApp Image 2026-04-15 at 8.48.51 AM.jpeg
