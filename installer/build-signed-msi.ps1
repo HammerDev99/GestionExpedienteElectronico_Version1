@@ -1,4 +1,4 @@
-<#
+﻿<#
 .SYNOPSIS
     Firma y empaqueta AgilEx by Marduk como MSI distribuible.
 
@@ -45,6 +45,18 @@ if (-not (Test-Path $OutputDir)) {
 $script:TranscriptPath = Join-Path $OutputDir "transcript.log"
 Start-Transcript -Path $script:TranscriptPath -Force | Out-Null
 
+# Cierra el transcript ante cualquier excepcion terminante no controlada por
+# Stop-WithError (permisos, rutas invalidas, fallos de Get-FileHash, etc.).
+# Ninguna ruta de salida debe dejar el transcript abierto: un transcript
+# huerfano contamina la evidencia de ejecuciones posteriores en la consola.
+trap {
+    Write-Host ""
+    Write-Host "[ERROR] Error no controlado: $($_.Exception.Message)" -ForegroundColor Red
+    Write-Host "[ACCION] Revise el detalle del error arriba y contacte al desarrollador." -ForegroundColor Yellow
+    Stop-Transcript | Out-Null
+    exit 99
+}
+
 function Write-Stage {
     param([string]$Message)
     Write-Host ""
@@ -87,31 +99,34 @@ function Test-Prerequisites {
 
     $script:SignTool = Find-SignTool
     if (-not $script:SignTool) {
-        Stop-WithError -Message "No se encontro signtool.exe" `
-            -Action "Instale el Windows SDK (componente Signing Tools)." -Code 10
+        Stop-WithError -Message "No se encontró signtool.exe" `
+            -Action "Verifique primero si el Windows SDK esta instalado (revise `"C:\Program Files (x86)\Windows Kits\10\bin`"). Si no esta, instale el componente `"Signing Tools for Desktop Apps`" del Windows SDK." -Code 10
     }
     Write-Host "[OK] signtool: $($script:SignTool)" -ForegroundColor Green
 
     $wix = Get-Command wix -ErrorAction SilentlyContinue
     if (-not $wix) {
-        Stop-WithError -Message "No se encontro la herramienta wix" `
-            -Action "Ejecute: dotnet tool install --global wix" -Code 10
+        $wixAction = "Verifique primero si ya esta instalada con: dotnet tool list --global`n" `
+            + "     Si aparece en la lista, el problema es el PATH: agregue %USERPROFILE%\.dotnet\tools al PATH del usuario y abra una consola nueva.`n" `
+            + "     Si no aparece, instalela con: dotnet tool install --global wix --version 6.0.1"
+        Stop-WithError -Message "No se encontró la herramienta wix en el PATH" `
+            -Action $wixAction -Code 10
     }
     Write-Host "[OK] wix: $($wix.Source)" -ForegroundColor Green
 
     $script:RarExe = Find-Rar
     if (-not $script:RarExe -and -not $SkipRar) {
-        Write-Host "[AVISO] Rar.exe no encontrado. La etapa 5 se omitira." -ForegroundColor Yellow
+        Write-Host "[AVISO] Rar.exe no encontrado. La etapa 5 se omitirá." -ForegroundColor Yellow
     }
 
     if (-not (Test-Path $script:ExePath)) {
-        Stop-WithError -Message "No se encontro bin\AgilEx_by_Marduk.exe" `
-            -Action "Verifique que descomprimio el paquete completo." -Code 10
+        Stop-WithError -Message "No se encontró bin\AgilEx_by_Marduk.exe" `
+            -Action "Verifique que descomprimió el paquete completo." -Code 10
     }
 
     if (-not (Test-Path $script:ManifestPath)) {
-        Stop-WithError -Message "No se encontro MANIFIESTO.txt" `
-            -Action "Verifique que descomprimio el paquete completo." -Code 10
+        Stop-WithError -Message "No se encontró MANIFIESTO.txt" `
+            -Action "Verifique que descomprimió el paquete completo." -Code 10
     }
 
     $cert = Get-ChildItem -Path Cert:\CurrentUser\My, Cert:\LocalMachine\My -ErrorAction SilentlyContinue |
@@ -119,12 +134,12 @@ function Test-Prerequisites {
         Select-Object -First 1
 
     if (-not $cert) {
-        Stop-WithError -Message "No se encontro el certificado $Thumbprint" `
+        Stop-WithError -Message "No se encontró el certificado $Thumbprint" `
             -Action "Verifique la huella con: Get-ChildItem Cert:\CurrentUser\My" -Code 10
     }
 
     if ($cert.NotAfter -lt (Get-Date)) {
-        Stop-WithError -Message "El certificado vencio el $($cert.NotAfter)" `
+        Stop-WithError -Message "El certificado venció el $($cert.NotAfter)" `
             -Action "Use un certificado vigente." -Code 10
     }
 
@@ -151,7 +166,7 @@ function Test-Prerequisites {
 
     if (-not $hasCodeSigning) {
         Stop-WithError -Message "El certificado no tiene EKU Code Signing (OID $CODE_SIGNING_OID)" `
-            -Action "Use un certificado emitido para firma de codigo." -Code 10
+            -Action "Use un certificado emitido para firma de código." -Code 10
     }
 
     $script:IsSelfSigned = ($cert.Subject -eq $cert.Issuer)
@@ -166,7 +181,7 @@ function Test-Prerequisites {
 }
 
 function Test-BinaryIntegrity {
-    Write-Stage "Etapa 1/6 - Verificacion de integridad"
+    Write-Stage "Etapa 1/6 - Verificación de integridad"
 
     $declared = (Get-Content $script:ManifestPath |
         Where-Object { $_ -match "^SHA256=" }) -replace "^SHA256=", ""
@@ -174,14 +189,14 @@ function Test-BinaryIntegrity {
 
     if (-not $declared) {
         Stop-WithError -Message "MANIFIESTO.txt no declara SHA256" `
-            -Action "Solicite al desarrollador un paquete valido." -Code 20
+            -Action "Solicite al desarrollador un paquete válido." -Code 20
     }
 
     $actual = (Get-FileHash $script:ExePath -Algorithm SHA256).Hash.ToUpper()
 
     if ($actual -ne $declared) {
         Stop-WithError -Message "El SHA256 del ejecutable no coincide con el declarado.`n  Esperado: $declared`n  Obtenido: $actual" `
-            -Action "NO FIRMAR. El binario fue alterado en transito. Solicite reenvio." -Code 20
+            -Action "NO FIRMAR. El binario fue alterado en tránsito. Solicite reenvío." -Code 20
     }
 
     Write-Host "[OK] SHA256 verificado: $actual" -ForegroundColor Green
