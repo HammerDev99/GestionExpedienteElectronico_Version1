@@ -58,6 +58,20 @@ trap {
 }
 
 if ($OutputDir -eq "") { $OutputDir = Join-Path $script:Root "salida" }
+
+# Normaliza a ruta absoluta antes de crear el directorio. Build-Msi hace
+# Push-Location hacia installer\wix\ antes de invocar wix build, y un
+# OutputDir relativo se resolveria contra ese directorio en vez del
+# directorio de invocacion original, dejando el MSI en un sitio distinto
+# al que buscan las etapas siguientes. No se usa [IO.Path]::GetFullPath
+# porque esa API resuelve contra Environment.CurrentDirectory, que
+# Set-Location de PowerShell no sincroniza: produciria el mismo bug con
+# otro nombre. $PWD si refleja el directorio real de la sesion.
+if (-not [System.IO.Path]::IsPathRooted($OutputDir)) {
+    $OutputDir = Join-Path $PWD.Path $OutputDir
+}
+$OutputDir = [System.IO.Path]::GetFullPath($OutputDir)
+
 if (-not (Test-Path $OutputDir)) {
     try {
         New-Item -ItemType Directory -Force -Path $OutputDir -ErrorAction Stop | Out-Null
