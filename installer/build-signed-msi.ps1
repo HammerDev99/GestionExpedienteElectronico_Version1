@@ -292,8 +292,9 @@ function Build-Msi {
     & wix extension add -g WixToolset.Util.wixext/6.0.1 2>&1 | Out-Null
 
     # wix resuelve SourceFile relativo al directorio actual, no al .wxs.
-    # Product.wxs referencia el icono como ..\..\src\assets\law_logo.ico,
-    # ruta valida unicamente desde installer\wix\.
+    # Product.wxs referencia el icono como law_logo.ico (ruta relativa local,
+    # el icono viaja junto al .wxs en el paquete de entrega), asi que wix
+    # debe ejecutarse posicionado en el mismo directorio del .wxs.
     $wxsDir = Split-Path -Parent $script:WxsPath
     Push-Location $wxsDir
     try {
