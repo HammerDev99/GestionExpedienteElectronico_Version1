@@ -15,6 +15,8 @@ El proyecto sigue [versionado semántico](https://semver.org/lang/es/). Para la 
   - Validación completa del instalador en equipo real: instalación silenciosa, metadatos en Agregar o quitar programas, accesos directos, desinstalación limpia, bloqueo de downgrade y actualización de versión sin generar entradas duplicadas.
   - Mitigación del congelamiento aparente de la interfaz durante el procesamiento de cargas grandes: la ventana deja de ser marcada como "No responde" por Windows mientras el proceso avanza.
   - El aviso de nueva versión disponible pasa a ser informativo: se mantiene la detección automática, pero se elimina la descarga directa del ejecutable para que la distribución se realice exclusivamente por el canal institucional, evitando instalaciones paralelas sin la firma de la entidad.
+  - Escalado de la interfaz según la resolución de pantalla: en monitores de alta densidad (4K) los elementos ya no quedan desproporcionados. En 1920x1080 el resultado es idéntico al anterior.
+  - Estilos visuales de Windows: los controles se dibujan con la apariencia actual del sistema operativo en lugar del tema clásico.
 - 2026-04-20 Nuevo Release 🚀 GestionExpedienteElectronico v1.5.1
   - Re-firmado Authenticode del binario con certificado renovado tras el vencimiento del anterior (2026-03-04): algoritmo SHA256 + timestamp RFC 3161 (DigiCert TSA), cert vigente 2026-04-15 a 2029-04-15.
   - Actualización de metadatos PE (version_info.rc) a FileVersion/ProductVersion 1.5.1.0 y alineación del manifiesto UAC (app.manifest assemblyIdentity 1.5.1.0) para trazabilidad del build ante el SOC Rama Judicial.

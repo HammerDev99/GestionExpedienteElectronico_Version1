@@ -17,6 +17,8 @@ Esta versión introduce el empaquetado como instalador MSI firmado por el área 
 #### Correcciones de compatibilidad
 - **Rutas de escritura**: los registros de actividad se escriben en `%LOCALAPPDATA%`, no junto al ejecutable. Sin este cambio la aplicación no arrancaba instalada en `Program Files`, por ser un directorio de solo lectura.
 - **Respuesta de la interfaz**: durante el procesamiento de cargas grandes la ventana deja de ser marcada como "No responde" por Windows.
+- **Escalado según la resolución de pantalla**: la interfaz se ajusta al DPI real del monitor. En resoluciones altas (4K) los elementos ya no quedan desproporcionados. En 1920x1080 el resultado es idéntico al anterior.
+- **Estilos visuales de Windows**: los controles se dibujan con la apariencia actual del sistema operativo en lugar del tema clásico.
 
 #### Notificación de actualizaciones
 - El aviso de nueva versión disponible pasa a ser **informativo**: se mantiene la detección automática, pero se elimina la descarga directa del ejecutable. La distribución se realiza exclusivamente por el canal institucional, evitando instalaciones paralelas sin la firma de la entidad.
