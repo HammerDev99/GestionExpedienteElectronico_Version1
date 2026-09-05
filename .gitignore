@@ -73,6 +73,9 @@ __pycache__/
 build/
 develop-eggs/
 dist/
+
+# Salida del pipeline de firma institucional (MSI/RAR/evidencia firmados)
+installer/salida/
 downloads/
 eggs/
 .eggs/
