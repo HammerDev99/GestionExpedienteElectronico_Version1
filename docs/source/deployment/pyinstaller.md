@@ -13,11 +13,11 @@ Esta guía cubre el proceso completo de empaquetado de GestionExpedienteElectron
 .venv\Scripts\Activate  # Windows
 
 # Instalar PyInstaller
-pip install pyinstaller==5.13.0
+pip install pyinstaller==6.12.0
 ```
 
 !!! note "Versión Específica"
-    Se recomienda usar PyInstaller 5.13.0 por compatibilidad verificada con xlwings y pywin32.
+    Se recomienda usar PyInstaller 6.12.0 por compatibilidad verificada con xlwings y pywin32.
 
 ### Estructura de Archivos de Spec — Resumen
 

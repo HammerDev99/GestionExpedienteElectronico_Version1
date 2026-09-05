@@ -223,13 +223,7 @@ Esta versión no introduce modificaciones en el comportamiento del aplicativo. L
 
 ### Próximas Versiones Planeadas
 
-#### Versión 1.5.0 (Estimada: Q3 2025)
-- **Soporte multiplataforma completo**: Linux y macOS
-- **API REST**: Interfaz para integración con otros sistemas
-- **Procesamiento en lote**: Automatización de grandes volúmenes
-- **Templates personalizables**: Configuración de formatos de salida
-
-#### Versión 2.0.0 (Estimada: Q4 2025)
+#### Versión 2.0.0
 - **Interfaz web**: GUI moderna basada en navegador
 - **Base de datos integrada**: Persistencia de configuraciones
 - **Autenticación**: Control de acceso y usuarios

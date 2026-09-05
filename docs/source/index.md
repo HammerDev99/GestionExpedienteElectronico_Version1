@@ -25,11 +25,11 @@ Esta aplicación permite realizar de forma automatizada la **creación y diligen
 
 ### Versión Actual
 
-**Versión 1.4.5** - Julio 2025
+**Versión 1.5.1** - Abril 2026
 
-- Implementación de conversión de tamaños de archivo siguiendo estándares de OneDrive
-- Refactorización completa del patrón Strategy con arquitectura MVC
-- Mejoras en validación de CUIs y sistema de logging optimizado
+Release de trazabilidad y firma digital (sin cambios funcionales respecto
+a 1.5.0). Ver el [registro de cambios completo](reference/changelog.md)
+para el historial de versiones.
 
 ## Inicio Rápido
 

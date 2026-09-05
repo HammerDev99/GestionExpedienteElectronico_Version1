@@ -90,7 +90,38 @@ python src/__main__.py
     - No necesita configuración de dependencias
     - Listo para usar inmediatamente
 
-### Opción 3: Fork Personal (Para Desarrolladores)
+### Opción 3: Distribución Institucional (MSI firmado)
+
+Para despliegue en equipos de la Rama Judicial de Colombia, AgilEx by Marduk
+se distribuye también como paquete de instalación `.msi`, firmado
+digitalmente con el certificado institucional de la Unidad de
+Transformación Digital.
+
+!!! info "Canal recomendado para despliegue institucional"
+    Esta es la vía recomendada para instalación masiva en entidades de la
+    Rama Judicial mediante GPO o herramientas de gestión de parque
+    informático (SCCM/Intune).
+
+**Características de este método:**
+
+- Instalación a nivel de equipo (requiere permisos de administrador).
+- Queda registrado en "Agregar o quitar programas" con versión y editor
+  verificables.
+- Las actualizaciones de versión reemplazan automáticamente la instalación
+  anterior, sin generar entradas duplicadas.
+- El binario y el instalador están firmados con Authenticode, verificable
+  con `Get-AuthenticodeSignature` en PowerShell.
+
+Para solicitar este canal de distribución, contacte al área de Seguridad
+Informática de la Unidad de Transformación Digital de la Rama Judicial.
+
+!!! note "Verificación de integridad"
+    Independientemente del canal de distribución, siempre verifique el
+    SHA256 del ejecutable contra el publicado en la
+    [página de releases](https://github.com/HammerDev99/GestionExpedienteElectronico_Version1/releases)
+    correspondiente a la versión instalada.
+
+### Opción 4: Fork Personal (Para Desarrolladores)
 
 #### 1. Crear Fork en GitHub
 
