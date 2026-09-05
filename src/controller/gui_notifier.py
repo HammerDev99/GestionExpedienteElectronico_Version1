@@ -124,8 +124,16 @@ class ProgressBarObserver(GUIObserver):
                 print(f"Error actualizando progress bar: {e}")
 
     def force_update(self):
-        if hasattr(self.progress_bar, "update_idletasks"):
-            self.progress_bar.update_idletasks()
+        # update() procesa la cola de eventos ademas de redibujar, a diferencia
+        # de update_idletasks() que solo redibuja. Como el procesamiento corre
+        # en el hilo de la GUI, sin esto Windows marca la ventana como "No
+        # responde" al primer clic aunque el proceso avance correctamente.
+        if hasattr(self.progress_bar, "update"):
+            try:
+                self.progress_bar.update()
+            except tk.TclError:
+                # La ventana se cerro durante el procesamiento
+                pass
 
 
 class DialogObserver(GUIObserver):

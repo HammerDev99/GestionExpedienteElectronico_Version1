@@ -671,7 +671,18 @@ class Application(ttk.Frame):
 
     def run_async_process(self, app):
         """Inicia el procesamiento asíncrono"""
-        asyncio.run(app.procesa_expedientes())
+        # El boton se deshabilita mientras dura el proceso: force_update() ahora
+        # procesa la cola de eventos, por lo que un segundo clic en Aceptar
+        # dispararia un procesamiento simultaneo sobre los mismos archivos.
+        self.aceptar.configure(state=tk.DISABLED)
+        try:
+            asyncio.run(app.procesa_expedientes())
+        finally:
+            try:
+                self.aceptar.configure(state=tk.NORMAL)
+            except tk.TclError:
+                # La ventana se cerro durante el procesamiento
+                pass
 
     async def procesa_expedientes(self):
         """Procesa expedientes usando estrategias unificadas para todos los tipos."""
