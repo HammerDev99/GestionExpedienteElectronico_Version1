@@ -36,7 +36,7 @@
 
     <MediaTemplate EmbedCab="yes" />
 
-    <Icon Id="AgilExIcon" SourceFile="..\..\src\assets\law_logo.ico" />
+    <Icon Id="AgilExIcon" SourceFile="law_logo.ico" />
     <Property Id="ARPPRODUCTICON" Value="AgilExIcon" />
     <Property Id="ARPCONTACT" Value="darbelaal@cendoj.ramajudicial.gov.co" />
     <Property Id="ARPURLINFOABOUT" Value="https://github.com/HammerDev99/GestionExpedienteElectronico_Version1" />
