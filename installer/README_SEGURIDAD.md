@@ -30,7 +30,23 @@ El orden es obligatorio: primero el `.exe`, luego el `.msi`. Un MSI firmado es i
 
 `dotnet tool install --global wix` sin versión instala v7 por defecto (requiere aceptar un EULA distinto) y el script está probado contra 6.0.1 con las extensiones pinneadas a esa misma versión.
 
-Se necesita el certificado de firma de código institucional instalado en `Cert:\CurrentUser\My` o `Cert:\LocalMachine\My`.
+Se necesita el certificado de firma de código institucional **instalado en el almacén de Windows** (`Cert:\CurrentUser\My` o `Cert:\LocalMachine\My`), no como archivo suelto. El script nunca recibe ni transporta la llave privada: solo referencia el certificado por su huella (thumbprint) una vez que ya está en el almacén.
+
+### Cómo poner el certificado en el almacén
+
+**Si el certificado institucional llega como archivo `.pfx` (con contraseña):**
+
+```powershell
+Import-PfxCertificate -FilePath "C:\ruta\al\certificado.pfx" `
+    -CertStoreLocation Cert:\CurrentUser\My `
+    -Password (Read-Host -AsSecureString "Contraseña del PFX")
+```
+
+También puede hacerse con doble clic en el `.pfx` y siguiendo el asistente de importación de Windows (elegir el almacén "Personal").
+
+**Si el certificado institucional vive en un token físico o HSM:** no requiere importación — el software del proveedor del token ya lo expone automáticamente en el almacén de Windows al conectarlo.
+
+En ambos casos, una vez instalado, verifíquelo con el paso siguiente.
 
 ## Ejecución
 

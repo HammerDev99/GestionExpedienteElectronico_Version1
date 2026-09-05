@@ -299,6 +299,7 @@ function Build-Msi {
     Push-Location $wxsDir
     try {
         & wix build (Split-Path -Leaf $script:WxsPath) `
+            -arch x64 `
             -ext WixToolset.UI.wixext/6.0.1 `
             -ext WixToolset.Util.wixext/6.0.1 `
             -d ExeSourcePath="$script:ExePath" `
