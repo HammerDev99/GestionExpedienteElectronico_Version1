@@ -351,6 +351,7 @@ scripts/certificacion_firma_digital/plantillas/
 scripts/certificacion_firma_digital/evidencias/
 scripts/certificacion_firma_digital/HALLAZGOS_CERT_ACTUAL.md
 scripts/certificacion_firma_digital/RUNBOOK_COMANDOS.md
+scripts/certificacion_firma_digital/CHECKLIST_ENVIO_SOC.md
 ~$*.docx
 *.code-workspace
 scripts/Rasultados autofirmado.png

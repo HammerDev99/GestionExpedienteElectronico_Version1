@@ -3,9 +3,10 @@
 > Carpeta de control de la gestión de certificación y mitigación de falsos positivos
 > antivirus/XDR para despliegue en entidades del Estado colombiano (Rama Judicial).
 >
-> **Incidente disparador:** `RJ-MDE-MAL-ALERT-002` / ID `804977` — Microsoft XDR marcó
-> `AgilEx_by_Marduk.exe` como `Malgent` en un equipo de la Rama Judicial
-> (abril 2026). Causal declarada por el SOC: *"comportamiento, firma digital o reputación"*.
+> **Incidente disparador:** Microsoft XDR marcó `AgilEx_by_Marduk.exe` como
+> `Malgent` en un equipo de la Rama Judicial (abril 2026). Causal declarada
+> por el SOC: *"comportamiento, firma digital o reputación"*. Identificador
+> de caso disponible en el radicado interno con el SOC.
 
 ---
 
@@ -126,11 +127,11 @@ scripts/certificacion_firma_digital/
 |---|---|---|---|
 | 2026-04-06 | Detección Microsoft XDR en endpoint de la Rama Judicial (incidente interno) | SOC Rama Judicial | `../problemas_firma_equipo_entidad/*.jpeg` |
 | 2026-04-15 | Apertura de gestión y creación de esta carpeta | Daniel Arbeláez | `README.md` |
-| 2026-04-15 | Regeneración cert autofirmado (thumbprint `EDE170B6…D0D7CE2`, vigencia 2029-04-15, EKU Code Signing, Subject institucional) | Daniel Arbeláez | `docs/others/code_signing/backup_20260415_141744/` (cert anterior); nuevo `cert.pfx` / `cert.pem` / `cert_public.cer` |
-| 2026-04-15 | Re-regeneración con `TripleDES_SHA1` (thumbprint `FAE8C5A6…9575261`) tras detectar incompatibilidad de signtool con AES256-SHA256 default de Windows 11 | Daniel Arbeláez | `Get-PfxData` confirmó PFX válido; signtool requería cifrado legado. Script `regenerate_selfsigned_cert.ps1` ajustado para este algoritmo |
+| 2026-04-15 | Regeneración cert autofirmado (vigencia 2029-04-15, EKU Code Signing, Subject institucional) | Daniel Arbeláez | `docs/others/code_signing/backup_20260415_141744/` (cert anterior); nuevo `cert.pfx` / `cert.pem` / `cert_public.cer` |
+| 2026-04-15 | Re-regeneración con `TripleDES_SHA1` tras detectar incompatibilidad de signtool con AES256-SHA256 default de Windows 11 | Daniel Arbeláez | `Get-PfxData` confirmó PFX válido; signtool requería cifrado legado. Script `regenerate_selfsigned_cert.ps1` ajustado para este algoritmo |
 | _pendiente_ | Rebuild `onedir` + firma dual | — | hash SHA256 antes/después |
-| 2026-04-15 | Rebuild `onedir` + firma SHA256 con timestamp DigiCert (thumbprint `FAE8C5A6…9575261`, identidad SprintJudicial) | Daniel Arbeláez | SHA256 post-firma: `78223843EEB28B9477A1284F9E61D8092389F2637F912D958A0E665BFD72DA11` |
-| 2026-04-15 | Ajuste legal a persona natural (SprintJudicial sin marca registrada): regeneración cert con `CN=Daniel Arbelaez Alvarez, OU=AgilEx by Marduk` (thumbprint `92ADA07A…0AE7D57B1`, vigencia 2029-04-15). Actualización `version_info.rc`, `app.manifest` y plantilla SOC para reflejar aporte voluntario + derechos morales Ley 23/1982 art. 30 + licencia MIT | Daniel Arbeláez | SHA256 post-firma: `CD89FD0F10C6027221F56C867BF2922DDFE691A6C802A1B383D335FBD1437023`. Evidencias: `evidencias/hash_sha256.txt`, `evidencias/cert_public.cer`. ZIP distribución: `dist/AgilEx_by_Marduk_v1.5.0_signed.zip` |
+| 2026-04-15 | Rebuild `onedir` + firma SHA256 con timestamp DigiCert (identidad SprintJudicial) | Daniel Arbeláez | SHA256 post-firma: `78223843EEB28B9477A1284F9E61D8092389F2637F912D958A0E665BFD72DA11` |
+| 2026-04-15 | Ajuste legal a persona natural (SprintJudicial sin marca registrada): regeneración cert con `CN=Daniel Arbelaez Alvarez, OU=AgilEx by Marduk` (vigencia 2029-04-15). Actualización `version_info.rc`, `app.manifest` y plantilla SOC para reflejar aporte voluntario + derechos morales Ley 23/1982 art. 30 + licencia MIT | Daniel Arbeláez | SHA256 post-firma: `CD89FD0F10C6027221F56C867BF2922DDFE691A6C802A1B383D335FBD1437023`. Evidencias: `evidencias/hash_sha256.txt`, `evidencias/cert_public.cer`. ZIP distribución: `dist/AgilEx_by_Marduk_v1.5.0_signed.zip` |
 | 2026-04-15 | Análisis VirusTotal del build onedir firmado: 1/72 detecciones (solo Bkav Pro genérico ML), Microsoft Defender Undetected. Evidencia clave para carta SOC | Daniel Arbeláez | `evidencias/virustotal_result.txt` |
 | 2026-04-15 | Generación carta formal SOC (.docx) y cuerpo de correo (.md) con identidad persona natural y datos cert actualizados | Claude | `evidencias/solicitud_whitelist_soc_FINAL.docx`, `evidencias/cuerpo_correo_soc.md` |
 | 2026-04-15 | **REGRESIÓN detectada en despliegue:** binario onedir firmado se cierra automáticamente en equipo de Rama Judicial (XDR + ASR + AppLocker bloquean DLLs no firmadas adyacentes). Pivote: regreso a `onefile` como flujo principal de distribución | Daniel Arbeláez | Hallazgo 5 en `HALLAZGOS_CERT_ACTUAL.md` |
@@ -139,12 +140,15 @@ scripts/certificacion_firma_digital/
 | 2026-04-15 | Validación cruzada informe Diana: 23 datos técnicos verificados (21 OK, 2 corregidos: tildes en Subject del cert + manifest version 1.4.4→1.5.0). Recompilación + re-firma onefile con manifest corregido | Daniel Arbeláez | SHA256 post-firma definitivo: `CD0D9EFBE36BAC8FBE68DEB80B944048CBFD0157EB78E791328CC90509A2CCBC`. Timestamp DigiCert 2026-04-15 21:07:40 |
 | 2026-04-20 | Respuesta oficial de Andes SCD (Katerine López Villamil): EV Code Signing white-label de Sectigo, raíz en Microsoft Trusted Root Program, reputación SmartScreen inmediata, token FIPS 140-2. Producto técnicamente validado como viable | Daniel Arbeláez | `evidencias/respuesta_andes_scd_2026-04-20.txt` |
 | 2026-04-20 | Reunión técnica con el SOC Rama Judicial — acordado envío de evidencia (informe técnico, hash, cert público, binario firmado) para pruebas estáticas y dinámicas | SOC Rama Judicial + Daniel Arbeláez | Acta/minuta de reunión |
-| 2026-04-20 | Bump versión 1.5.0 → **1.5.1** (patch, SemVer) sin cambios funcionales, solo trazabilidad: `version_info.rc` FileVersion/ProductVersion 1.5.1.0, `app.manifest` assemblyIdentity 1.5.1.0, `last_version.json` 1.5.1, `config/main.spec` software_version 1.5.1. Recompilación onefile + re-firma con mismo cert (thumbprint `92ADA07A…7D57B1`) | Daniel Arbeláez | SHA256 post-firma 1.5.1: `09657C47EB8657838E1B75C413185247543D479A0B14F90E45D4F62CAB7E1BF7`. Timestamp DigiCert 2026-04-20 15:18:23 |
+| 2026-04-20 | Bump versión 1.5.0 → **1.5.1** (patch, SemVer) sin cambios funcionales, solo trazabilidad: `version_info.rc` FileVersion/ProductVersion 1.5.1.0, `app.manifest` assemblyIdentity 1.5.1.0, `last_version.json` 1.5.1, `config/main.spec` software_version 1.5.1. Recompilación onefile + re-firma con mismo cert | Daniel Arbeláez | SHA256 post-firma 1.5.1: `09657C47EB8657838E1B75C413185247543D479A0B14F90E45D4F62CAB7E1BF7`. Timestamp DigiCert 2026-04-20 15:18:23 |
 | _pendiente_ | Envío reporte FP a Microsoft WDSI | — | ticket ID de WDSI |
 | _pendiente_ | Envío al SOC: informe técnico PDF + exe 1.5.1 + cert_public.cer + hash + evidencias | — | radicado de correo |
 | _pendiente_ | Cotización formal Andes SCD con tiempos y proceso EV persona natural | — | cotización adjunta |
 | _pendiente_ | Compra e instalación cert EV definitivo | — | token FIPS 140-2 |
 | 2026-09-04 | Diseño y construcción del pipeline de empaquetado MSI + firma institucional. Decisión: el área de Seguridad Informática firma `.exe` y `.msi` con certificado institucional; **certificado EV de Andes SCD descartado** en consecuencia. Corrección previa de rutas de escritura que impedían el arranque desde `Program Files` | Daniel Arbeláez + Claude | `docs/superpowers/specs/2026-09-04-msi-pipeline-firma-institucional-design.md`, `installer/`, `evidencias/validacion_fase_a.txt`, `evidencias/validacion_pipeline_msi.txt` |
+| 2026-09-04 | **Pipeline MSI completado y fusionado a `master`**: instalador WiX per-machine con detección de aplicación en uso, script `build-signed-msi.ps1` de 6 etapas (preflight, integridad, firma exe, empaquetado MSI, firma MSI, RAR + evidencia) verificado de extremo a extremo simulando el entorno del área de Seguridad Informática (paquete extraído sin acceso al repositorio). Review final de rama detectó y corrigió 3 hallazgos antes del merge: icono del instalador nunca commiteado (bloqueaba la prueba del `UpgradeCode`), un commit con atribución fuera de política, y `installer/salida/` sin cubrir en `.gitignore` | Daniel Arbeláez + Claude | `docs/superpowers/plans/2026-09-04-msi-pipeline-firma-institucional.md`, `installer/build-signed-msi.ps1`, `installer/wix/`, `installer/README_SEGURIDAD.md`, `installer/PRUEBA_MANUAL_MSI.md`, commit de merge en `master` |
+| _pendiente_ | Validación manual del usuario: instalación real del MSI (elevación UAC no disponible en sesión de agente) y equivalencia funcional de las tres estrategias de procesamiento contra la versión 1.5.1 | Daniel Arbeláez | `installer/PRUEBA_MANUAL_MSI.md` |
+| _pendiente_ | Entrega del paquete de firma (`AgilEx_v1.5.1_paquete_firma.zip`, generado con `scripts/new-delivery-package.ps1`) al área de Seguridad Informática | — | correo de propuesta de ajuste al proceso de firmado |
 
 ---
 
