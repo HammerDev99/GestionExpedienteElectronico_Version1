@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<!--
+  Manifiesto de Aplicación para AgilEx by Marduk
+
+  Propósito:
+    - Declarar niveles de ejecución y permisos UAC
+    - Especificar compatibilidad con versiones de Windows
+    - Mejorar la confiabilidad del ejecutable ante sistemas antivirus
+
+  Información sobre UAC (User Account Control):
+    - asInvoker: No requiere elevación de privilegios (recomendado)
+    - highestAvailable: Solicita máximos privilegios disponibles
+    - requireAdministrator: Requiere permisos de administrador
+-->
+<assembly xmlns="urn:schemas-microsoft-com:asm.v1" manifestVersion="1.0">
+
+  <!-- Información de identidad de la aplicación -->
+  <assemblyIdentity
+    version="1.5.2.0"
+    processorArchitecture="amd64"
+    name="AgilExByMarduk.GestionExpedienteElectronico"
+    type="win32"
+  />
+
+  <!-- Descripción visible de la aplicación -->
+  <description>
+    AgilEx by Marduk - Automatización RDA para expediente electrónico judicial colombiano.
+    Aporte voluntario de Daniel Arbeláez Álvarez al Sistema Judicial Colombiano (PCSJA20-11567/2020).
+  </description>
+
+  <!-- Configuración de confianza y permisos UAC -->
+  <trustInfo xmlns="urn:schemas-microsoft-com:asm.v3">
+    <security>
+      <requestedPrivileges>
+        <!--
+          asInvoker: Ejecuta con los mismos privilegios del usuario
+          - NO solicita elevación de permisos
+          - NO muestra diálogo UAC
+          - Reduce sospecha de antivirus
+          - Recomendado para aplicaciones normales
+        -->
+        <requestedExecutionLevel
+          level="asInvoker"
+          uiAccess="false"
+        />
+      </requestedPrivileges>
+    </security>
+  </trustInfo>
+
+  <!-- Declaración de compatibilidad con versiones de Windows -->
+  <compatibility xmlns="urn:schemas-microsoft-com:compatibility.v1">
+    <application>
+      <!-- Windows 10 / Windows 11 -->
+      <supportedOS Id="{8e0f7a12-bfb3-4fe8-b9a5-48fd50a15a9a}"/>
+
+      <!-- Windows 8.1 -->
+      <supportedOS Id="{1f676c76-80e1-4239-95bb-83d0f6d0da78}"/>
+
+      <!-- Windows 8 -->
+      <supportedOS Id="{4a2f28e3-53b9-4441-ba9c-d69d4a4a6e38}"/>
+
+      <!-- Windows 7 -->
+      <supportedOS Id="{35138b9a-5d96-4fbd-8e2d-a2440225f93a}"/>
+    </application>
+  </compatibility>
+
+  <!-- Configuración de DPI Awareness (opcional, mejora renderizado en pantallas HiDPI) -->
+  <asmv3:application xmlns:asmv3="urn:schemas-microsoft-com:asm.v3">
+    <asmv3:windowsSettings xmlns="http://schemas.microsoft.com/SMI/2005/WindowsSettings">
+      <!--
+        dpiAware: La aplicación maneja correctamente diferentes DPIs
+        Valores: true, false, true/PM (Per-Monitor)
+      -->
+      <dpiAware>true</dpiAware>
+
+      <!--
+        dpiAwareness: Control más granular de DPI (Windows 10+)
+        Valores:
+          - unaware: El sistema escala la aplicación
+          - system: La aplicación escala basada en DPI del sistema
+          - permonitor: La aplicación escala por cada monitor
+          - permonitorv2: Escala avanzada (Windows 10 1703+)
+      -->
+      <dpiAwareness xmlns="http://schemas.microsoft.com/SMI/2016/WindowsSettings">
+        system
+      </dpiAwareness>
+
+      <!-- Estilo visual largo de controles (mejora apariencia) -->
+      <longPathAware xmlns="http://schemas.microsoft.com/SMI/2016/WindowsSettings">
+        true
+      </longPathAware>
+    </asmv3:windowsSettings>
+  </asmv3:application>
+
+  <!-- Dependencias de ensamblados (opcional, para aplicaciones .NET) -->
+  <!-- No requerido para aplicaciones Python empaquetadas con PyInstaller -->
+
+</assembly>

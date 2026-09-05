@@ -90,6 +90,12 @@ MANIFEST
 *.manifest
 *.spec
 
+# Excepciones: estos NO son generados por PyInstaller, son fuente del build.
+# app.manifest declara UAC (asInvoker), DPI awareness y compatibilidad de
+# Windows, y va embebido en el ejecutable. main.spec define el empaquetado.
+!src/assets/app.manifest
+!config/main.spec
+
 # Installer logs
 logs/
 config/

@@ -122,8 +122,8 @@ Con estos pasos, deberías haber creado un fork del repositorio original en tu c
 
 ## Registro de cambios
 
-- 2026-09-05 Pipeline automatizado de empaquetado MSI y firma institucional
-  - instalador WiX per-machine (con detección de aplicación en uso y actualización sin entradas duplicadas) y script de firma de 6 etapas para que el área de Seguridad Informática firme el ejecutable y el instalador con el certificado de la entidad, verificado de extremo a extremo.
+- 2026-09-05 Nuevo Release 🚀 GestionExpedienteElectronico v1.5.2
+  - Pipeline automatizado de empaquetado MSI y firma institucional: instalador WiX per-machine (con detección de aplicación en uso y actualización sin entradas duplicadas) y script de firma de 6 etapas para que el área de Seguridad Informática firme el ejecutable y el instalador con el certificado de la entidad, verificado de extremo a extremo.
   - Corrección previa de rutas de escritura que impedían el arranque de la aplicación instalada en Program Files.
   - Validación completa del instalador en equipo real: instalación silenciosa, metadatos en Agregar o quitar programas, accesos directos, desinstalación limpia, bloqueo de downgrade y actualización de versión sin generar entradas duplicadas.
   - Mitigación del congelamiento aparente de la interfaz durante el procesamiento de cargas grandes: la ventana deja de ser marcada como "No responde" por Windows mientras el proceso avanza.

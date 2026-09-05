@@ -10,8 +10,8 @@ Not use large (simplify) explanatory comments unless requested
 
 **Solución RDA (Robotic Desktop Automation)** para automatizar la creación de índices electrónicos de expedientes judiciales según los estándares del sistema judicial colombiano (PCSJA20-11567 de 2020).
 
-**Versión Actual**: 1.5.1
-**Estado**: Re-firmado Authenticode SHA256 con certificado renovado (sin cambio funcional respecto a 1.5.0; trazabilidad del binario para evidencia SOC)
+**Versión Actual**: 1.5.2
+**Estado**: Distribución institucional mediante instalador MSI firmado por el área de Seguridad Informática de la Rama Judicial. Incluye corrección de rutas de escritura para instalación en `Program Files`, mitigación del congelamiento de la interfaz durante el procesamiento, y aviso de actualización informativo sin descarga directa
 
 ## Comandos Comunes de Desarrollo
 
