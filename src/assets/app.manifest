@@ -28,6 +28,33 @@
     Aporte voluntario de Daniel Arbeláez Álvarez al Sistema Judicial Colombiano (PCSJA20-11567/2020).
   </description>
 
+  <!--
+    Common Controls v6 — estilos visuales modernos de Windows
+
+    Sin esta dependencia los controles (botones, radio buttons, combobox)
+    se dibujan con el tema clásico de Windows en lugar del actual. El
+    efecto solo aparece cuando el ejecutable arranca aislado: lanzado
+    desde `python src/__main__.py` hereda el contexto de activación del
+    intérprete, que sí la declara, y por eso se ve correcto en desarrollo
+    pero no en el binario empaquetado ni desde el acceso directo del MSI.
+
+    PyInstaller la incluye en el manifiesto que genera por defecto; al
+    sustituirlo por este manifiesto propio (config/main.spec) hay que
+    declararla explícitamente.
+  -->
+  <dependency>
+    <dependentAssembly>
+      <assemblyIdentity
+        type="win32"
+        name="Microsoft.Windows.Common-Controls"
+        version="6.0.0.0"
+        processorArchitecture="*"
+        publicKeyToken="6595b64144ccf1df"
+        language="*"
+      />
+    </dependentAssembly>
+  </dependency>
+
   <!-- Configuración de confianza y permisos UAC -->
   <trustInfo xmlns="urn:schemas-microsoft-com:asm.v3">
     <security>

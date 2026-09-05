@@ -76,6 +76,8 @@ class Application(ttk.Frame):
             # root.geometry("350x300")
             root.protocol("WM_DELETE_WINDOW", self._on_closing)
 
+            self._aplicar_escalado_dpi(root)
+
             # Configurar ícono de la ventana
             try:
                 icon_path = resource_manager.get_path("src/assets/law_logo.ico")
@@ -606,6 +608,36 @@ class Application(ttk.Frame):
 
         except Exception as e:
             self.logger.error(f"Error en limpieza de recursos: {str(e)}", exc_info=True)
+
+    def _aplicar_escalado_dpi(self, root):
+        """
+        Ajusta el escalado de Tkinter al DPI real de la pantalla.
+
+        Los tamaños de fuente del proyecto estan definidos para 96 DPI
+        (1920x1080 al 100%). En pantallas de mayor densidad -4K, o Windows
+        configurado por encima del 100%- Tkinter no escala por su cuenta y
+        la interfaz queda desproporcionada respecto al resto del sistema.
+
+        El escalado nunca debe impedir que la aplicacion arranque: ante
+        cualquier fallo se conserva el comportamiento por defecto.
+        """
+        try:
+            dpi = root.winfo_fpixels("1i")  # pixeles por pulgada reales
+            factor = dpi / 72.0             # Tk mide en puntos, no en pixeles
+
+            # Por debajo de 96 DPI no se reduce: encoger la interfaz la
+            # volveria ilegible en pantallas pequenas.
+            if dpi < 96:
+                self.logger.info(f"DPI {dpi:.0f}: se conserva el escalado por defecto")
+                return
+
+            root.tk.call("tk", "scaling", factor)
+            self.logger.info(
+                f"Escalado DPI aplicado: {dpi:.0f} DPI "
+                f"({dpi / 96 * 100:.0f}% del estandar), factor {factor:.2f}"
+            )
+        except Exception as e:
+            self.logger.warning(f"No se pudo aplicar el escalado DPI: {e}")
 
     def _obtener_version_actual(self):
         # Determinar la versión del programa
