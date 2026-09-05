@@ -77,6 +77,11 @@ firma que Windows reconoce como confiable. Requiere tiempo de reputación en Sma
 
 ### Fase 2 — Certificado EV definitivo
 
+> **Estado 2026-09-04 — DESCARTADO.** El área de Seguridad Informática de la
+> Unidad de Transformación Digital firmará los artefactos con el certificado
+> institucional de la entidad. La adquisición de un certificado EV propio deja
+> de ser necesaria. Ver `docs/superpowers/specs/2026-09-04-msi-pipeline-firma-institucional-design.md` (decisiones D2 y D3).
+
 DigiCert / GlobalSign EV con token físico. El script `sign_executable_token.ps1` ya
 queda listo para recibirlo (firma por thumbprint, sin `.pfx`).
 
@@ -139,6 +144,7 @@ scripts/certificacion_firma_digital/
 | _pendiente_ | Envío al SOC: informe técnico PDF + exe 1.5.1 + cert_public.cer + hash + evidencias | — | radicado de correo |
 | _pendiente_ | Cotización formal Andes SCD con tiempos y proceso EV persona natural | — | cotización adjunta |
 | _pendiente_ | Compra e instalación cert EV definitivo | — | token FIPS 140-2 |
+| 2026-09-04 | Diseño y construcción del pipeline de empaquetado MSI + firma institucional. Decisión: el área de Seguridad Informática firma `.exe` y `.msi` con certificado institucional; **certificado EV de Andes SCD descartado** en consecuencia. Corrección previa de rutas de escritura que impedían el arranque desde `Program Files` | Daniel Arbeláez + Claude | `docs/superpowers/specs/2026-09-04-msi-pipeline-firma-institucional-design.md`, `installer/`, `evidencias/validacion_fase_a.txt`, `evidencias/validacion_pipeline_msi.txt` |
 
 ---
 

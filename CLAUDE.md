@@ -51,6 +51,21 @@ pyinstaller config/main.spec
 
 **Requisito crítico**: Microsoft Excel debe estar instalado para el funcionamiento correcto (usa xlwings para automatización COM).
 
+### Paquete de entrega para firma institucional
+
+```bash
+# 1. Compilar el ejecutable (sin firmar)
+pyinstaller config/main.spec --clean
+
+# 2. Generar el paquete de entrega para Seguridad Informática
+powershell -File scripts/new-delivery-package.ps1
+# Produce: dist/AgilEx_v<version>_paquete_firma.zip
+```
+
+El área de Seguridad Informática ejecuta `build-signed-msi.ps1` dentro de ese paquete: firma el `.exe`, empaqueta el MSI, lo firma y lo comprime. Ver `installer/README_SEGURIDAD.md`.
+
+**Regla de versionado MSI**: todo release distribuido debe incrementar alguno de los tres primeros campos de la versión (`1.5.1` → `1.5.2`). Un cuarto campo (`1.5.1.1`) es invisible para el motor de actualización de Windows Installer.
+
 ## Arquitectura del Código (Estado Actual - Refactorizada y Unificada)
 
 ### Patrón MVC con Strategy Pattern Completamente Autónomo
