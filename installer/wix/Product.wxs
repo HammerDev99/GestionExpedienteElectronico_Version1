@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  AgilEx by Marduk — definicion del instalador MSI
+
+  ADVERTENCIA: el UpgradeCode NO debe modificarse nunca. Es lo que
+  permite que las versiones futuras se reconozcan como actualizaciones
+  del mismo producto. Cambiarlo rompe la cadena de actualizaciones en
+  todos los endpoints ya desplegados.
+
+  Variables de preprocesador requeridas:
+    -d ExeSourcePath=<ruta al AgilEx_by_Marduk.exe firmado>
+    -d ProductVersion=<version de tres campos, ej. 1.5.1>
+-->
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs"
+     xmlns:ui="http://wixtoolset.org/schemas/v4/wxs/ui"
+     xmlns:util="http://wixtoolset.org/schemas/v4/wxs/util">
+
+  <Package
+      Name="AgilEx by Marduk - Gestión de Expediente Electrónico"
+      Manufacturer="Daniel Arbelaez Alvarez"
+      Version="$(ProductVersion)"
+      UpgradeCode="DFC217C9-AB3A-4616-A287-A73921CC2035"
+      Scope="perMachine"
+      Compressed="yes"
+      Language="1034"
+      Codepage="1252">
+
+    <SummaryInformation
+        Description="Automatización RDA para expediente electrónico judicial colombiano (PCSJA20-11567/2020)"
+        Manufacturer="Daniel Arbelaez Alvarez" />
+
+    <MajorUpgrade
+        Schedule="afterInstallInitialize"
+        AllowDowngrades="no"
+        DowngradeErrorMessage="Ya está instalada una versión más reciente de AgilEx by Marduk. Desinstálela antes de continuar." />
+
+    <MediaTemplate EmbedCab="yes" />
+
+    <Icon Id="AgilExIcon" SourceFile="law_logo.ico" />
+    <Property Id="ARPPRODUCTICON" Value="AgilExIcon" />
+    <Property Id="ARPCONTACT" Value="darbelaal@cendoj.ramajudicial.gov.co" />
+    <Property Id="ARPURLINFOABOUT" Value="https://github.com/HammerDev99/GestionExpedienteElectronico_Version1" />
+    <!--
+      ARPNOMODIFY no se declara aqui: WixUI_InstallDir (WixToolset.UI.wixext)
+      ya lo define internamente con Value="1", porque esa UI predefinida no
+      soporta la operacion "Modificar". Declararlo de nuevo produce
+      WIX0091 (Duplicate Property) contra WixUI_InstallDir.wxs.
+    -->
+
+    <!--
+      El bootloader onefile de PyInstaller mantiene un proceso hijo que retiene
+      el ejecutable. Sin esta deteccion, actualizar o desinstalar con la
+      aplicacion abierta obliga a reiniciar el equipo — inviable en despliegue
+      masivo por GPO.
+    -->
+    <util:CloseApplication
+        Id="CloseAgilEx"
+        Target="AgilEx_by_Marduk.exe"
+        Description="Cierre AgilEx by Marduk antes de continuar con la instalación."
+        CloseMessage="yes"
+        RebootPrompt="no"
+        PromptToContinue="yes" />
+
+    <StandardDirectory Id="ProgramFiles64Folder">
+      <Directory Id="INSTALLFOLDER" Name="AgilEx by Marduk" />
+    </StandardDirectory>
+
+    <StandardDirectory Id="ProgramMenuFolder">
+      <Directory Id="ApplicationProgramsFolder" Name="AgilEx by Marduk" />
+    </StandardDirectory>
+
+    <StandardDirectory Id="DesktopFolder" />
+
+    <ComponentGroup Id="ProductComponents">
+
+      <Component Id="CmpMainExecutable" Directory="INSTALLFOLDER" Guid="*">
+        <File Id="FileMainExecutable"
+              Source="$(ExeSourcePath)"
+              Name="AgilEx_by_Marduk.exe"
+              KeyPath="yes" />
+      </Component>
+
+      <!--
+        Los accesos directos per-machine requieren un KeyPath en HKLM
+        para que la validacion ICE del MSI sea correcta. Sin el, wix
+        emite advertencias que pueden leerse como paquete mal formado.
+      -->
+      <Component Id="CmpStartMenuShortcut" Directory="ApplicationProgramsFolder" Guid="*">
+        <Shortcut Id="StartMenuShortcut"
+                  Name="AgilEx by Marduk"
+                  Description="Generador de índices electrónicos de expedientes judiciales"
+                  Target="[INSTALLFOLDER]AgilEx_by_Marduk.exe"
+                  WorkingDirectory="INSTALLFOLDER"
+                  Icon="AgilExIcon" />
+        <RemoveFolder Id="RemoveApplicationProgramsFolder"
+                      Directory="ApplicationProgramsFolder"
+                      On="uninstall" />
+        <RegistryValue Root="HKLM"
+                       Key="Software\AgilEx by Marduk"
+                       Name="StartMenuShortcut"
+                       Type="integer"
+                       Value="1"
+                       KeyPath="yes" />
+      </Component>
+
+      <Component Id="CmpDesktopShortcut" Directory="DesktopFolder" Guid="*">
+        <Shortcut Id="DesktopShortcut"
+                  Name="AgilEx by Marduk"
+                  Description="Generador de índices electrónicos de expedientes judiciales"
+                  Target="[INSTALLFOLDER]AgilEx_by_Marduk.exe"
+                  WorkingDirectory="INSTALLFOLDER"
+                  Icon="AgilExIcon" />
+        <RegistryValue Root="HKLM"
+                       Key="Software\AgilEx by Marduk"
+                       Name="DesktopShortcut"
+                       Type="integer"
+                       Value="1"
+                       KeyPath="yes" />
+      </Component>
+
+    </ComponentGroup>
+
+    <Feature Id="Main" Title="AgilEx by Marduk" Level="1">
+      <ComponentGroupRef Id="ProductComponents" />
+    </Feature>
+
+    <ui:WixUI Id="WixUI_InstallDir" InstallDirectory="INSTALLFOLDER" />
+    <WixVariable Id="WixUILicenseRtf" Value="License.rtf" />
+
+  </Package>
+</Wix>

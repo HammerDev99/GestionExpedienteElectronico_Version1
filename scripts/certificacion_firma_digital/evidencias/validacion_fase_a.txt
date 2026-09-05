@@ -1,0 +1,129 @@
+VALIDACIÓN DE FASE A — Corrección de rutas de escritura
+========================================================
+
+Fecha de ejecución : 2026-09-04
+Rama               : feat/msi-pipeline-firma-institucional
+Commits validados  : eb6fbe8, 889d188, a2df977, 9daf194, fcc5d65
+Ejecutado por      : Daniel Arbeláez (asistido por Claude Code)
+
+Objetivo: confirmar que la aplicación arranca desde un directorio de solo
+lectura, condición necesaria para instalarla en Program Files.
+
+
+PASO 1 — Suite de tests
+-----------------------
+Comando : .venv/Scripts/python.exe -m pytest src/test/test_resource_manager.py src/test/test_logger_config.py -v
+Resultado: 8 passed in 0.05s
+
+  test_writable_path_in_development_uses_cwd          PASSED
+  test_writable_path_when_frozen_uses_localappdata    PASSED
+  test_writable_path_falls_back_to_temp               PASSED
+  test_writable_path_without_subdir_returns_base      PASSED
+  test_setup_logger_returns_logger                    PASSED
+  test_setup_logger_writes_file_in_writable_dir       PASSED
+  test_setup_logger_survives_unwritable_location      PASSED
+  test_setup_logger_never_raises_on_makedirs_failure  PASSED
+
+Estado: OK
+
+
+PASO 2 — Compilación del ejecutable
+-----------------------------------
+Comando : pyinstaller config/main.spec --clean --noconfirm
+Modo    : onefile (single-file), conforme a la decisión del 2026-04-15
+Salida  : dist/AgilEx_by_Marduk.exe
+Tamaño  : 51.388.249 bytes
+SHA256  : 3193B7B09A8A8D798836A7B13F448C7DA0B5C54AEBE301C57AF80733B95ED8CE
+
+Binario de referencia 1.5.1 (previo a Fase A, firmado y documentado ante el SOC):
+SHA256  : 09657C47EB8657838E1B75C413185247543D479A0B14F90E45D4F62CAB7E1BF7
+Respaldado antes de recompilar.
+
+Estado: OK
+
+
+PASO 3 — Carpeta de solo lectura
+--------------------------------
+Ruta   : %TEMP%\agilex_readonly_test
+Comando: icacls <dir> /deny "<usuario>:(WD,AD)"
+
+Verificación de que la denegación es efectiva: se intentó crear un archivo
+dentro de la carpeta y la operación fue rechazada. La prueba es válida.
+
+Estado: OK
+
+
+PASO 4 — Ejecución desde la carpeta de solo lectura
+---------------------------------------------------
+Comando : Start-Process -FilePath <dir>\AgilEx_by_Marduk.exe -WorkingDirectory <dir>
+Espera  : 12 segundos
+
+Resultado: el proceso SIGUE VIVO (PID 41976). La ventana de la aplicación abrió.
+
+Antes de la Fase A este escenario terminaba en PermissionError dentro de
+setup_logger(), antes de que la GUI existiera: la aplicación no abría y el
+usuario no recibía ningún mensaje de error.
+
+Estado: OK — bloqueante crítico resuelto
+
+
+PASO 5 — Ubicación de los logs
+------------------------------
+Archivo creado: %LOCALAPPDATA%\AgilEx\logs\app_20260904_182004.log
+
+Contenido inicial:
+  2026-09-04 18:20:04,480 - GestionExpediente - INFO - __main__.py:30 - Iniciando aplicación...
+  2026-09-04 18:20:04,480 - GestionExpediente - INFO - __main__.py:45 - Analytics configurado correctamente
+  2026-09-04 18:20:04,631 - GestionExpediente - INFO - application.py:70 - Iniciando interfaz gráfica
+
+Contenido de la carpeta de solo lectura tras la ejecución:
+  AgilEx_by_Marduk.exe   (único archivo; no se creó nada nuevo)
+
+Confirma que la aplicación ya no escribe dentro de su propio árbol de archivos.
+
+Estado: OK
+
+
+PASO 6 — Equivalencia funcional de las tres estrategias
+-------------------------------------------------------
+PENDIENTE — requiere expedientes de prueba reales e interacción con la GUI.
+
+Procedimiento a ejecutar por el responsable funcional:
+
+  1. Abrir dist\AgilEx_by_Marduk.exe
+  2. Procesar un expediente de prueba con cada modo:
+       - Cuaderno único        (selected_value = "1")
+       - Expediente único      (selected_value = "2")
+       - Múltiples expedientes (selected_value = "3")
+  3. Comparar cada índice Excel generado contra el producido por la
+     versión 1.5.1 sobre el mismo expediente (binario de referencia
+     respaldado, SHA256 09657C47...).
+  4. Criterio de aceptación: equivalencia en estructura y contenido.
+
+Estado: PENDIENTE
+
+
+PASO 7 — Limpieza
+-----------------
+Permisos restaurados con icacls /reset y carpeta de prueba eliminada.
+
+Observación registrada durante la limpieza: tras cerrar el proceso padre,
+un proceso hijo de AgilEx_by_Marduk siguió vivo reteniendo el ejecutable
+(comportamiento normal del bootloader onefile de PyInstaller, que lanza un
+proceso hijo para la aplicación real). Fue necesario detenerlo explícitamente
+para poder borrar el archivo.
+
+Relevancia para la Fase B: un MSI que actualice o desinstale mientras la
+aplicación está en ejecución encontrará el ejecutable bloqueado. Debe
+preverse el manejo de archivos en uso en el instalador.
+
+Estado: OK
+
+
+CONCLUSIÓN
+----------
+Pasos 1, 2, 3, 4, 5 y 7: OK.
+Paso 6: pendiente de validación funcional con expedientes reales.
+
+El bloqueante crítico de la Fase A (PermissionError en setup_logger al
+arrancar desde un directorio de solo lectura) queda resuelto y verificado.

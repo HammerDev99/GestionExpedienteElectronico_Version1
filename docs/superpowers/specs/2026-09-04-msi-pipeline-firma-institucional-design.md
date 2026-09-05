@@ -107,7 +107,16 @@ if not os.path.exists(log_dir):
 
 Instalado en `Program Files` y lanzado desde un acceso directo, el CWD es el directorio de instalación. `os.makedirs` lanza `PermissionError` durante `setup_logger()`, antes de que exista la GUI. La aplicación no abre y el usuario no recibe mensaje de error.
 
-**Bloqueante 2 (menor) — `src/view/tools_launcher.py:15`**
+**Bloqueante 2 (descartado tras verificación) — `src/view/tools_launcher.py:15`**
+
+> **Corrección 2026-09-04:** durante la implementación se verificó que `create_tool_images()`
+> **nunca se invoca** en ningún punto del proyecto — solo está definida. Sus dos escrituras
+> están confinadas dentro de esa función, que termina antes de `class ToolsLauncher`. La
+> aplicación instalada en `Program Files` nunca las habría ejecutado, así que esto **no era
+> un bloqueante real**. El único bloqueante genuino de la Fase A era el del logger, que sí
+> se ejecutaba en cada arranque. La corrección aplicada (documentar la función como utilidad
+> de desarrollo) se mantiene por higiene, pero su motivación es distinta a la aquí descrita.
+
 
 ```python
 def create_tool_images(output_dir="src/assets/tools"):
@@ -193,6 +202,16 @@ UI interactiva: `WixUI_InstallDir` mínima (bienvenida, licencia MIT, ruta, conf
 | Escritura en registro más allá del `KeyPath` | Innecesario |
 
 Un instalador que solo copia un archivo firmado y crea dos accesos directos es el perfil de menor sospecha posible ante un XDR.
+
+### 5.7 Detección de aplicación en uso
+
+> **Añadido 2026-09-04, tras la validación de la Fase A.**
+
+El bootloader onefile de PyInstaller mantiene un proceso hijo que retiene `AgilEx_by_Marduk.exe` incluso después de cerrar el proceso padre. Se comprobó durante la limpieza de la puerta de validación: fue necesario detener ese proceso explícitamente para poder borrar el archivo.
+
+Sin manejo explícito, actualizar o desinstalar con la aplicación abierta haría que Windows Installer encontrara el archivo en uso y **solicitara reiniciar el equipo** — inaceptable en un despliegue por GPO a cientos de endpoints.
+
+El instalador incorpora `util:CloseApplication` (extensión `WixToolset.Util.wixext`) para pedir el cierre de la aplicación en lugar de exigir reinicio, con `RebootPrompt="no"`.
 
 ## 6. Fase B — Script `build-signed-msi.ps1`
 

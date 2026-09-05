@@ -16,3 +16,4 @@ six==1.16.0
 urllib3==2.2.3
 xlwings==0.28.5
 umami-analytics==0.2.20
+pytest==8.3.4
