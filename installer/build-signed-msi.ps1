@@ -218,10 +218,208 @@ function Test-BinaryIntegrity {
     return $actual
 }
 
+function Invoke-SignFile {
+    param(
+        [string]$Path,
+        [string]$Description,
+        [int]$ErrorCode
+    )
+
+    $args = @(
+        "sign",
+        "/sha1", $Thumbprint,
+        "/fd", "SHA256",
+        "/td", "SHA256",
+        "/tr", $TimestampUrl,
+        "/d", "AgilEx by Marduk",
+        $Path
+    )
+
+    & $script:SignTool @args
+    if ($LASTEXITCODE -ne 0) {
+        Stop-WithError -Message "signtool falló al firmar $Description (exit $LASTEXITCODE)" `
+            -Action "Verifique la conectividad con $TimestampUrl y los permisos del certificado." -Code $ErrorCode
+    }
+
+    $sig = Get-AuthenticodeSignature $Path
+
+    if ($sig.Status -eq "Valid") {
+        Write-Host "[OK] Firma válida en $Description" -ForegroundColor Green
+    }
+    elseif ($sig.Status -eq "UnknownError" -and $script:IsSelfSigned) {
+        Write-Host "[AVISO] Firma íntegra pero la cadena no encadena a una raíz de confianza." -ForegroundColor Yellow
+        Write-Host "        Esperado con certificado autofirmado (modo de prueba)." -ForegroundColor Yellow
+    }
+    else {
+        Stop-WithError -Message "Estado de firma inesperado en ${Description}: $($sig.Status)" `
+            -Action "Revise el certificado y vuelva a intentarlo." -Code $ErrorCode
+    }
+
+    return $sig
+}
+
+function Get-ProductVersion {
+    $declared = (Get-Content $script:ManifestPath |
+        Where-Object { $_ -match "^VERSION=" }) -replace "^VERSION=", ""
+    $declared = $declared.Trim()
+    if (-not $declared) {
+        Stop-WithError -Message "MANIFIESTO.txt no declara VERSION" `
+            -Action "Solicite al desarrollador un paquete válido." -Code 40
+    }
+    return $declared
+}
+
+function Build-Msi {
+    param([string]$Version, [string]$Destination)
+
+    Write-Stage "Etapa 3/6 - Empaquetado MSI"
+
+    & wix extension add -g WixToolset.UI.wixext/6.0.1 2>&1 | Out-Null
+    & wix extension add -g WixToolset.Util.wixext/6.0.1 2>&1 | Out-Null
+
+    # wix resuelve SourceFile relativo al directorio actual, no al .wxs.
+    # Product.wxs referencia el icono como ..\..\src\assets\law_logo.ico,
+    # ruta valida unicamente desde installer\wix\.
+    $wxsDir = Split-Path -Parent $script:WxsPath
+    Push-Location $wxsDir
+    try {
+        & wix build (Split-Path -Leaf $script:WxsPath) `
+            -ext WixToolset.UI.wixext/6.0.1 `
+            -ext WixToolset.Util.wixext/6.0.1 `
+            -d ExeSourcePath="$script:ExePath" `
+            -d ProductVersion="$Version" `
+            -o $Destination
+        $exitCode = $LASTEXITCODE
+    }
+    finally {
+        Pop-Location
+    }
+
+    if ($exitCode -ne 0) {
+        Stop-WithError -Message "wix build falló (exit $exitCode)" `
+            -Action "Revise el transcript en $script:TranscriptPath" -Code 40
+    }
+
+    Write-Host "[OK] MSI generado: $Destination" -ForegroundColor Green
+}
+
+function Compress-Package {
+    param([string]$MsiPath, [string]$RarPath)
+
+    Write-Stage "Etapa 5/6 - Compresión RAR"
+
+    if ($SkipRar) {
+        Write-Host "[OMITIDO] -SkipRar activo" -ForegroundColor Yellow
+        return $false
+    }
+    if (-not $script:RarExe) {
+        Write-Host "[OMITIDO] Rar.exe no disponible. El MSI firmado queda en $MsiPath" -ForegroundColor Yellow
+        return $false
+    }
+
+    & $script:RarExe a -m5 -ep1 $RarPath $MsiPath | Out-Null
+
+    if ($LASTEXITCODE -ne 0 -or -not (Test-Path $RarPath)) {
+        Write-Host "[AVISO] La compresión falló. El MSI firmado sigue siendo válido." -ForegroundColor Yellow
+        return $false
+    }
+
+    Write-Host "[OK] RAR generado: $RarPath" -ForegroundColor Green
+    return $true
+}
+
+function Write-SignatureReport {
+    param(
+        [string]$ReportPath,
+        $Certificate,
+        [string]$Version,
+        [string]$ExeHashBefore,
+        [string]$ExeHashAfter,
+        [string]$MsiPath,
+        [string]$MsiHash,
+        [bool]$RarCreated
+    )
+
+    $exeSig = Get-AuthenticodeSignature $script:ExePath
+    $msiSig = Get-AuthenticodeSignature $MsiPath
+
+    $lines = @(
+        "REPORTE DE FIRMA - AgilEx by Marduk",
+        "===================================",
+        "",
+        "Fecha de ejecución : $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')",
+        "Equipo             : $env:COMPUTERNAME",
+        "Versión del producto: $Version",
+        "",
+        "CERTIFICADO",
+        "-----------",
+        "Subject    : $($Certificate.Subject)",
+        "Issuer     : $($Certificate.Issuer)",
+        "Thumbprint : $($Certificate.Thumbprint)",
+        "Vigencia   : $($Certificate.NotBefore) a $($Certificate.NotAfter)",
+        "Autofirmado: $($script:IsSelfSigned)",
+        "Timestamp  : $TimestampUrl",
+        "",
+        "EJECUTABLE",
+        "----------",
+        "SHA256 antes de firmar : $ExeHashBefore",
+        "SHA256 después de firmar: $ExeHashAfter",
+        "Estado de firma        : $($exeSig.Status)",
+        "",
+        "INSTALADOR MSI",
+        "--------------",
+        "Archivo         : $(Split-Path $MsiPath -Leaf)",
+        "SHA256          : $MsiHash",
+        "Estado de firma : $($msiSig.Status)",
+        "",
+        "DISTRIBUCIÓN",
+        "------------",
+        "RAR generado : $RarCreated",
+        "",
+        "NOTA SOBRE TRAZABILIDAD",
+        "-----------------------",
+        "El SHA256 del ejecutable cambia al firmarlo. Si se compara contra",
+        "el hash documentado ante el SOC para el binario sin firma",
+        "institucional, la diferencia es esperada y no indica alteración.",
+        "Incidente relacionado: RJ-MDE-MAL-ALERT-002 / ID 804977."
+    )
+
+    $lines | Set-Content -Path $ReportPath -Encoding UTF8
+    Write-Host "[OK] Reporte generado: $ReportPath" -ForegroundColor Green
+}
+
 # ----- Bloque principal -----
 $cert = Test-Prerequisites
 $hashBefore = Test-BinaryIntegrity
 
+Write-Stage "Etapa 2/6 - Firma del ejecutable"
+Invoke-SignFile -Path $script:ExePath -Description "el ejecutable" -ErrorCode 30 | Out-Null
+$hashAfter = (Get-FileHash $script:ExePath -Algorithm SHA256).Hash.ToUpper()
+
+$version = Get-ProductVersion
+$msiName = "AgilEx_by_Marduk_v${version}_firmado.msi"
+$msiPath = Join-Path $OutputDir $msiName
+Build-Msi -Version $version -Destination $msiPath
+
+Write-Stage "Etapa 4/6 - Firma del MSI"
+Invoke-SignFile -Path $msiPath -Description "el MSI" -ErrorCode 50 | Out-Null
+$msiHash = (Get-FileHash $msiPath -Algorithm SHA256).Hash.ToUpper()
+
+$rarPath = Join-Path $OutputDir "AgilEx_v${version}_firmado.rar"
+$rarCreated = Compress-Package -MsiPath $msiPath -RarPath $rarPath
+
+Write-Stage "Etapa 6/6 - Reporte de evidencia"
+$reportPath = Join-Path $OutputDir "REPORTE_FIRMA.txt"
+Write-SignatureReport -ReportPath $reportPath -Certificate $cert -Version $version `
+    -ExeHashBefore $hashBefore -ExeHashAfter $hashAfter `
+    -MsiPath $msiPath -MsiHash $msiHash -RarCreated $rarCreated
+
 Write-Host ""
-Write-Host "Etapas 0 y 1 completadas." -ForegroundColor Green
+Write-Host "===========================================" -ForegroundColor Green
+Write-Host " Proceso completado" -ForegroundColor Green
+Write-Host "===========================================" -ForegroundColor Green
+Write-Host " Salida: $OutputDir" -ForegroundColor Gray
+Write-Host ""
+
 Close-TranscriptSafely
+exit 0
