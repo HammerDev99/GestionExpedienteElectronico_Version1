@@ -15,13 +15,42 @@ Este paquete contiene el ejecutable **sin firmar** junto con las herramientas pa
 
 El orden es obligatorio: primero el `.exe`, luego el `.msi`. Un MSI firmado es inmutable, por lo que su contenido debe estar firmado antes de empaquetarlo.
 
+## Qué certificado se necesita
+
+El certificado debe tener el **EKU de firma de código** (`Code Signing`, OID `1.3.6.1.5.5.7.3.3`), con validación **OV** o **EV**.
+
+Un certificado **TLS de servidor** (OID `1.3.6.1.5.5.7.3.1`), como el que protege los sitios web institucionales, **no sirve para este proceso** aunque sea de la entidad y esté vigente. Son emisiones distintas ante la autoridad certificadora: `signtool` no lo selecciona, y si se forzara la firma, Windows la rechazaría al verificar — el binario quedaría igual que sin firmar, pero además con una firma inválida. El script detecta esta situación en el preflight y se detiene con código 10 antes de tocar el ejecutable.
+
+Para verificar un certificado antes de usarlo:
+
+```powershell
+$c = Get-ChildItem Cert:\CurrentUser\My | Where-Object { $_.Thumbprint -eq "HUELLA" }
+$c.Extensions | Where-Object { $_.Oid.Value -eq "2.5.29.37" } |
+    ForEach-Object { $_.EnhancedKeyUsages } |
+    Format-Table Value, FriendlyName
+```
+
+Debe aparecer `1.3.6.1.5.5.7.3.3` en la lista.
+
+## Modos de firma
+
+El script admite dos modos, según dónde viva la llave privada.
+
+| Modo | Cuándo usarlo | La llave privada |
+|---|---|---|
+| **Azure Key Vault** | La entidad ya opera un Key Vault | Nunca sale del vault |
+| **Almacén local** | Certificado en archivo PFX o token físico/HSM | Se instala en el almacén de Windows, o vive en el token |
+
+**Se recomienda Azure Key Vault** cuando esté disponible: la firma ocurre de forma remota, no hay material sensible que transportar por correo ni que instalar en la estación de firma, y el vault deja registro de auditoría de cada operación de firma.
+
 ## Prerequisitos
 
-| Herramienta | Cómo instalarla |
-|---|---|
-| Windows SDK (signtool) | Componente "Signing Tools" del Windows SDK |
-| WiX Toolset v6 | `dotnet tool install --global wix --version 6.0.1` |
-| WinRAR | Opcional. Si falta, el proceso deja el MSI firmado sin comprimir |
+| Herramienta | Cómo instalarla | Modo |
+|---|---|---|
+| WiX Toolset v6 | `dotnet tool install --global wix --version 6.0.1` | Ambos |
+| AzureSignTool | `dotnet tool install --global AzureSignTool` | Key Vault |
+| Windows SDK (signtool) | Componente "Signing Tools" del Windows SDK | Almacén local |
+| WinRAR | Opcional. Si falta, el proceso deja el MSI firmado sin comprimir | Ambos |
 
 > **Si el script reporta "No se encontró la herramienta wix" pese a haberla instalado:**
 > ejecute `dotnet tool list --global` para confirmar que aparece en la lista. Si aparece,
@@ -30,9 +59,9 @@ El orden es obligatorio: primero el `.exe`, luego el `.msi`. Un MSI firmado es i
 
 `dotnet tool install --global wix` sin versión instala v7 por defecto (requiere aceptar un EULA distinto) y el script está probado contra 6.0.1 con las extensiones pinneadas a esa misma versión.
 
-Se necesita el certificado de firma de código institucional **instalado en el almacén de Windows** (`Cert:\CurrentUser\My` o `Cert:\LocalMachine\My`), no como archivo suelto. El script nunca recibe ni transporta la llave privada: solo referencia el certificado por su huella (thumbprint) una vez que ya está en el almacén.
+### Modo almacén local: cómo poner el certificado en el almacén
 
-### Cómo poner el certificado en el almacén
+En este modo el certificado debe estar **instalado en el almacén de Windows** (`Cert:\CurrentUser\My` o `Cert:\LocalMachine\My`), no como archivo suelto. El script nunca recibe ni transporta la llave privada: solo referencia el certificado por su huella (thumbprint) una vez que ya está en el almacén.
 
 **Si el certificado institucional llega como archivo `.pfx` (con contraseña):**
 
@@ -50,26 +79,43 @@ En ambos casos, una vez instalado, verifíquelo con el paso siguiente.
 
 ## Ejecución
 
-1. Descomprimir el paquete completo en una carpeta local.
-2. Obtener la huella del certificado:
+Descomprimir el paquete completo en una carpeta local y ejecutar según el modo elegido.
+
+### Modo Azure Key Vault
+
+```powershell
+az login
+.\build-signed-msi.ps1 -KeyVaultUrl "https://NOMBRE-DEL-VAULT.vault.azure.net" `
+    -KeyVaultCertificate "NOMBRE-DEL-CERTIFICADO"
+```
+
+La identidad autenticada necesita permiso **Get** sobre certificados y **Sign** sobre llaves en el vault.
+
+Para automatización desatendida puede usarse un service principal con `-KeyVaultClientId`, `-KeyVaultTenantId` y `-KeyVaultClientSecret`. Se recomienda preferir `az login` o una identidad administrada: el secret pasado por línea de comandos queda en el historial de la consola y en el `transcript.log`.
+
+### Modo almacén local
+
+1. Obtener la huella del certificado:
 
    ```powershell
    Get-ChildItem Cert:\CurrentUser\My | Format-List Subject, Thumbprint, NotAfter
    ```
 
-3. Ejecutar:
+2. Ejecutar:
 
    ```powershell
    .\build-signed-msi.ps1 -Thumbprint "HUELLA_DEL_CERTIFICADO"
    ```
 
-El script no requiere privilegios de administrador ni accede a internet salvo al servicio de sellado de tiempo (`http://timestamp.digicert.com`, configurable con `-TimestampUrl`).
+Los dos modos son excluyentes: PowerShell rechaza la invocación si se combinan parámetros de ambos.
+
+El script no requiere privilegios de administrador. Accede a internet para el sellado de tiempo (`http://timestamp.digicert.com`, configurable con `-TimestampUrl`) y, en modo Key Vault, al vault de Azure.
 
 ## Qué hace, paso a paso
 
 | Etapa | Acción |
 |---|---|
-| 0 | Verifica herramientas (signtool, wix, opcionalmente Rar.exe) y el certificado (vigencia, EKU de firma de código) |
+| 0 | Verifica herramientas (signtool o AzureSignTool, wix, opcionalmente Rar.exe) y, en modo local, el certificado (vigencia, EKU de firma de código) |
 | 1 | Compara el SHA256 del ejecutable con el declarado en `MANIFIESTO.txt` |
 | 2 | Firma el ejecutable con SHA256 y sellado de tiempo RFC 3161 |
 | 3 | Empaqueta el MSI con WiX |
@@ -94,9 +140,9 @@ Todo queda en la subcarpeta `salida\`:
 |---|---|---|
 | 10 | Preflight | Falta una herramienta, el certificado no existe/está vencido/no sirve para firma de código, falta un archivo del paquete, o la ruta de `-OutputDir` no es accesible |
 | 20 | Integridad | El SHA256 no coincide. **No firmar**: solicitar reenvío del paquete |
-| 30 | Firma exe | `signtool` falló o el estado de la firma es inesperado |
+| 30 | Firma exe | `signtool`/`AzureSignTool` falló o el estado de la firma es inesperado |
 | 40 | MSI | `wix build` falló (revise que el icono viaja junto al `.wxs`) |
-| 50 | Firma MSI | `signtool` falló sobre el MSI |
+| 50 | Firma MSI | `signtool`/`AzureSignTool` falló sobre el MSI |
 | 99 | Error no controlado | Situación no prevista por el script — revise `transcript.log` en la carpeta de salida y contacte al desarrollador |
 
 Ante cualquier fallo, la carpeta de salida contiene `transcript.log` con la traza completa.

@@ -10,16 +10,68 @@
     El script no toma decisiones ni corrige errores: valida y se detiene
     con un mensaje accionable ante cualquier anomalia.
 
+    Soporta dos modos de firma, excluyentes entre si:
+
+      - Almacen local: el certificado esta instalado en el almacen de
+        Windows y se referencia por su huella (-Thumbprint). Aplica a
+        certificados en archivo PFX importado o en token fisico/HSM.
+
+      - Azure Key Vault: la llave privada nunca sale del vault; se firma
+        de forma remota con AzureSignTool (-KeyVaultUrl y -KeyVaultCertificate).
+        Es el modo recomendado cuando la entidad ya opera un Key Vault,
+        porque ningun material sensible se transporta ni se instala en la
+        estacion de firma.
+
 .PARAMETER Thumbprint
-    Huella del certificado de firma, presente en Cert:\CurrentUser\My o
-    Cert:\LocalMachine\My.
+    Modo almacen local. Huella del certificado de firma, presente en
+    Cert:\CurrentUser\My o Cert:\LocalMachine\My.
+
+.PARAMETER KeyVaultUrl
+    Modo Azure Key Vault. URL del vault, por ejemplo
+    https://kv-csj-utdi-prd.vault.azure.net
+
+.PARAMETER KeyVaultCertificate
+    Modo Azure Key Vault. Nombre del certificado dentro del vault.
+
+.PARAMETER KeyVaultClientId
+    Modo Azure Key Vault. Client ID del service principal. Si se omite,
+    AzureSignTool usa la credencial administrada / sesion de Azure CLI.
+
+.PARAMETER KeyVaultClientSecret
+    Modo Azure Key Vault. Secret del service principal. Se recomienda
+    omitirlo y autenticar con `az login` para no exponerlo en la linea
+    de comandos ni en el historial de la consola.
+
+.PARAMETER KeyVaultTenantId
+    Modo Azure Key Vault. Tenant ID del directorio de Azure.
 
 .EXAMPLE
     .\build-signed-msi.ps1 -Thumbprint "A1B2C3D4E5F6..."
+
+.EXAMPLE
+    az login
+    .\build-signed-msi.ps1 -KeyVaultUrl "https://kv-csj-utdi-prd.vault.azure.net" `
+        -KeyVaultCertificate "agilex-code-signing"
 #>
+[CmdletBinding(DefaultParameterSetName = "LocalStore")]
 param(
-    [Parameter(Mandatory = $true)]
+    [Parameter(Mandatory = $true, ParameterSetName = "LocalStore")]
     [string]$Thumbprint,
+
+    [Parameter(Mandatory = $true, ParameterSetName = "KeyVault")]
+    [string]$KeyVaultUrl,
+
+    [Parameter(Mandatory = $true, ParameterSetName = "KeyVault")]
+    [string]$KeyVaultCertificate,
+
+    [Parameter(ParameterSetName = "KeyVault")]
+    [string]$KeyVaultClientId,
+
+    [Parameter(ParameterSetName = "KeyVault")]
+    [string]$KeyVaultClientSecret,
+
+    [Parameter(ParameterSetName = "KeyVault")]
+    [string]$KeyVaultTenantId,
 
     [string]$TimestampUrl = "http://timestamp.digicert.com",
     [string]$OutputDir = "",
@@ -35,7 +87,9 @@ $script:WxsPath = Join-Path $script:Root "wix\Product.wxs"
 $script:ManifestPath = Join-Path $script:Root "MANIFIESTO.txt"
 $script:IsSelfSigned = $false
 $script:SignTool = $null
+$script:AzureSignTool = $null
 $script:RarExe = $null
+$script:SignMode = $PSCmdlet.ParameterSetName
 
 # Cierra el transcript de forma tolerante: si nunca se inicio (por ejemplo,
 # porque el fallo ocurrio antes de Start-Transcript), Stop-Transcript lanza
@@ -112,6 +166,14 @@ function Find-SignTool {
     return $null
 }
 
+function Find-AzureSignTool {
+    $cmd = Get-Command AzureSignTool -ErrorAction SilentlyContinue
+    if ($cmd) { return $cmd.Source }
+    $dotnetTool = Join-Path $env:USERPROFILE ".dotnet\tools\AzureSignTool.exe"
+    if (Test-Path $dotnetTool) { return $dotnetTool }
+    return $null
+}
+
 function Find-Rar {
     $candidates = @(
         "$env:ProgramFiles\WinRAR\Rar.exe",
@@ -126,12 +188,25 @@ function Find-Rar {
 function Test-Prerequisites {
     Write-Stage "Etapa 0/6 - Preflight"
 
-    $script:SignTool = Find-SignTool
-    if (-not $script:SignTool) {
-        Stop-WithError -Message "No se encontró signtool.exe" `
-            -Action "Verifique primero si el Windows SDK esta instalado (revise `"C:\Program Files (x86)\Windows Kits\10\bin`"). Si no esta, instale el componente `"Signing Tools for Desktop Apps`" del Windows SDK." -Code 10
+    Write-Host "[INFO] Modo de firma: $(if ($script:SignMode -eq 'KeyVault') { 'Azure Key Vault (firma remota)' } else { 'Almacén local de Windows' })" -ForegroundColor Gray
+
+    if ($script:SignMode -eq "KeyVault") {
+        $script:AzureSignTool = Find-AzureSignTool
+        if (-not $script:AzureSignTool) {
+            $astAction = "Instálela con: dotnet tool install --global AzureSignTool`n" `
+                + "     Si ya está instalada, agregue %USERPROFILE%\.dotnet\tools al PATH y abra una consola nueva."
+            Stop-WithError -Message "No se encontró AzureSignTool" -Action $astAction -Code 10
+        }
+        Write-Host "[OK] AzureSignTool: $($script:AzureSignTool)" -ForegroundColor Green
     }
-    Write-Host "[OK] signtool: $($script:SignTool)" -ForegroundColor Green
+    else {
+        $script:SignTool = Find-SignTool
+        if (-not $script:SignTool) {
+            Stop-WithError -Message "No se encontró signtool.exe" `
+                -Action "Verifique primero si el Windows SDK esta instalado (revise `"C:\Program Files (x86)\Windows Kits\10\bin`"). Si no esta, instale el componente `"Signing Tools for Desktop Apps`" del Windows SDK." -Code 10
+        }
+        Write-Host "[OK] signtool: $($script:SignTool)" -ForegroundColor Green
+    }
 
     $wix = Get-Command wix -ErrorAction SilentlyContinue
     if (-not $wix) {
@@ -158,6 +233,18 @@ function Test-Prerequisites {
             -Action "Verifique que descomprimió el paquete completo." -Code 10
     }
 
+    # En modo Key Vault la llave vive en Azure: no hay certificado local que
+    # inspeccionar. AzureSignTool valida el EKU contra el vault al firmar, y
+    # la etapa 2 se detiene si el certificado no sirve para firma de codigo.
+    if ($script:SignMode -eq "KeyVault") {
+        Write-Host "[OK] Vault: $KeyVaultUrl" -ForegroundColor Green
+        Write-Host "     Certificado: $KeyVaultCertificate" -ForegroundColor Gray
+        if (-not $KeyVaultClientId) {
+            Write-Host "[INFO] Sin -KeyVaultClientId: se usará la sesión de Azure CLI o la identidad administrada." -ForegroundColor Gray
+        }
+        return $null
+    }
+
     $cert = Get-ChildItem -Path Cert:\CurrentUser\My, Cert:\LocalMachine\My -ErrorAction SilentlyContinue |
         Where-Object { $_.Thumbprint -eq $Thumbprint } |
         Select-Object -First 1
@@ -178,12 +265,15 @@ function Test-Prerequisites {
     # "Enhanced Key Usage", y la comparacion literal fallaria siempre.
     $CODE_SIGNING_OID = "1.3.6.1.5.5.7.3.3"
     $EKU_EXTENSION_OID = "2.5.29.37"
+    $SERVER_AUTH_OID = "1.3.6.1.5.5.7.3.1"
 
     $hasCodeSigning = $false
+    $foundEkus = @()
     foreach ($ext in $cert.Extensions) {
         if ($ext.Oid.Value -ne $EKU_EXTENSION_OID) { continue }
         if ($ext -is [System.Security.Cryptography.X509Certificates.X509EnhancedKeyUsageExtension]) {
             foreach ($usage in $ext.EnhancedKeyUsages) {
+                $foundEkus += $usage.Value
                 if ($usage.Value -eq $CODE_SIGNING_OID) { $hasCodeSigning = $true }
             }
         }
@@ -194,8 +284,26 @@ function Test-Prerequisites {
     }
 
     if (-not $hasCodeSigning) {
-        Stop-WithError -Message "El certificado no tiene EKU Code Signing (OID $CODE_SIGNING_OID)" `
-            -Action "Use un certificado emitido para firma de código." -Code 10
+        # Diagnostico explicito: el error mas probable en una entidad es que
+        # entreguen el certificado TLS del dominio institucional, que es el
+        # que administran a diario, en vez de uno de firma de codigo. Nombrar
+        # esa confusion ahorra un ciclo completo de ida y vuelta.
+        $ekuDetail = if ($foundEkus) { $foundEkus -join ", " } else { "(el certificado no declara ningún EKU)" }
+        $msg = "El certificado no sirve para firma de código.`n" `
+            + "  Subject : $($cert.Subject)`n" `
+            + "  EKU presentes: $ekuDetail`n" `
+            + "  EKU requerido: $CODE_SIGNING_OID (Code Signing)"
+
+        $action = if ($foundEkus -contains $SERVER_AUTH_OID) {
+            "Este es un certificado TLS de servidor web, no de firma de código. Son emisiones distintas:`n" `
+                + "     un certificado TLS (aunque sea de la entidad y esté vigente) no puede firmar ejecutables,`n" `
+                + "     y forzar la firma produciría una firma que Windows rechaza al verificar.`n" `
+                + "     Solicite al área emisora un certificado con EKU Code Signing (validación OV o EV)."
+        } else {
+            "Use un certificado emitido para firma de código (EKU $CODE_SIGNING_OID, validación OV o EV)."
+        }
+
+        Stop-WithError -Message $msg -Action $action -Code 10
     }
 
     $script:IsSelfSigned = ($cert.Subject -eq $cert.Issuer)
@@ -239,20 +347,49 @@ function Invoke-SignFile {
         [int]$ErrorCode
     )
 
-    $args = @(
-        "sign",
-        "/sha1", $Thumbprint,
-        "/fd", "SHA256",
-        "/td", "SHA256",
-        "/tr", $TimestampUrl,
-        "/d", "AgilEx by Marduk",
-        $Path
-    )
+    if ($script:SignMode -eq "KeyVault") {
+        $args = @(
+            "sign",
+            "--azure-key-vault-url", $KeyVaultUrl,
+            "--azure-key-vault-certificate", $KeyVaultCertificate,
+            "--file-digest", "sha256",
+            "--timestamp-rfc3161", $TimestampUrl,
+            "--timestamp-digest", "sha256",
+            "--description", "AgilEx by Marduk"
+        )
+        if ($KeyVaultClientId)     { $args += @("--azure-key-vault-client-id", $KeyVaultClientId) }
+        if ($KeyVaultClientSecret) { $args += @("--azure-key-vault-client-secret", $KeyVaultClientSecret) }
+        if ($KeyVaultTenantId)     { $args += @("--azure-key-vault-tenant-id", $KeyVaultTenantId) }
+        if (-not $KeyVaultClientId) { $args += "--azure-key-vault-managed-identity" }
+        $args += $Path
 
-    & $script:SignTool @args
-    if ($LASTEXITCODE -ne 0) {
-        Stop-WithError -Message "signtool falló al firmar $Description (exit $LASTEXITCODE)" `
-            -Action "Verifique la conectividad con $TimestampUrl y los permisos del certificado." -Code $ErrorCode
+        & $script:AzureSignTool @args
+        if ($LASTEXITCODE -ne 0) {
+            $kvAction = "Verifique:`n" `
+                + "     - Que la sesión de Azure esté activa (az login) o que las credenciales del service principal sean correctas.`n" `
+                + "     - Que la identidad tenga permisos Get sobre certificados y Sign sobre llaves en el vault.`n" `
+                + "     - Que el certificado '$KeyVaultCertificate' exista en el vault y tenga EKU Code Signing (1.3.6.1.5.5.7.3.3).`n" `
+                + "     - La conectividad con $TimestampUrl."
+            Stop-WithError -Message "AzureSignTool falló al firmar $Description (exit $LASTEXITCODE)" `
+                -Action $kvAction -Code $ErrorCode
+        }
+    }
+    else {
+        $args = @(
+            "sign",
+            "/sha1", $Thumbprint,
+            "/fd", "SHA256",
+            "/td", "SHA256",
+            "/tr", $TimestampUrl,
+            "/d", "AgilEx by Marduk",
+            $Path
+        )
+
+        & $script:SignTool @args
+        if ($LASTEXITCODE -ne 0) {
+            Stop-WithError -Message "signtool falló al firmar $Description (exit $LASTEXITCODE)" `
+                -Action "Verifique la conectividad con $TimestampUrl y los permisos del certificado." -Code $ErrorCode
+        }
     }
 
     $sig = Get-AuthenticodeSignature $Path
@@ -359,6 +496,35 @@ function Write-SignatureReport {
     $exeSig = Get-AuthenticodeSignature $script:ExePath
     $msiSig = Get-AuthenticodeSignature $MsiPath
 
+    # En modo Key Vault no hay objeto de certificado local: los datos del
+    # firmante se leen del certificado embebido en la firma resultante.
+    $signer = $Certificate
+    if (-not $signer) { $signer = $msiSig.SignerCertificate }
+
+    $certLines = if ($signer) {
+        @(
+            "Subject    : $($signer.Subject)",
+            "Issuer     : $($signer.Issuer)",
+            "Thumbprint : $($signer.Thumbprint)",
+            "Vigencia   : $($signer.NotBefore) a $($signer.NotAfter)"
+        )
+    } else {
+        @("Subject    : (no se pudo leer el certificado de la firma)")
+    }
+
+    $originLines = if ($script:SignMode -eq "KeyVault") {
+        @(
+            "Origen     : Azure Key Vault (firma remota, la llave privada no salió del vault)",
+            "Vault      : $KeyVaultUrl",
+            "Certificado: $KeyVaultCertificate"
+        )
+    } else {
+        @(
+            "Origen     : Almacén local de Windows",
+            "Autofirmado: $($script:IsSelfSigned)"
+        )
+    }
+
     $lines = @(
         "REPORTE DE FIRMA - AgilEx by Marduk",
         "===================================",
@@ -368,12 +534,8 @@ function Write-SignatureReport {
         "Versión del producto: $Version",
         "",
         "CERTIFICADO",
-        "-----------",
-        "Subject    : $($Certificate.Subject)",
-        "Issuer     : $($Certificate.Issuer)",
-        "Thumbprint : $($Certificate.Thumbprint)",
-        "Vigencia   : $($Certificate.NotBefore) a $($Certificate.NotAfter)",
-        "Autofirmado: $($script:IsSelfSigned)",
+        "-----------"
+    ) + $certLines + $originLines + @(
         "Timestamp  : $TimestampUrl",
         "",
         "EJECUTABLE",
