@@ -296,8 +296,8 @@ function Test-Prerequisites {
 
         $action = if ($foundEkus -contains $SERVER_AUTH_OID) {
             "Este es un certificado TLS de servidor web, no de firma de código. Son emisiones distintas:`n" `
-                + "     un certificado TLS (aunque sea de la entidad y esté vigente) no puede firmar ejecutables,`n" `
-                + "     y forzar la firma produciría una firma que Windows rechaza al verificar.`n" `
+                + "     aunque signtool puede forzar la firma con /u, Windows la reporta como no válida para el uso`n" `
+                + "     solicitado, y Control de aplicaciones puede bloquear el ejecutable firmado.`n" `
                 + "     Solicite al área emisora un certificado con EKU Code Signing (validación OV o EV)."
         } else {
             "Use un certificado emitido para firma de código (EKU $CODE_SIGNING_OID, validación OV o EV)."

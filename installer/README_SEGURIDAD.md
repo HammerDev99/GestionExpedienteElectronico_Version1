@@ -19,7 +19,15 @@ El orden es obligatorio: primero el `.exe`, luego el `.msi`. Un MSI firmado es i
 
 El certificado debe tener el **EKU de firma de código** (`Code Signing`, OID `1.3.6.1.5.5.7.3.3`), con validación **OV** o **EV**.
 
-Un certificado **TLS de servidor** (OID `1.3.6.1.5.5.7.3.1`), como el que protege los sitios web institucionales, **no sirve para este proceso** aunque sea de la entidad y esté vigente. Son emisiones distintas ante la autoridad certificadora: `signtool` no lo selecciona, y si se forzara la firma, Windows la rechazaría al verificar — el binario quedaría igual que sin firmar, pero además con una firma inválida. El script detecta esta situación en el preflight y se detiene con código 10 antes de tocar el ejecutable.
+Un certificado **TLS de servidor** (OID `1.3.6.1.5.5.7.3.1`), como el que protege los sitios web institucionales, **no sirve para este proceso** aunque sea de la entidad y esté vigente. Son emisiones distintas ante la autoridad certificadora.
+
+Con el parámetro `/u` de `signtool` es posible aplicar la firma con un certificado TLS, pero `/u` solo cambia lo que `signtool` acepta al firmar, no lo que Windows exige al verificar. El resultado:
+
+- Windows reporta la firma como *no válida para el uso solicitado*.
+- AppLocker no reconoce ningún editor, así que no se puede crear una regla por editor.
+- En equipos con Control de aplicaciones activo (por ejemplo, Smart App Control), el ejecutable firmado **queda bloqueado**, mientras que el mismo ejecutable sin firmar se ejecuta.
+
+Por eso el script no admite `/u`: detecta el certificado TLS en el preflight y se detiene con código 10 antes de tocar el ejecutable.
 
 Para verificar un certificado antes de usarlo:
 
