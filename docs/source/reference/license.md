@@ -94,7 +94,7 @@ Al descargar, instalar o utilizar el software GestionExpedienteElectronico_Versi
 - **Uso**: Template para generación de índices electrónicos
 
 #### Datos de Referencia
-- **JUZGADOS.csv**: Información pública de juzgados colombianos
+- **JUZGADOS.csv**: Lista de ejemplo de despachos para el campo «Despacho» (editable; el campo también admite texto libre)
 - **TRD.csv**: Clasificación documental basada en estándares públicos
 - **Licencia**: Información de dominio público
 

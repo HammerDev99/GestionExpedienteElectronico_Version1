@@ -19,15 +19,15 @@ El proyecto sigue [versionado semántico](https://semver.org/lang/es/). Para la 
   - Estilos visuales de Windows: los controles se dibujan con la apariencia actual del sistema operativo en lugar del tema clásico.
 - 2026-04-20 Nuevo Release 🚀 GestionExpedienteElectronico v1.5.1
   - Re-firmado Authenticode del binario con certificado renovado tras el vencimiento del anterior (2026-03-04): algoritmo SHA256 + timestamp RFC 3161 (DigiCert TSA), cert vigente 2026-04-15 a 2029-04-15.
-  - Actualización de metadatos PE (version_info.rc) a FileVersion/ProductVersion 1.5.1.0 y alineación del manifiesto UAC (app.manifest assemblyIdentity 1.5.1.0) para trazabilidad del build ante el SOC Rama Judicial.
+  - Actualización de metadatos PE (version_info.rc) a FileVersion/ProductVersion 1.5.1.0 y alineación del manifiesto UAC (app.manifest assemblyIdentity 1.5.1.0) para trazabilidad del build ante herramientas de análisis de seguridad.
   - Compilación definitiva en modo onefile (PyInstaller) para compatibilidad con entornos corporativos con ASR/AppLocker activos.
   - Sin cambios funcionales en el comportamiento de la aplicación respecto a 1.5.0; los cambios son exclusivamente de firma digital, metadatos y trazabilidad del binario.
 - 2025-11-13 Nuevo Release 🚀 GestionExpedienteElectronico v1.5.0
   - Incorporación de enlaces directo en el menú de ayuda con acceso rápido a la documentación oficial de Agilex by Marduk facilitando el acceso a recursos de usuario básico y técnico, desde la interfaz de usuario.
   - Integración con Umami Analytics: Implementación de sistema de analytics básico y respetuoso con la privacidad para tracking de uso de la aplicación, enviando únicamente versión y eventos de inicio.
   - Validación ampliada de formatos de archivo: Soporte completo para archivos comprimidos (.zip, .rar, .7z), formatos de video adicionales (.avi, .mov, .mkv, .flv, .webm, .mpeg, .mpg, .m4v) y formatos de audio (.mp3, .wav, .wma, .aac, .flac, .ogg, .m4a), todos contabilizados como 1 página.
-  - Mejoras de seguridad en metadatos del ejecutable: Actualización de version_info.rc con información institucional completa (Rama Judicial - CENDOJ), licencia MIT, descripción técnica detallada y validación "No malware" para optimizar resultados en análisis estático de seguridad (SAST) y reducir falsos positivos en VirusTotal.
-  - Actualización de logo institucional: Implementación de logo oficial proporcionado por la UTDI de la Rama Judicial con configuración dual en ventana Tkinter y ejecutable empaquetado para visualización correcta.
+  - Mejoras de seguridad en metadatos del ejecutable: Actualización de version_info.rc con autoría, licencia MIT, descripción técnica detallada y validación "No malware" para optimizar resultados en análisis estático de seguridad (SAST) y reducir falsos positivos en VirusTotal.
+  - Actualización del logo de AgilEx con configuración dual en ventana Tkinter y ejecutable empaquetado para visualización correcta.
   - Documentación técnica profesional con MkDocs: Implementación completa de documentación estructurada con MkDocs Material, incluyendo guías de usuario, API, arquitectura y deployment.
   - Refactorización del código de validación: Optimización de page_counter() usando conjuntos (set) para mejor legibilidad y mantenibilidad del código.
 - 2025-07-08 Nuevo Release 🚀 GestionExpedienteElectronico v1.4.5

@@ -2,13 +2,14 @@
 
 ## 🔒 Aviso de Seguridad
 
-**AgilEx by Marduk** es un software legítimo de automatización robótica (RDA - Robotic Desktop Automation) desarrollado para el **Consejo Superior de la Judicatura - Rama Judicial de Colombia**.
+**AgilEx by Marduk** es un software de automatización robótica de escritorio (RDA - Robotic Desktop Automation) de código abierto. Es una obra personal de Daniel Arbeláez Álvarez, publicada bajo licencia MIT desde 2022 y registrada ante la Dirección Nacional de Derecho de Autor el 03/11/2022 (versión 1).
+
+Este repositorio contiene el código fuente público. Las versiones firmadas por la entidad se distribuyen por el canal institucional.
 
 ### ✅ Declaración de Autenticidad
 
 - **Propósito**: Automatizar la creación de índices electrónicos de expedientes judiciales según el estándar PCSJA20-11567 de 2020
-- **Desarrollador**: Daniel Arbelaez Alvarez (darbelaal@cendoj.ramajudicial.gov.co)
-- **Organización**: CENDOJ - Centro de Documentación Judicial
+- **Autor**: Daniel Arbeláez Álvarez (daniel.arbelaez.alvarez@gmail.com)
 - **Licencia**: MIT License - Código abierto y auditable
 - **Repositorio oficial**: https://github.com/HammerDev99/GestionExpedienteElectronico_Version1
 
@@ -17,7 +18,7 @@
 El código ha sido sometido a análisis de seguridad:
 
 - ✅ **Análisis de código estático**: Solo 1 alerta de nivel MEDIO (gestión de archivos temporales)
-- ✅ **Sin código malicioso**: Verificado y auditado
+- ✅ **Código revisable**: el código fuente es abierto y cualquiera puede auditarlo
 - ✅ **Código fuente abierto**: Completamente transparente y revisable
 - ✅ **Firma digital**: Ejecutable firmado digitalmente (cuando se compila con certificado)
 
@@ -175,11 +176,9 @@ response = requests.get("https://raw.githubusercontent.com/...")
    - Timestamp incluido para validez perpetua
 
 3. **Metadatos Extendidos** (`src/assets/version_info.rc`)
-   - CompanyName: Rama Judicial de Colombia - CENDOJ
-   - LegalTrademarks: Consejo Superior de la Judicatura
-   - PrivateBuild: Identificación del desarrollador oficial
-   - SpecialBuild: "Validated for Colombian Judicial System - No malware"
-   - Comments: Descripción completa del propósito
+   - CompanyName y LegalCopyright: el autor, persona natural
+   - SpecialBuild: aporte voluntario bajo licencia MIT
+   - Comments: propósito, licencia y enlace al código fuente
 
 4. **Manifiesto UAC** (`src/assets/app.manifest`)
    - Nivel `asInvoker`: Sin elevación de privilegios
@@ -199,7 +198,7 @@ response = requests.get("https://raw.githubusercontent.com/...")
 
 **NO lo publiques públicamente**. Reporta de forma responsable a:
 
-- **Email**: darbelaal@cendoj.ramajudicial.gov.co
+- **Email**: daniel.arbelaez.alvarez@gmail.com
 - **Subject**: [SECURITY] Reporte de Vulnerabilidad - AgilEx
 
 Incluye:
@@ -228,7 +227,7 @@ Incluye:
    - [VirusTotal](https://www.virustotal.com/)
 
 4. **Contacta al desarrollador**
-   - Email: darbelaal@cendoj.ramajudicial.gov.co
+   - Email: daniel.arbelaez.alvarez@gmail.com
    - GitHub Issues: https://github.com/HammerDev99/GestionExpedienteElectronico_Version1/issues
 
 ---
@@ -265,9 +264,8 @@ Este software se proporciona "TAL CUAL", sin garantías de ningún tipo. El uso 
 
 ## 📞 Contacto
 
-**Desarrollador**: Daniel Arbelaez Alvarez
-**Email**: darbelaal@cendoj.ramajudicial.gov.co
-**Organización**: CENDOJ - Consejo Superior de la Judicatura
+**Autor**: Daniel Arbeláez Álvarez
+**Email**: daniel.arbelaez.alvarez@gmail.com
 **GitHub**: https://github.com/HammerDev99
 **Repositorio**: https://github.com/HammerDev99/GestionExpedienteElectronico_Version1
 
@@ -277,11 +275,12 @@ Este software se proporciona "TAL CUAL", sin garantías de ningún tipo. El uso 
 
 | Fecha | Versión | Cambio de Seguridad |
 |-------|---------|---------------------|
+| 2026-10-09 | — | Contacto de seguridad en el correo personal del autor; la documentación interna de la firma institucional sale del repositorio público |
 | 2025-10-06 | 1.4.5 | Desactivación de UPX, metadatos extendidos, manifiesto UAC |
 | 2025-03-04 | 1.4.4 | Implementación de firma digital con certificado autofirmado |
 | 2024-XX-XX | 1.4.0 | Refactorización MVC con separación de responsabilidades |
 
 ---
 
-**Última actualización**: Octubre 6, 2025
-**Versión del documento**: 1.0
+**Última actualización**: Octubre 9, 2026
+**Versión del documento**: 1.1

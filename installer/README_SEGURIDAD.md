@@ -2,7 +2,7 @@
 
 ## Qué es este paquete
 
-AgilEx by Marduk es una herramienta de automatización que genera índices electrónicos de expedientes judiciales conforme al Acuerdo PCSJA20-11567 de 2020. Lleva 3.5 años en operación en la Rama Judicial.
+AgilEx by Marduk es una herramienta de automatización que genera índices electrónicos de expedientes judiciales conforme al Acuerdo PCSJA20-11567 de 2020. Es software libre: se publica bajo licencia MIT desde 2022 en https://github.com/HammerDev99/GestionExpedienteElectronico_Version1.
 
 Este paquete contiene el ejecutable **sin firmar** junto con las herramientas para que el área de Seguridad Informática lo firme con el certificado institucional, lo empaquete como MSI y lo prepare para distribución.
 
@@ -155,14 +155,12 @@ Todo queda en la subcarpeta `salida\`:
 
 Ante cualquier fallo, la carpeta de salida contiene `transcript.log` con la traza completa.
 
-## Nota sobre el hash y el incidente 804977
+## Nota sobre el hash
 
-Este trabajo responde al incidente `RJ-MDE-MAL-ALERT-002` / ID `804977`, en el que Microsoft XDR marcó el ejecutable como `Malgent`.
-
-**El SHA256 del ejecutable cambia al firmarlo.** El hash documentado previamente ante el SOC corresponde al binario firmado con el certificado autofirmado del desarrollador. Tras la firma institucional será distinto, y esa diferencia es esperada — no indica alteración. `REPORTE_FIRMA.txt` registra ambos valores.
+**El SHA256 del ejecutable cambia al firmarlo.** Un hash registrado antes para el binario firmado con el certificado autofirmado del desarrollador será distinto del hash tras la firma institucional; esa diferencia es esperada — no indica alteración. `REPORTE_FIRMA.txt` registra ambos valores.
 
 Una vez firmado con el certificado institucional, es posible crear una regla de AppLocker/WDAC **por publisher** que confíe en ese certificado. Una sola regla cubre esta versión y todas las futuras sin intervención adicional.
 
 ## Contacto
 
-Daniel Arbeláez Álvarez — darbelaal@cendoj.ramajudicial.gov.co
+Daniel Arbeláez Álvarez — daniel.arbelaez.alvarez@gmail.com

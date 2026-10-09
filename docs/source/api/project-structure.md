@@ -302,7 +302,7 @@ class ResourceManager:
 Directorio que contiene todos los recursos estáticos necesarios:
 
 - **`000IndiceElectronicoC0.xlsm`**: Template Excel oficial para índices
-- **`JUZGADOS.csv`**: Base de datos de juzgados colombianos
+- **`JUZGADOS.csv`**: Lista de ejemplo de despachos para el campo «Despacho» (editable)
 - **`TRD.csv`**: Clasificación de tipos documentales (TRD)
 - **`last_version.json`**: Control de versiones para actualizaciones automáticas
 - **Imágenes UI**: Iconos, logos y recursos gráficos
@@ -310,10 +310,11 @@ Directorio que contiene todos los recursos estáticos necesarios:
 #### Archivos de Datos de Referencia
 
 ##### `JUZGADOS.csv`
+Lista de ejemplo que alimenta las sugerencias del campo «Despacho». Cada despacho puede reemplazarla por la suya o escribir el nombre directamente en el campo.
 ```csv
-codigo,nombre,ciudad,especialidad
-001,Juzgado Primero Civil Municipal,Bogotá,Civil
-002,Juzgado Segundo Penal del Circuito,Medellín,Penal
+idjuzgado,"nombre"
+1,"JUZGADO 001 CIVIL MUNICIPAL DE EJEMPLO"
+2,"JUZGADO 001 PENAL DEL CIRCUITO DE EJEMPLO"
 ...
 ```
 

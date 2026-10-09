@@ -1,7 +1,7 @@
 # AgilEx
 
 <div align="center">
-  <img src="assets/UTDI_Mesa-de-trabajo-1Logo_Agilex.webp" alt="Logo AgilEx" width="300"/>
+  <img src="assets/law_logo.png" alt="Logo AgilEx" width="200"/>
 </div>
 
 ## Bienvenido a la Documentación

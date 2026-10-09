@@ -392,3 +392,8 @@ scripts/certificacion_firma_digital/evidencias/virustotal/VirusTotal - File - cd
 scripts/certificacion_firma_digital/evidencias/virustotal/VirusTotal - File - cd89fd0f10c6027221f56c867bf2922ddfe691a6c802a1b383d335fbd1437023_files/saved_resource(1).html
 scripts/certificacion_firma_digital/evidencias/virustotal/VirusTotal - File - cd89fd0f10c6027221f56c867bf2922ddfe691a6c802a1b383d335fbd1437023_files/styles__ltr.css
 installer/installer.rar
+
+# Documentación interna de la firma institucional (solo local; fuera del repositorio público)
+scripts/certificacion_firma_digital/
+docs/superpowers/specs/2026-09-04-msi-pipeline-firma-institucional-design.md
+docs/superpowers/plans/2026-09-04-msi-pipeline-firma-institucional.md

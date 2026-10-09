@@ -15,6 +15,7 @@
   - [Registro de cambios](#registro-de-cambios)
   - [Construido con](#construido-con)
   - [Descargar](#descargar)
+  - [Autoría, licencia y reconocimientos](#autoría-licencia-y-reconocimientos)
   - [Descargo de responsabilidades](#descargo-de-responsabilidades)
 
 ---
@@ -135,6 +136,18 @@ La versión actual es **1.5.2**. El historial completo de versiones está en
 [Descargar última versión](https://github.com/HammerDev99/GestionExpedienteElectronico_Version1/releases/tag/latest)
 
 Para recibir actualizaciones de las novedades y cambios que se realicen al programa puedes seguirme en la cuenta de twitter [@hammerdev99](https://www.twitter.com/hammerdev99) dónde se comparte su creación en público.
+
+## Autoría, licencia y reconocimientos
+
+- **Autor:** Daniel Arbeláez Álvarez. La versión 1 (2022) es un proyecto personal del autor, desarrollado con equipo y cuentas propias, sin encargo ni instrucción de ninguna entidad o dependencia.
+- **Inicio:** primer commit el 05/01/2022; primera versión publicada el 26/10/2022.
+- **Registro:** Dirección Nacional de Derecho de Autor, 03/11/2022 (Libro 13, Tomo 92, Partida 259), versión 1.
+- **Licencia:** MIT, "Copyright (c) 2022 Daniel Arbeláez" (ver [LICENSE](LICENSE)).
+- **Reconocimiento:** el autor integró el equipo Marduk, ganador del I Concurso de Innovación JusticIALab 2024, categoría Justicia Basada en Datos ([noticia del Consejo Superior de la Judicatura, 13/12/2024](https://www.ramajudicial.gov.co/web/consejo-superior-de-la-judicatura/-/construimos-la-justicia-del-futuro-con-el-primer-concurso-de-innovaci%C3%B3n-de-la-rama-judicial)).
+- **Distribución:** este repositorio publica el código fuente y las versiones del autor. Las versiones firmadas por la entidad se distribuyen por el canal institucional.
+- **Qué no hace:** trabaja solo con los metadatos de los archivos (nombre, fechas, número de páginas, formato y tamaño) para diligenciar el índice electrónico; no valora el contenido de los documentos ni interviene en ninguna decisión judicial.
+
+*Herramienta personal de software libre, publicada a título personal. No representa a la Rama Judicial; su uso en un despacho requiere las autorizaciones institucionales que correspondan.*
 
 ## Descargo de responsabilidades
 

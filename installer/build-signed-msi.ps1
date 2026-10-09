@@ -28,7 +28,7 @@
 
 .PARAMETER KeyVaultUrl
     Modo Azure Key Vault. URL del vault, por ejemplo
-    https://kv-csj-utdi-prd.vault.azure.net
+    https://<nombre-del-vault>.vault.azure.net
 
 .PARAMETER KeyVaultCertificate
     Modo Azure Key Vault. Nombre del certificado dentro del vault.
@@ -50,7 +50,7 @@
 
 .EXAMPLE
     az login
-    .\build-signed-msi.ps1 -KeyVaultUrl "https://kv-csj-utdi-prd.vault.azure.net" `
+    .\build-signed-msi.ps1 -KeyVaultUrl "https://<nombre-del-vault>.vault.azure.net" `
         -KeyVaultCertificate "agilex-code-signing"
 #>
 [CmdletBinding(DefaultParameterSetName = "LocalStore")]
@@ -557,9 +557,8 @@ function Write-SignatureReport {
         "NOTA SOBRE TRAZABILIDAD",
         "-----------------------",
         "El SHA256 del ejecutable cambia al firmarlo. Si se compara contra",
-        "el hash documentado ante el SOC para el binario sin firma",
-        "institucional, la diferencia es esperada y no indica alteración.",
-        "Incidente relacionado: RJ-MDE-MAL-ALERT-002 / ID 804977."
+        "un hash registrado antes para el binario sin firma",
+        "institucional, la diferencia es esperada y no indica alteración."
     )
 
     $lines | Set-Content -Path $ReportPath -Encoding UTF8

@@ -22,7 +22,7 @@ VSVersionInfo(
           StringStruct(u'OriginalFilename', u'AgilEx_by_Marduk.exe'),
           StringStruct(u'ProductName', u'AgilEx by Marduk - Gestión de Expediente Electrónico'),
           StringStruct(u'ProductVersion', u'1.5.2.0'),
-          StringStruct(u'PrivateBuild', u'Official Build - darbelaal@cendoj.ramajudicial.gov.co'),
+          StringStruct(u'PrivateBuild', u'Official Build - daniel.arbelaez.alvarez@gmail.com'),
           StringStruct(u'SpecialBuild', u'Aporte voluntario al Sistema Judicial Colombiano - Derechos morales reservados al autor'),
           StringStruct(u'Comments', u'Software de automatización robótica (RDA) para creación de índices electrónicos de expedientes judiciales conforme al Acuerdo PCSJA20-11567/2020. Autor persona natural: Daniel Arbeláez Álvarez (derechos morales irrenunciables, Ley 23/1982 art. 30). Aporte voluntario al Sistema Judicial Colombiano bajo Licencia MIT, sin relación contractual. Proyecto: AgilEx by Marduk. Código fuente abierto: https://github.com/HammerDev99/GestionExpedienteElectronico_Version1')
         ]

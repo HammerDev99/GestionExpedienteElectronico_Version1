@@ -4,8 +4,8 @@
 
 - Integración con Umami Analytics para tracking básico de uso (privacy-first: solo versión y eventos de inicio)
 - Validación ampliada de formatos: soporte completo para archivos comprimidos (.zip, .rar, .7z), videos (.avi, .mov, .mkv, .flv, .webm, .mpeg, .mpg, .m4v) y audio (.mp3, .wav, .wma, .aac, .flac, .ogg, .m4a)
-- Mejoras de seguridad en metadatos del ejecutable con información institucional completa (Rama Judicial - CENDOJ), licencia MIT y validación "No malware" para optimizar resultados en SAST y reducir falsos positivos en VirusTotal
-- Actualización de logo institucional oficial proporcionado por la UTDI de la Rama Judicial con configuración dual en ventana Tkinter y ejecutable empaquetado
+- Mejoras de seguridad en metadatos del ejecutable con autoría, licencia MIT y validación "No malware" para optimizar resultados en SAST y reducir falsos positivos en VirusTotal
+- Actualización del logo de AgilEx con configuración dual en ventana Tkinter y ejecutable empaquetado
 - Documentación técnica profesional con MkDocs Material disponible en línea
 - Refactorización del código de validación usando conjuntos (set) para mejor legibilidad y mantenibilidad
 

@@ -4,7 +4,7 @@ import os
 
 # Datos adicionales de autoridad
 author_name = "Daniel Arbelaez Alvarez"
-author_email = "darbelaal@cendoj.ramajudicial.gov.co"
+author_email = "daniel.arbelaez.alvarez@gmail.com"
 software_version = "1.5.2"
 
 # Determinar sistema operativo
